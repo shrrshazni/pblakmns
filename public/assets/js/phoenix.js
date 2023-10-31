@@ -287,7 +287,7 @@
 
         iconCopiedToast.querySelector(
           '.toast-body'
-        ).innerHTML = `<code class='text-500'>Code has been copied to clipboard.</code>`;
+        ).innerHTML = `<code class='text-500'>Text has been copied to clipboard.</code>`;
         iconCopiedToastInstance.show();
       });
     });
