@@ -1,0 +1,397 @@
+<%- include("partials/header") %> <%- include("partials/navbar") %>
+
+<div class="content">
+  <!-- header top section -->
+  <nav class="mb-2" aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item active">Schedule</li>
+      <li class="breadcrumb-item active">View</li>
+    </ol>
+  </nav>
+
+  <!-- title -->
+  <div class="row gx-6 gy-3 mb-4 align-items-center">
+    <div class="col-auto">
+      <h2 class="mb-0">
+        Schedule<span class="fw-normal text-700 ms-3">(32)</span>
+      </h2>
+    </div>
+    <div class="col-auto">
+      <a
+        class="btn btn-primary px-5"
+        href="../../apps/project-management/create-new.html"
+        ><i class="fa-solid fa-plus me-2"></i>Add new schedule</a
+      >
+    </div>
+  </div>
+
+  <!-- location sections -->
+  <div class="row justify-content-between align-items-end mb-4 g-3">
+    <div class="col-12 col-sm-auto">
+      <ul class="nav nav-links mx-n2">
+        <li class="nav-item">
+          <a class="nav-link px-2 py-1 active" aria-current="page" href="#"
+            ><span>All</span><span class="text-700 fw-semi-bold">(32)</span></a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link px-2 py-1" href="#"
+            ><span>Baitul Makmur I</span
+            ><span class="text-700 fw-semi-bold">(total amount)</span></a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link px-2 py-1" href="#"
+            ><span>Baitul Makmur II</span
+            ><span class="text-700 fw-semi-bold">(total amount)</span></a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link px-2 py-1" href="#"
+            ><span>Jamek Mosque</span
+            ><span class="text-700 fw-semi-bold">(total amount)</span></a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link px-2 py-1" href="#"
+            ><span>City Mosque</span
+            ><span class="text-700 fw-semi-bold">(total amount)</span></a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link px-2 py-1" href="#"
+            ><span>Raudhatul Sakinah</span
+            ><span class="text-700 fw-semi-bold">(total amount)</span></a
+          >
+        </li>
+      </ul>
+    </div>
+
+    <!-- search -->
+    <div class="col-12 col-sm-auto">
+      <div class="d-flex align-items-center">
+        <div class="search-box me-0">
+          <form
+            class="position-relative"
+            data-bs-toggle="search"
+            data-bs-display="static"
+          >
+            <input
+              class="form-control search-input search"
+              type="search"
+              placeholder="Search projects"
+              aria-label="Search"
+            />
+            <span class="fas fa-search search-box-icon"></span>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- card view content -->
+  <div
+    class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xxl-4 g-3 mb-9"
+  >
+    <!-- card body-1 -->
+    <div class="col">
+      <div class="card h-100 hover-actions-trigger">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <h4 class="mb-2 line-clamp-1 lh-sm flex-1 me-5">Schedule Title</h4>
+            <div class="hover-actions top-0 end-0 mt-4 me-4">
+              <button
+                class="btn btn-primary btn-icon flex-shrink-0"
+                data-bs-toggle="modal"
+                data-bs-target="#schedule-modal-1"
+              >
+                <span class="fa-solid fa-chevron-right"></span>
+              </button>
+            </div>
+          </div>
+          <span class="badge badge-phoenix fs--2 mb-4 badge-phoenix-success"
+            >completed</span
+          >
+          <div class="d-flex align-items-center mb-3">
+            <span
+              class="fa-solid fa-credit-card me-2 text-700 fs--1 fw-extra-bold"
+            ></span>
+            <p class="fw-bold mb-0 lh-1">
+              Month : <span class="ms-1 text-1100">November</span>
+            </p>
+          </div>
+
+          <div class="d-flex align-items-center mt-3">
+            <p class="mb-0 fw-bold fs--1">
+              Start date :<span class="fw-semi-bold text-600 ms-1">
+                17th Nov. 2020</span
+              >
+            </p>
+          </div>
+          <div class="d-flex align-items-center mt-2">
+            <p class="mb-0 fw-bold fs--1">
+              End date :
+              <span class="fw-semi-bold text-600 ms-1"> 21st May 2028</span>
+            </p>
+          </div>
+
+          <div class="d-block align-items-center mt-3">
+            <h5>Notes</h5>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              Pellentesque odio leo, porta eu sagittis sit amet, luctus in
+              risus. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- card body-1 -->
+    <div class="col">
+      <div class="card h-100 hover-actions-trigger">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <h4 class="mb-2 line-clamp-1 lh-sm flex-1 me-5">
+              Schedule Title 2
+            </h4>
+            <div class="hover-actions top-0 end-0 mt-4 me-4">
+              <button
+                class="btn btn-primary btn-icon flex-shrink-0"
+                data-bs-toggle="modal"
+                data-bs-target="#schedule-modal-2"
+              >
+                <span class="fa-solid fa-chevron-right"></span>
+              </button>
+            </div>
+          </div>
+          <span class="badge badge-phoenix fs--2 mb-4 badge-phoenix-warning"
+            >Updated</span
+          >
+          <div class="d-flex align-items-center mb-3">
+            <span
+              class="fa-solid fa-credit-card me-2 text-700 fs--1 fw-extra-bold"
+            ></span>
+            <p class="fw-bold mb-0 lh-1">
+              Month : <span class="ms-1 text-1100">November</span>
+            </p>
+          </div>
+
+          <div class="d-flex align-items-center mt-3">
+            <p class="mb-0 fw-bold fs--1">
+              Start date :<span class="fw-semi-bold text-600 ms-1">
+                17th Nov. 2020</span
+              >
+            </p>
+          </div>
+          <div class="d-flex align-items-center mt-2">
+            <p class="mb-0 fw-bold fs--1">
+              End date :
+              <span class="fw-semi-bold text-600 ms-1"> 21st May 2028</span>
+            </p>
+          </div>
+
+          <div class="d-block align-items-center mt-3">
+            <h5>Notes</h5>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              Pellentesque odio leo, porta eu sagittis sit amet, luctus in
+              risus. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- schedule modal 1 -->
+  <div
+    class="modal fade"
+    id="schedule-modal-1"
+    tabindex="-1"
+    aria-labelledby="projectsCardViewModal"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-md">
+      <div class="modal-content overflow-hidden">
+        <div class="modal-body p-5">
+          <div class="row g-5">
+            <div class="col-12">
+              <!-- modal header -->
+              <div class="mb-3">
+                <h3 class="fw-bolder lh-sm">Schedule Title</h3>
+                <p class="text-1000 fw-semi-bold mb-0">
+                  For month,<a class="ms-1 fw-bold" href="#!">November</a>
+                </p>
+              </div>
+
+              <!-- notes -->
+              <div class="border border-300 p-3 mb-4">
+                <div class="d-flex mb-2">
+                  <p class="mb-0 fw-bold fs--1">
+                    Start date :<span class="fw-semi-bold text-600 ms-1">
+                      17th Nov. 2020</span
+                    >
+                  </p>
+                </div>
+                <div class="d-flex align-items-center">
+                  <p class="mb-0 fw-bold fs--1">
+                    End date :
+                    <span class="fw-semi-bold text-600 ms-1">
+                      21st May 2028</span
+                    >
+                  </p>
+                </div>
+              </div>
+
+              <!-- downlaod or view the file -->
+              <div class="mb-6">
+                <div class="d-flex align-items-center mb-2">
+                  <h4 class="me-3">Notes</h4>
+                  <button class="btn btn-link p-0">
+                    <span class="fa-solid fa-pen"></span>
+                  </button>
+                </div>
+                <p class="text-1000">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  Pellentesque odio leo, porta eu sagittis sit amet, luctus in
+                  risus. Lorem ipsum dolor sit amet, consectetur adipiscing
+                  elit.
+                </p>
+              </div>
+
+              <div class="bg-100 rounded-2 p-4 mb-3">
+                <div class="row justify-contnet-between g-0 gy-2 pb-3">
+                  <div class="col-12 col-sm">
+                    <p class="fs--1 text-800 mb-2">
+                      <a class="fw-semi-bold" href="#!">Full name (username) </a
+                      >uploaded a file
+                    </p>
+                    <img
+                      class="rounded-2 mb-2"
+                      src="../../assets/img/generic/42.png"
+                      alt=""
+                      width="220"
+                    />
+                    <p class="text-1000 fw-semi-bold fs--1 mb-0">
+                      Name of the file
+                    </p>
+                  </div>
+                  <div class="col-12 col-sm-auto">
+                    <p class="text-800 fw-semi-bold fs--2 mb-0">
+                      Oct 3 at 4:38 pm (Uploaded date-time)
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- schedule modal 2 -->
+  <div
+    class="modal fade"
+    id="schedule-modal-2"
+    tabindex="-1"
+    aria-labelledby="projectsCardViewModal"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-md">
+      <div class="modal-content overflow-hidden">
+        <div class="modal-body p-5">
+          <div class="row g-5">
+            <div class="col-12">
+              <div class="modal-header border-bottom-none p-0">
+                <div class="mb-3">
+                  <h3 class="fw-bolder lh-sm">Schedule Title</h3>
+                  <p class="text-1000 fw-semi-bold mb-0">
+                    For month,<a class="ms-1 fw-bold" href="#!">November</a>
+                  </p>
+                </div>
+
+                <!-- button close -->
+                <button
+                  class="btn p-1 mt-n7"
+                  type="button"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span class="fas fa-times fs--1"></span>
+                </button>
+              </div>
+
+              <!-- notes -->
+              <div class="border border-300 p-3 mb-4">
+                <div class="d-flex mb-2">
+                  <p class="mb-0 fw-bold fs--1">
+                    Start date :<span class="fw-semi-bold text-600 ms-1">
+                      17th Nov. 2020</span
+                    >
+                  </p>
+                </div>
+                <div class="d-flex align-items-center">
+                  <p class="mb-0 fw-bold fs--1">
+                    End date :
+                    <span class="fw-semi-bold text-600 ms-1">
+                      21st May 2028</span
+                    >
+                  </p>
+                </div>
+              </div>
+
+              <!-- downlaod or view the file -->
+              <div class="mb-6">
+                <div class="d-flex align-items-center mb-2">
+                  <h4 class="me-3">Notes</h4>
+                  <button class="btn btn-link p-0">
+                    <span class="fa-solid fa-pen"></span>
+                  </button>
+                </div>
+                <p class="text-1000">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  Pellentesque odio leo, porta eu sagittis sit amet, luctus in
+                  risus. Lorem ipsum dolor sit amet, consectetur adipiscing
+                  elit.
+                </p>
+              </div>
+
+              <div class="bg-100 rounded-2 p-4 mb-3">
+                <div class="row justify-contnet-between g-0 gy-2 pb-3">
+                  <div class="col-12 col-sm">
+                    <p class="fs--1 text-800 mb-2">
+                      <a class="fw-semi-bold" href="#!">Full name (username) </a
+                      >uploaded a file
+                    </p>
+                    <!-- 16:9 aspect ratio -->
+                    <div
+                      class="ratio ratio-1x1"
+                    >
+                      <iframe
+                        class="embed-responsive-item"
+                        src="assets/uploads/after-you-jojo-moyes.pdf"
+                        width="100%"
+                      ></iframe>
+                    </div>
+                    <p class="text-1000 fw-semi-bold fs--1 mb-0">
+                      Name of the file
+                    </p>
+                  </div>
+                  <div class="col-12 col-sm-auto">
+                    <p class="text-800 fw-semi-bold fs--2 mb-0">
+                      Oct 3 at 4:38 pm (Uploaded date-time)
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("partials/navbar-script") %> <%- include("partials/footer") %>

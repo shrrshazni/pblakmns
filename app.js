@@ -16,6 +16,8 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
+// STARTUP
+
 //init index
 app.get('/', function (req, res) {
   res.render('sign-in');
@@ -45,7 +47,7 @@ app.get('/patrol-report/submit', function (req, res) {
 
 //details
 app.get('/patrol-report/details', function (req, res) {
-  res.render('patrol-report/details');
+  res.render('patrol-report-details');
 });
 
 //view
@@ -62,7 +64,13 @@ app.get('/case-report/submit', function (req, res) {
 
 //case-report-details
 app.get('/case-report/details', function (req, res) {
-  res.render('case-report/details');
+  res.render('case-report-details');
+});
+
+// SCHEDULE
+
+app.get('/schedule', function (req, res) {
+  res.render('schedule');
 });
 
 //check server
