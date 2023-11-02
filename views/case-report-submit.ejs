@@ -151,7 +151,12 @@
                 </form>
 
                 <!-- form >form tag will be merge with file uploader form tag -->
-                <form class="row g-3 needs-validation" novalidate="novalidate">
+                <form
+                  action="/case-report/submit"
+                  method="post"
+                  class="row g-3 needs-validation"
+                  novalidate="novalidate"
+                >
                   <!-- form title report -->
                   <div class="col-md-4">
                     <label class="form-label" for="validationCustom04"
@@ -162,6 +167,7 @@
                       class="form-select"
                       id="validationCustom04"
                       required=""
+                      name="reportType"
                     >
                       <option selected="" value="">Choose title report</option>
                       <option value="Criminal Case">
@@ -178,19 +184,20 @@
                   </div>
 
                   <div class="col-md-4">
-                    <label class="form-label" for="timepicker1">Date</label>
+                    <label class="form-label" for="datepicker1">Date</label>
 
                     <input
                       class="form-control datetimepicker flatpickr-input"
-                      id="timepicker1"
+                      id="datepicker1"
                       type="text"
                       placeholder="day/month/year"
                       data-options='{"dateFormat":"d/m/y","disableMobile":true,"allowInput":true}'
                       required="required"
+                      name="date"
                     />
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">
-                      Please select a time here.
+                      Please select a date here.
                     </div>
                   </div>
 
@@ -204,6 +211,7 @@
                       placeholder="hour : minute"
                       data-options='{"enableTime":true,"noCalendar":true,"dateFormat":"H:i","disableMobile":true,"allowInput":true}'
                       required="required"
+                      name="time"
                     />
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">
@@ -220,20 +228,13 @@
                       class="form-select"
                       id="validationCustom05"
                       required=""
+                      name="location"
                     >
                       <option selected="" value="">Choose location</option>
-                      <option value="Baitul Makmur I">
-                        Baitul Makmur I
-                      </option>
-                      <option value="Baitul Makmur II">
-                        Baitul Makmur II
-                      </option>
-                      <option value="Jamek Mosque">
-                        Jamek Mosque
-                      </option>
-                      <option value="City Mosque">
-                        City Mosque
-                      </option>
+                      <option value="Baitul Makmur I">Baitul Makmur I</option>
+                      <option value="Baitul Makmur II">Baitul Makmur II</option>
+                      <option value="Jamek Mosque">Jamek Mosque</option>
+                      <option value="City Mosque">City Mosque</option>
                       <option value="Raudhatul Sakinah">
                         Raudhatul Sakinah
                       </option>
@@ -254,6 +255,7 @@
                       id="validationCustom03"
                       type="text"
                       required=""
+                      name="staffs"
                     />
                     <div class="invalid-feedback">
                       Please provide a staff assigned.
@@ -270,6 +272,7 @@
                       placeholder="Leave a summary report here"
                       style="height: 64px"
                       required="required"
+                      name="eventSummary"
                     ></textarea>
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">
@@ -287,6 +290,7 @@
                       placeholder="Leave a summary report here"
                       style="height: 64px"
                       required="required"
+                      name="actionTaken"
                     ></textarea>
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">
@@ -304,6 +308,7 @@
                       placeholder="Leave a note here"
                       style="height: 128px"
                       required="required"
+                      name="reportSummary"
                     ></textarea>
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">

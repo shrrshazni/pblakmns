@@ -98,6 +98,22 @@ const patrolReportSchema = new mongoose.Schema({
 
 const PatrolReport = mongoose.model('PatrolReport', patrolReportSchema);
 
+// case init
+//patrol init
+const caseReportSchema = new mongoose.Schema({
+  reportid: String,
+  type: String,
+  time: String,
+  date: String,
+  summary: String,
+  actionTaken: String,
+  eventSummary: String,
+  notes: String,
+  location: String
+});
+
+const CaseReport = mongoose.model('CaseReport', caseReportSchema);
+
 //init home
 app.get('/', async function (req, res) {
   if (req.isAuthenticated()) {
@@ -226,7 +242,7 @@ app.post('/patrol-report/submit', async function (req, res) {
   const result = PatrolReport.create(newReport);
 
   if (result) {
-    console.log('Success added report.');
+    console.log('Successfully added report.');
     res.redirect('/patrol-report/submit');
   } else {
     console.log('Report add failed');
@@ -287,6 +303,40 @@ app.get('/case-report/submit', async function (req, res) {
     }
   } else {
     res.redirect('/sign-in');
+  }
+});
+
+app.post('/case-report/submit', async function (req, res) {
+  const reportId = crypto.randomBytes(6).toString('hex').toUpperCase();
+  const reportType = req.body.reportType;
+  const eventSummary = req.body.eventSummary;
+  const actionTaken = req.body.actionTaken;
+  const location = req.body.location;
+  const time = req.body.time;
+  const date = req.body.date;
+  const reportSummary = req.body.reportSummary;
+  const notes = req.body.notes;
+
+  const newReport = new CaseReport({
+    reportid: reportId,
+    type: reportType,
+    eventSummary: eventSummary,
+    actionTaken: actionTaken,
+    time: time,
+    date: date,
+    summary: reportSummary,
+    notes: notes,
+    location: location
+  });
+
+  const result = CaseReport.create(newReport);
+
+  if (result) {
+    console.log('Successfully added a report');
+    res.redirect('/case-report/submit');
+  } else {
+    console.log('Report add failed');
+    res.redirect('/case-report/submit');
   }
 });
 
