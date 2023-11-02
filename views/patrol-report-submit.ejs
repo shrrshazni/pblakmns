@@ -151,7 +151,12 @@
                 </form>
 
                 <!-- form >form tag will be merge with file uploader form tag -->
-                <form class="row g-3 needs-validation" novalidate="novalidate">
+                <form
+                  action="/patrol-report/submit"
+                  method="post"
+                  class="row g-3 needs-validation"
+                  novalidate="novalidate"
+                >
                   <!-- form title report -->
                   <div class="col-md-4">
                     <label class="form-label" for="validationCustom04"
@@ -251,18 +256,10 @@
                       name="location"
                     >
                       <option selected="" value="">Choose location</option>
-                      <option value="Baitul Makmur I">
-                        Baitul Makmur I
-                      </option>
-                      <option value="Baitul Makmur II">
-                        Baitul Makmur II
-                      </option>
-                      <option value="Jamek Mosque">
-                        Jamek Mosque
-                      </option>
-                      <option value="City Mosque">
-                        City Mosque
-                      </option>
+                      <option value="Baitul Makmur I">Baitul Makmur I</option>
+                      <option value="Baitul Makmur II">Baitul Makmur II</option>
+                      <option value="Jamek Mosque">Jamek Mosque</option>
+                      <option value="City Mosque">City Mosque</option>
                       <option value="Raudhatul Sakinah">
                         Raudhatul Sakinah
                       </option>

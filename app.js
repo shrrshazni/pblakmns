@@ -1,5 +1,4 @@
 //jshint esversion:6
-require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -10,6 +9,7 @@ const passport = require('passport');
 const passportLocalMongoose = require('passport-local-mongoose');
 const findOrCreate = require('mongoose-findorcreate');
 const MongoDBSession = require('connect-mongodb-session')(session);
+const crypto = require('crypto');
 
 const mongoURI = 'mongodb://localhost:27017/sessions';
 
@@ -86,13 +86,14 @@ passport.deserializeUser(function (id, done) {
 
 //patrol init
 const patrolReportSchema = new mongoose.Schema({
+  reportid: String,
   type: String,
   start: String,
   end: String,
   date: String,
   summary: String,
   notes: String,
-  location : String,
+  location: String
 });
 
 const PatrolReport = mongoose.model('PatrolReport', patrolReportSchema);
@@ -201,18 +202,37 @@ app.get('/patrol-report/submit', async function (req, res) {
   }
 });
 
-app.post('/patrol-report/submit', async function(res,req){
-  const reportType =req.body.reportType;
-  const startTime =req.body.startTime;
-  const endTime=req.body.endTime;
-  const reportSummary=req.body.reportSummary;
-  const notes=req.body.notes;
+app.post('/patrol-report/submit', async function (req, res) {
+  const reportId = crypto.randomBytes(6).toString('hex').toUpperCase();
+  const reportType = req.body.reportType;
+  const startTime = req.body.startTime;
+  const endTime = req.body.endTime;
+  const location = req.body.location;
+  const date = req.body.date;
+  const reportSummary = req.body.reportSummary;
+  const notes = req.body.notes;
 
   const newReport = new PatrolReport({
+    reportid: reportId,
+    type: reportType,
+    start: startTime,
+    end: endTime,
+    date: date,
+    summary: reportSummary,
+    notes: notes,
+    location: location
   });
 
-  const result = PatrolReport.insert()
-})
+  const result = PatrolReport.create(newReport);
+
+  if (result) {
+    console.log('Success added report.');
+    res.redirect('/patrol-report/submit');
+  } else {
+    console.log('Report add failed');
+    res.redirect('/patrol-report/submit');
+  }
+});
 
 //details
 app.get('/patrol-report/details', async function (req, res) {
