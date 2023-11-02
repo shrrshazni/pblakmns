@@ -162,6 +162,7 @@
                       class="form-select"
                       id="validationCustom04"
                       required=""
+                      name="reportType"
                     >
                       <option selected="" value="">Choose title report</option>
                       <option value="Unit Patrol Parameter">
@@ -192,6 +193,7 @@
                       placeholder="hour : minute"
                       data-options='{"enableTime":true,"noCalendar":true,"dateFormat":"H:i","disableMobile":true,"allowInput":true}'
                       required="required"
+                      name="startTime"
                     />
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">
@@ -211,10 +213,63 @@
                       placeholder="hour : minute"
                       data-options='{"enableTime":true,"noCalendar":true,"dateFormat":"H:i","disableMobile":true,"allowInput":true}'
                       required="required"
+                      name="endTime"
                     />
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">
                       Please select a time here.
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label" for="datepicker2">Date</label>
+
+                    <input
+                      class="form-control datetimepicker flatpickr-input"
+                      id="datepicker2"
+                      type="text"
+                      placeholder="day / month / year"
+                      data-options='{"dateFormat":"d/m/y","disableMobile":true,"allowInput":true}'
+                      required="required"
+                      name="date"
+                    />
+                    <div class="valid-feedback">Looks good!</div>
+                    <div class="invalid-feedback">
+                      Please select a date here.
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label" for="validationCustom05"
+                      >Location</label
+                    >
+
+                    <select
+                      class="form-select"
+                      id="validationCustom05"
+                      required=""
+                      name="location"
+                    >
+                      <option selected="" value="">Choose location</option>
+                      <option value="Baitul Makmur I">
+                        Baitul Makmur I
+                      </option>
+                      <option value="Baitul Makmur II">
+                        Baitul Makmur II
+                      </option>
+                      <option value="Jamek Mosque">
+                        Jamek Mosque
+                      </option>
+                      <option value="City Mosque">
+                        City Mosque
+                      </option>
+                      <option value="Raudhatul Sakinah">
+                        Raudhatul Sakinah
+                      </option>
+                    </select>
+                    <div class="valid-feedback">Looks good!</div>
+                    <div class="invalid-feedback">
+                      Please select a title report.
                     </div>
                   </div>
 
@@ -228,10 +283,11 @@
                       placeholder="Leave a summary report here"
                       style="height: 128px"
                       required="required"
+                      name="reportSummary"
                     ></textarea>
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">
-                      Please enter a note here.
+                      Please enter a report summary here.
                     </div>
                   </div>
 
@@ -245,6 +301,7 @@
                       placeholder="Leave a note here"
                       style="height: 64px"
                       required="required"
+                      name="notes"
                     ></textarea>
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">

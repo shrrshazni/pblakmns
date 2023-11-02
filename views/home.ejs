@@ -4,8 +4,7 @@
   <!-- Page title -->
   <h2 class="mb-2 lh-sm">Home</h2>
   <p class="text-700 lead mb-2">
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris et tempor
-    dui, eget efficitur mauris.
+    Welcome and get started, <strong> <%= currentFullName %></strong>!
   </p>
 
   <!-- Body -->
@@ -45,7 +44,8 @@
                     >
                       <span class="me-2" data-feather="eye"></span>Preview</a
                     ><a class="btn btn-sm btn-phoenix-primary preview-btn ms-2"
-                      ><span class="me-2" data-feather="minimize-2"></span>Close</a
+                      ><span class="me-2" data-feather="minimize-2"></span
+                      >Close</a
                     >
                   </nav>
                 </div>
@@ -80,7 +80,10 @@
                         aria-expanded="true"
                         aria-controls="collapse-home-reports-1"
                       >
-                        <i class="fa-solid fa-building-shield mx-2 fa-sm mb-1"></i>Daily Report
+                        <i
+                          class="fa-solid fa-building-shield mx-2 fa-sm mb-1"
+                        ></i
+                        >Patrol Report
                       </button>
                     </h2>
                     <div
@@ -90,23 +93,11 @@
                       data-bs-parent="#accordionExample"
                     >
                       <div class="accordion-body pt-0">
-                        <a href="/reports/daily-report/location-patrol/view"><strong
-                          >Visit to location patrol</strong
-                        ></a>
-                        Nulla ac tortor at tortor vehicula malesuada. Mauris at
-                        mi id ex auctor efficitur. Pellentesque sit amet dictum
-                        mauris. Vivamus id eleifend mi. Maecenas sodales
-                        imperdiet ante, vulputate maximus velit malesuada
-                        eleifend. Nunc vestibulum dolor vel interdum commodo.
-                        <br>
-                        <a href="/reports/daily-report/unit-patrol/view"><strong
-                          >Visit to unit patrol</strong
-                        ></a>
-                        Nulla ac tortor at tortor vehicula malesuada. Mauris at
-                        mi id ex auctor efficitur. Pellentesque sit amet dictum
-                        mauris. Vivamus id eleifend mi. Maecenas sodales
-                        imperdiet ante, vulputate maximus velit malesuada
-                        eleifend. Nunc vestibulum dolor vel interdum commodo.
+                        <a href="/patrol-report/view"
+                          ><strong>Visit to location patrol</strong></a
+                        >
+                        by submitting & viewing patrol report daily based on your
+                        location, shift etc.
                       </div>
                     </div>
                   </div>
@@ -120,7 +111,8 @@
                         aria-expanded="false"
                         aria-controls="collapse-home-reports-2"
                       >
-                        <i class="fa-solid fa-folder-closed mx-2 fa-sm mb-1"></i>Case Report
+                        <i class="fa-solid fa-folder-closed mx-2 fa-sm mb-1"></i
+                        >Case Report
                       </button>
                     </h2>
                     <div
@@ -130,14 +122,12 @@
                       data-bs-parent="#accordionExample"
                     >
                       <div class="accordion-body pt-0">
-                        <a href="/reports/case-report/view"><strong
-                          >Visit to case report</strong
-                        ></a>
-                        Nulla ac tortor at tortor vehicula malesuada. Mauris at
-                        mi id ex auctor efficitur. Pellentesque sit amet dictum
-                        mauris. Vivamus id eleifend mi. Maecenas sodales
-                        imperdiet ante, vulputate maximus velit malesuada
-                        eleifend. Nunc vestibulum dolor vel interdum commodo.
+                        <a href="/case-report/view"
+                          ><strong>Visit to case report</strong></a
+                        >
+                        by submitting and viewing your case report based on your with details
+                        such as date, location, event summary, action taken,
+                        report summary .
                       </div>
                     </div>
                   </div>
@@ -204,7 +194,8 @@
                     >
                       <span class="me-2" data-feather="eye"></span>Preview</a
                     ><a class="btn btn-sm btn-phoenix-primary preview-btn ms-2"
-                      ><span class="me-2" data-feather="minimize-2"></span>Close</a
+                      ><span class="me-2" data-feather="minimize-2"></span
+                      >Close</a
                     >
                   </nav>
                 </div>
@@ -219,11 +210,7 @@
                   class="scrollbar bg-200 p-3"
                   style="max-height: 420px"
                 ><code class="code-to-copy">
-                          ELorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur ornare pretium eros, quis mattis nisi sollicitudin
-                          in. Vestibulum vel urna congue, bibendum lacus a, dignissim elit. Morbi nec consequat massa. Proin dictum a urna quis
-                          pulvinar. Integer feugiat sapien lectus, quis aliquet lectus consectetur quis. Phasellus arcu leo, aliquet ac metus
-                          vitae, finibus hendrerit magna. Quisque auctor risus ut enim facilisis vestibulum. Ut accumsan tellus sit amet urna
-                          mattis malesuada. Donec in tellus nulla.
+                          by downloading & viewing your schedule provided by us.
                 </code></pre>
               </div>
               <!-- lower section -->
@@ -239,7 +226,10 @@
                         aria-expanded="true"
                         aria-controls="collapse-home-schedule"
                       >
-                        <i class="fa-regular fa-calendar mx-2 fa-sm mb-1 mb-1"></i>View Schedule
+                        <i
+                          class="fa-regular fa-calendar mx-2 fa-sm mb-1 mb-1"
+                        ></i
+                        >View Schedule
                       </button>
                     </h2>
                     <div
@@ -249,14 +239,10 @@
                       data-bs-parent="#accordionExample"
                     >
                       <div class="accordion-body pt-0">
-                        <a href="/schedule"><strong
-                          >Visit to schedule</strong
-                        ></a>
-                        Nulla ac tortor at tortor vehicula malesuada. Mauris at
-                        mi id ex auctor efficitur. Pellentesque sit amet dictum
-                        mauris. Vivamus id eleifend mi. Maecenas sodales
-                        imperdiet ante, vulputate maximus velit malesuada
-                        eleifend. Nunc vestibulum dolor vel interdum commodo.
+                        <a href="/schedule"
+                          ><strong>Visit to schedule</strong></a
+                        >
+                        by downloading & viewing your schedule provided by us.
                       </div>
                     </div>
                   </div>
@@ -301,7 +287,8 @@
                     >
                       <span class="me-2" data-feather="eye"></span>Preview</a
                     ><a class="btn btn-sm btn-phoenix-primary preview-btn ms-2"
-                      ><span class="me-2" data-feather="minimize-2"></span>Close</a
+                      ><span class="me-2" data-feather="minimize-2"></span
+                      >Close</a
                     >
                   </nav>
                 </div>
@@ -336,7 +323,8 @@
                         aria-expanded="true"
                         aria-controls="collapse-home-social-1"
                       >
-                        <i class="fa-regular fa-user mx-2 fa-sm mb-1"></i>Profile
+                        <i class="fa-regular fa-user mx-2 fa-sm mb-1"></i
+                        >Profile
                       </button>
                     </h2>
                     <div
@@ -346,14 +334,11 @@
                       data-bs-parent="#accordionExample"
                     >
                       <div class="accordion-body pt-0">
-                        <a href="/social/profile"><strong
-                          >Visit to profile</strong
-                        ></a>
-                        Nulla ac tortor at tortor vehicula malesuada. Mauris at
-                        mi id ex auctor efficitur. Pellentesque sit amet dictum
-                        mauris. Vivamus id eleifend mi. Maecenas sodales
-                        imperdiet ante, vulputate maximus velit malesuada
-                        eleifend. Nunc vestibulum dolor vel interdum commodo.
+                        <a href="/social/profile"
+                          ><strong>Visit to profile</strong></a
+                        >
+                        by keeping up to date with your details, amount of report submitted which
+                        include their activity timeline.
                       </div>
                     </div>
                   </div>
@@ -377,14 +362,11 @@
                       data-bs-parent="#accordionExample"
                     >
                       <div class="accordion-body pt-0">
-                        <a href="/social/setting"><strong
-                          >Visit to settings</strong
-                        ></a>
-                        Nulla ac tortor at tortor vehicula malesuada. Mauris at
-                        mi id ex auctor efficitur. Pellentesque sit amet dictum
-                        mauris. Vivamus id eleifend mi. Maecenas sodales
-                        imperdiet ante, vulputate maximus velit malesuada
-                        eleifend. Nunc vestibulum dolor vel interdum commodo.
+                        <a href="/social/settings"
+                          ><strong>Visit to settings</strong></a
+                        >
+                        through here, you can change your details such as email, name,
+                        phone number as well as your password.
                       </div>
                     </div>
                   </div>
@@ -394,7 +376,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 

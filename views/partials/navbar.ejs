@@ -29,11 +29,11 @@
     >
       <span class="navbar-toggle-icon"><span class="toggle-line"></span></span>
     </button>
-    <a class="navbar-brand me-1 me-sm-3" href="/home">
+    <a class="navbar-brand me-1 me-sm-3" href="/">
       <div class="d-flex align-items-center">
         <div class="d-flex align-items-center">
-          <img src="../assets/img/icons/logo.png" alt="logo" width="38" />
-          <p class="logo-text ms-2 d-none d-sm-block fs-1">auxiliarypolice</p>
+          <img class="d-lg-none d-md-none" src="../assets/img/icons/logo.png" alt="logo" width="38" />
+          <p class="logo-text ms-2 d-none d-sm-block fs-2 d-sm-none d-lg-block">Auxiliary Police</p>
         </div>
       </div>
     </a>
@@ -50,7 +50,7 @@
     >
       <!-- Home -->
       <li class="nav-item dropdown">
-        <a class="nav-link lh-1" href="/home" role="button"
+        <a class="nav-link lh-1" href="/" role="button"
           ><span class="uil fs-0 me-2 uil-home"></span>Home</a
         >
       </li>
@@ -92,14 +92,14 @@
             <!-- Hover popover child-1-1 -->
             <ul class="dropdown-menu">
               <li>
-                <a class="dropdown-item" href="#">
+                <a class="dropdown-item" href="/patrol-report/submit">
                   <div class="dropdown-item-wrapper">
                     <span class="me-2 uil"></span>Submit
                   </div>
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" href="#">
+                <a class="dropdown-item" href="/patrol-report/view">
                   <div class="dropdown-item-wrapper">
                     <span class="me-2 uil"></span>View
                   </div>
@@ -131,14 +131,14 @@
             <!-- Hover popover child-2-1 -->
             <ul class="dropdown-menu">
               <li>
-                <a class="dropdown-item" href="#">
+                <a class="dropdown-item" href="/case-report/submit">
                   <div class="dropdown-item-wrapper">
                     <span class="me-2 uil"></span>Submit
                   </div>
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" href="#">
+                <a class="dropdown-item" href="/case-report/view">
                   <div class="dropdown-item-wrapper">
                     <span class="me-2 uil"></span>View
                   </div>
@@ -172,14 +172,14 @@
         <!--Social dropdown hover  -->
         <ul class="dropdown-menu navbar-dropdown-caret">
           <li>
-            <a class="dropdown-item" href="../pages/starter.html">
+            <a class="dropdown-item" href="/social/profile">
               <div class="dropdown-item-wrapper">
                 <span class="me-2 uil" data-feather="user"></span>Profile
               </div>
             </a>
           </li>
           <li>
-            <a class="dropdown-item" href="../pages/starter.html">
+            <a class="dropdown-item" href="/social/settings">
               <div class="dropdown-item-wrapper">
                 <span class="me-2 uil" data-feather="settings"></span>Settings
               </div>
@@ -269,7 +269,8 @@
                   alt=""
                 />
               </div>
-              <h6 class="mt-2 text-black">Full Name</h6>
+              <h5 class="mt-2 text-black"><%= currentFullName %></h5>
+              <h6 class="badge badge-phoenix mt-2 text-black badge-phoenix-primary">PB<%= currentUser %></h6>
             </div>
           </div>
 
@@ -277,13 +278,13 @@
           <div class="overflow-auto scrollbar" style="height: 5rem">
             <ul class="nav d-flex flex-column mb-2 pb-1">
               <li class="nav-item">
-                <a class="nav-link px-3" href="#!">
+                <a class="nav-link px-3" href="/social/profile">
                   <span class="me-2 text-900" data-feather="user"></span
                   ><span>Profile</span></a
                 >
               </li>
               <li class="nav-item">
-                <a class="nav-link px-3" href="#!">
+                <a class="nav-link px-3" href="/social/settings">
                   <span class="me-2 text-900" data-feather="settings"></span
                   >Settings
                 </a>

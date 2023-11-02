@@ -9,6 +9,9 @@ const session = require('express-session');
 const passport = require('passport');
 const passportLocalMongoose = require('passport-local-mongoose');
 const findOrCreate = require('mongoose-findorcreate');
+const MongoDBSession = require('connect-mongodb-session')(session);
+
+const mongoURI = 'mongodb://localhost:27017/sessions';
 
 const app = express();
 
@@ -16,12 +19,23 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
+// mongoose session option
+const store = new MongoDBSession({
+  uri: mongoURI,
+  collections: 'mySessions',
+  stringify: false,
+  autoRemove: 'interval',
+  autoRemoveInterval: 1
+});
+
 //init session
 app.use(
   session({
     secret: 'Our little secret.',
-    resave: false,
-    saveUninitialized: false
+    resave: true,
+    saveUninitialized: false,
+    cookie: { maxAge: 24 * 60 * 60 * 1000 },
+    store: store
   })
 );
 
@@ -36,12 +50,13 @@ async function main() {
   await mongoose.connect('mongodb://localhost:27017/pblakmnsDB');
 }
 
-//init mongoose items
+//USER
 
+//user init
 const userSchema = new mongoose.Schema({
   fullname: String,
   password: String,
-  role: String,
+  username: String,
   email: String
 });
 
@@ -49,7 +64,6 @@ const userSchema = new mongoose.Schema({
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
 
-//mongoose model
 const User = new mongoose.model('User', userSchema);
 
 //simplified passport-local-mongoose
@@ -68,14 +82,46 @@ passport.deserializeUser(function (id, done) {
   }
 });
 
+//PATROL REPORT
+
+//patrol init
+const patrolReportSchema = new mongoose.Schema({
+  type: String,
+  start: String,
+  end: String,
+  date: String,
+  summary: String,
+  notes: String,
+  location : String,
+});
+
+const PatrolReport = mongoose.model('PatrolReport', patrolReportSchema);
+
+//init home
+app.get('/', async function (req, res) {
+  if (req.isAuthenticated()) {
+    var currentUsername = req.session.user.username;
+
+    const checkUser = await User.findOne({ username: currentUsername });
+
+    if (checkUser) {
+      res.render('home', {
+        currentFullName: checkUser.fullname,
+        currentUser: checkUser.username
+      });
+    }
+  } else {
+    res.redirect('/sign-in');
+  }
+});
+
 // SIGN IN
 
-//init index
-app.get('/', function (req, res) {
+app.get('/sign-in', function (req, res) {
   res.render('sign-in');
 });
 
-app.post('/', async function (req, res) {
+app.post('/sign-in', async function (req, res) {
   const username = req.body.username;
   const password = req.body.password;
 
@@ -86,10 +132,12 @@ app.post('/', async function (req, res) {
 
   req.login(user, function (err) {
     if (err) {
-      console.log(err);
+      console.log('Login error');
+      res.redirect('/sign-in');
     } else {
       passport.authenticate('local')(req, res, function () {
-        res.redirect('/home');
+        req.session.user = user;
+        res.redirect('/');
       });
     }
   });
@@ -104,7 +152,11 @@ app.get('/sign-up', function (req, res) {
 app.post('/sign-up', function (req, res) {
   //pasport local mongoose
   User.register(
-    { username: req.body.username },
+    {
+      username: req.body.username,
+      fullname: req.body.fullname,
+      email: req.body.email
+    },
     req.body.password,
     function (err, user) {
       if (err) {
@@ -119,67 +171,208 @@ app.post('/sign-up', function (req, res) {
   );
 });
 
-//init forgot pasword
+//FORGOT PASSWORD
 app.get('/forgot-password', function (req, res) {
   res.render('forgot-password');
 });
 
-//init reset password
+//RESET PASSWORD
 app.get('/reset-password', function (req, res) {
   res.render('reset-password');
-});
-
-//init home
-app.get('/home', function (req, res) {
-  res.render('home');
 });
 
 //PATROL REPORT SECTION
 
 //submit form
-app.get('/patrol-report/submit', function (req, res) {
-  res.render('patrol-report-submit');
+app.get('/patrol-report/submit', async function (req, res) {
+  if (req.isAuthenticated()) {
+    var currentUsername = req.session.user.username;
+
+    const checkUser = await User.findOne({ username: currentUsername });
+
+    if (checkUser) {
+      res.render('patrol-report-submit', {
+        currentFullName: checkUser.fullname,
+        currentUser: checkUser.username
+      });
+    }
+  } else {
+    res.redirect('/sign-in');
+  }
 });
 
+app.post('/patrol-report/submit', async function(res,req){
+  const reportType =req.body.reportType;
+  const startTime =req.body.startTime;
+  const endTime=req.body.endTime;
+  const reportSummary=req.body.reportSummary;
+  const notes=req.body.notes;
+
+  const newReport = new PatrolReport({
+  });
+
+  const result = PatrolReport.insert()
+})
+
 //details
-app.get('/patrol-report/details', function (req, res) {
-  res.render('patrol-report-details');
+app.get('/patrol-report/details', async function (req, res) {
+  if (req.isAuthenticated()) {
+    var currentUsername = req.session.user.username;
+
+    const checkUser = await User.findOne({ username: currentUsername });
+
+    if (checkUser) {
+      res.render('patrol-report-details', {
+        currentFullName: checkUser.fullname,
+        currentUser: checkUser.username
+      });
+    }
+  } else {
+    res.redirect('/sign-in');
+  }
 });
 
 //view
-app.get('/patrol-report/view', function (req, res) {
-  res.render('patrol-report-submit');
+app.get('/patrol-report/view', async function (req, res) {
+  if (req.isAuthenticated()) {
+    var currentUsername = req.session.user.username;
+
+    const checkUser = await User.findOne({ username: currentUsername });
+
+    if (checkUser) {
+      res.render('patrol-report-view', {
+        currentFullName: checkUser.fullname,
+        currentUser: checkUser.username
+      });
+    }
+  } else {
+    res.redirect('/sign-in');
+  }
 });
 
 //CASE REPORT
 
 //submit form
-app.get('/case-report/submit', function (req, res) {
-  res.render('case-report-submit');
+app.get('/case-report/submit', async function (req, res) {
+  if (req.isAuthenticated()) {
+    var currentUsername = req.session.user.username;
+
+    const checkUser = await User.findOne({ username: currentUsername });
+
+    if (checkUser) {
+      res.render('case-report-submit', {
+        currentFullName: checkUser.fullname,
+        currentUser: checkUser.username
+      });
+    }
+  } else {
+    res.redirect('/sign-in');
+  }
 });
 
 //case-report-details
-app.get('/case-report/details', function (req, res) {
-  res.render('case-report-details');
+app.get('/case-report/details', async function (req, res) {
+  if (req.isAuthenticated()) {
+    var currentUsername = req.session.user.username;
+
+    const checkUser = await User.findOne({ username: currentUsername });
+
+    if (checkUser) {
+      res.render('case-report-details', {
+        currentFullName: checkUser.fullname,
+        currentUser: checkUser.username
+      });
+    }
+  } else {
+    res.redirect('/sign-in');
+  }
+});
+
+//view
+app.get('/case-report/view', async function (req, res) {
+  if (req.isAuthenticated()) {
+    var currentUsername = req.session.user.username;
+
+    const checkUser = await User.findOne({ username: currentUsername });
+
+    if (checkUser) {
+      res.render('case-report-view', {
+        currentFullName: checkUser.fullname,
+        currentUser: checkUser.username
+      });
+    }
+  } else {
+    res.redirect('/sign-in');
+  }
 });
 
 // SCHEDULE
 
-app.get('/schedule', function (req, res) {
-  res.render('schedule');
+app.get('/schedule', async function (req, res) {
+  if (req.isAuthenticated()) {
+    var currentUsername = req.session.user.username;
+
+    const checkUser = await User.findOne({ username: currentUsername });
+
+    if (checkUser) {
+      res.render('schedule', {
+        currentFullName: checkUser.fullname,
+        currentUser: checkUser.username
+      });
+    }
+  } else {
+    res.redirect('/sign-in');
+  }
 });
 
 //PROFILE
 
-app.get('/profile', function (req, res) {
-  res.render('profile');
+app.get('/social/profile', async function (req, res) {
+  if (req.isAuthenticated()) {
+    var currentUsername = req.session.user.username;
+
+    const checkUser = await User.findOne({ username: currentUsername });
+
+    if (checkUser) {
+      res.render('profile', {
+        currentFullName: checkUser.fullname,
+        currentUser: checkUser.username
+      });
+    }
+  } else {
+    res.redirect('/sign-in');
+  }
 });
 
 //SETTINGS
 
-app.get('/settings', function (req, res) {
-  res.render('settings');
+app.get('/social/settings', async function (req, res) {
+  if (req.isAuthenticated()) {
+    var currentUsername = req.session.user.username;
+
+    const checkUser = await User.findOne({ username: currentUsername });
+
+    if (checkUser) {
+      res.render('settings', {
+        currentFullName: checkUser.fullname,
+        currentUser: checkUser.username
+      });
+    }
+  } else {
+    res.redirect('/sign-in');
+  }
 });
+
+// SIGN OUT
+app.get('/sign-out', function (req, res) {
+  req.session.destroy(function (err) {
+    if (err) {
+      return next(err);
+    }
+    res.redirect('/');
+  });
+});
+
 //check server
 app.listen(3000, function () {
   console.log('Server started on port 3000.');
