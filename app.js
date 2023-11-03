@@ -10,6 +10,7 @@ const passportLocalMongoose = require('passport-local-mongoose');
 const findOrCreate = require('mongoose-findorcreate');
 const MongoDBSession = require('connect-mongodb-session')(session);
 const crypto = require('crypto');
+const multer = require('multer');
 
 const mongoURI = 'mongodb://localhost:27017/sessions';
 
@@ -50,6 +51,60 @@ async function main() {
   await mongoose.connect('mongodb://localhost:27017/pblakmnsDB');
 }
 
+//EXAMPLE FILE
+
+// Define a schema for your model (e.g., for storing file metadata)
+const FileSchema = new mongoose.Schema({
+  filename: String,
+  path: String
+});
+
+const File = mongoose.model('File', FileSchema);
+
+// Set up Multer to handle multiple file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Set the upload directory
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname); // Keep the original filename
+  }
+});
+
+const upload = multer({ storage });
+
+// Serve uploaded files statically
+app.use('/uploads', express.static('uploads'));
+
+// Handle multiple file uploads
+app.post('/upload', upload.array('files', 10), (req, res) => {
+  const files = req.files;
+  if (!files || files.length === 0) {
+    return res.status(400).json({ message: 'No files were uploaded' });
+  }
+
+  const fileData = [];
+
+  // Process each uploaded file and store their information in an array
+  files.forEach(file => {
+    const newFile = new File({
+      filename: file.originalname,
+      path: file.path
+    });
+
+    const result = File.create(newFile);
+
+    if (result) {
+      fileData.push({
+        filename: file.originalname,
+        path: file.path
+      });
+    }
+  });
+
+  return res.json({ message: 'Files uploaded successfully', files: fileData });
+});
+
 //USER
 
 //user init
@@ -82,39 +137,10 @@ passport.deserializeUser(function (id, done) {
   }
 });
 
-//PATROL REPORT
+//PAGES INITIALISATION
 
-//patrol init
-const patrolReportSchema = new mongoose.Schema({
-  reportid: String,
-  type: String,
-  start: String,
-  end: String,
-  date: String,
-  summary: String,
-  notes: String,
-  location: String
-});
+//HOME
 
-const PatrolReport = mongoose.model('PatrolReport', patrolReportSchema);
-
-// case init
-//patrol init
-const caseReportSchema = new mongoose.Schema({
-  reportid: String,
-  type: String,
-  time: String,
-  date: String,
-  summary: String,
-  actionTaken: String,
-  eventSummary: String,
-  notes: String,
-  location: String
-});
-
-const CaseReport = mongoose.model('CaseReport', caseReportSchema);
-
-//init home
 app.get('/', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -134,121 +160,148 @@ app.get('/', async function (req, res) {
 
 // SIGN IN
 
-app.get('/sign-in', function (req, res) {
-  res.render('sign-in');
-});
+app
+  .get('/sign-in', function (req, res) {
+    res.render('sign-in');
+  })
+  .post('/sign-in', async function (req, res) {
+    const username = req.body.username;
+    const password = req.body.password;
 
-app.post('/sign-in', async function (req, res) {
-  const username = req.body.username;
-  const password = req.body.password;
+    const user = new User({
+      username: username,
+      password: password
+    });
 
-  const user = new User({
-    username: username,
-    password: password
+    req.login(user, function (err) {
+      if (err) {
+        console.log('Login error');
+        res.redirect('/sign-in');
+      } else {
+        passport.authenticate('local')(req, res, function () {
+          req.session.user = user;
+          res.redirect('/');
+        });
+      }
+    });
   });
-
-  req.login(user, function (err) {
-    if (err) {
-      console.log('Login error');
-      res.redirect('/sign-in');
-    } else {
-      passport.authenticate('local')(req, res, function () {
-        req.session.user = user;
-        res.redirect('/');
-      });
-    }
-  });
-});
 
 //SIGN UP
 
-app.get('/sign-up', function (req, res) {
-  res.render('sign-up');
-});
-
-app.post('/sign-up', function (req, res) {
-  //pasport local mongoose
-  User.register(
-    {
-      username: req.body.username,
-      fullname: req.body.fullname,
-      email: req.body.email
-    },
-    req.body.password,
-    function (err, user) {
-      if (err) {
-        console.log(err);
-        res.redirect('/sign-up');
-      } else {
-        passport.authenticate('local')(req, res, function () {
-          res.redirect('/sign-in');
-        });
+app
+  .get('/sign-up', function (req, res) {
+    res.render('sign-up');
+  })
+  .post('/sign-up', function (req, res) {
+    //pasport local mongoose
+    User.register(
+      {
+        username: req.body.username,
+        fullname: req.body.fullname,
+        email: req.body.email
+      },
+      req.body.password,
+      function (err, user) {
+        if (err) {
+          console.log(err);
+          res.redirect('/sign-up');
+        } else {
+          passport.authenticate('local')(req, res, function () {
+            res.redirect('/sign-in');
+          });
+        }
       }
-    }
-  );
-});
+    );
+  });
 
 //FORGOT PASSWORD
+
 app.get('/forgot-password', function (req, res) {
   res.render('forgot-password');
 });
 
 //RESET PASSWORD
+
 app.get('/reset-password', function (req, res) {
   res.render('reset-password');
 });
 
 //PATROL REPORT SECTION
 
+//patrol schema init
+const patrolReportSchema = new mongoose.Schema({
+  reportid: String,
+  username: String,
+  madeBy: String,
+  type: String,
+  start: String,
+  end: String,
+  date: String,
+  summary: String,
+  notes: String,
+  location: String
+});
+
+const PatrolReport = mongoose.model('PatrolReport', patrolReportSchema);
+
 //submit form
-app.get('/patrol-report/submit', async function (req, res) {
-  if (req.isAuthenticated()) {
+app
+  .get('/patrol-report/submit', async function (req, res) {
+    if (req.isAuthenticated()) {
+      const currentUsername = req.session.user.username;
+
+      const checkUser = await User.findOne({ username: currentUsername });
+
+      if (checkUser) {
+        res.render('patrol-report-submit', {
+          currentFullName: checkUser.fullname,
+          currentUser: checkUser.username
+        });
+      }
+    } else {
+      res.redirect('/sign-in');
+    }
+  })
+  .post('/patrol-report/submit', async function (req, res) {
+    const reportId = crypto.randomBytes(6).toString('hex').toUpperCase();
+    const reportType = req.body.reportType;
+    const startTime = req.body.startTime;
+    const endTime = req.body.endTime;
+    const location = req.body.location;
+    const date = req.body.date;
+    const reportSummary = req.body.reportSummary;
+    const notes = req.body.notes;
+
     var currentUsername = req.session.user.username;
 
     const checkUser = await User.findOne({ username: currentUsername });
 
-    if (checkUser) {
-      res.render('patrol-report-submit', {
-        currentFullName: checkUser.fullname,
-        currentUser: checkUser.username
-      });
+    const currentFullName = checkUser.fullname;
+    const currentUser = checkUser.username;
+
+    const newReport = new PatrolReport({
+      reportid: reportId,
+      username: 'PB' + currentUser,
+      madeBy: currentFullName,
+      type: reportType,
+      start: startTime,
+      end: endTime,
+      date: date,
+      summary: reportSummary,
+      notes: notes,
+      location: location
+    });
+
+    const result = PatrolReport.create(newReport);
+
+    if (result) {
+      console.log('Successfully added report.');
+      res.redirect('/patrol-report/submit');
+    } else {
+      console.log('Report add failed');
+      res.redirect('/patrol-report/submit');
     }
-  } else {
-    res.redirect('/sign-in');
-  }
-});
-
-app.post('/patrol-report/submit', async function (req, res) {
-  const reportId = crypto.randomBytes(6).toString('hex').toUpperCase();
-  const reportType = req.body.reportType;
-  const startTime = req.body.startTime;
-  const endTime = req.body.endTime;
-  const location = req.body.location;
-  const date = req.body.date;
-  const reportSummary = req.body.reportSummary;
-  const notes = req.body.notes;
-
-  const newReport = new PatrolReport({
-    reportid: reportId,
-    type: reportType,
-    start: startTime,
-    end: endTime,
-    date: date,
-    summary: reportSummary,
-    notes: notes,
-    location: location
   });
-
-  const result = PatrolReport.create(newReport);
-
-  if (result) {
-    console.log('Successfully added report.');
-    res.redirect('/patrol-report/submit');
-  } else {
-    console.log('Report add failed');
-    res.redirect('/patrol-report/submit');
-  }
-});
 
 //details
 app.get('/patrol-report/details', async function (req, res) {
@@ -288,57 +341,83 @@ app.get('/patrol-report/view', async function (req, res) {
 
 //CASE REPORT
 
+// case schema init
+const caseReportSchema = new mongoose.Schema({
+  reportId: String,
+  username: String,
+  madeBy: String,
+  type: String,
+  time: String,
+  date: String,
+  location: String,
+  summary: String,
+  actionTaken: String,
+  eventSummary: String,
+  notes: String
+});
+
+const CaseReport = mongoose.model('CaseReport', caseReportSchema);
+
 //submit form
-app.get('/case-report/submit', async function (req, res) {
-  if (req.isAuthenticated()) {
+app
+  .get('/case-report/submit', async function (req, res) {
+    if (req.isAuthenticated()) {
+      var currentUsername = req.session.user.username;
+
+      const checkUser = await User.findOne({ username: currentUsername });
+
+      if (checkUser) {
+        res.render('case-report-submit', {
+          currentFullName: checkUser.fullname,
+          currentUser: checkUser.username
+        });
+      }
+    } else {
+      res.redirect('/sign-in');
+    }
+  })
+  .post('/case-report/submit', async function (req, res) {
+    const reportId = crypto.randomBytes(6).toString('hex').toUpperCase();
+    const reportType = req.body.reportType;
+    const eventSummary = req.body.eventSummary;
+    const actionTaken = req.body.actionTaken;
+    const location = req.body.location;
+    const time = req.body.time;
+    const date = req.body.date;
+    const reportSummary = req.body.reportSummary;
+    const notes = req.body.notes;
+
     var currentUsername = req.session.user.username;
 
     const checkUser = await User.findOne({ username: currentUsername });
 
-    if (checkUser) {
-      res.render('case-report-submit', {
-        currentFullName: checkUser.fullname,
-        currentUser: checkUser.username
-      });
+    const currentFullName = checkUser.fullname;
+    const currentUser = checkUser.username;
+
+    const newReport = new CaseReport({
+      reportId: reportId,
+      username: 'PB' + currentUser,
+      madeBy: currentFullName,
+      type: reportType,
+      eventSummary: eventSummary,
+      actionTaken: actionTaken,
+      time: time,
+      date: date,
+      summary: reportSummary,
+      notes: notes,
+      location: location
+    });
+
+    const result = CaseReport.create(newReport);
+
+    if (result) {
+      console.log('Successfully added a report');
+      res.redirect('/case-report/submit');
+    } else {
+      console.log('Report add failed');
+      res.redirect('/case-report/submit');
     }
-  } else {
-    res.redirect('/sign-in');
-  }
-});
-
-app.post('/case-report/submit', async function (req, res) {
-  const reportId = crypto.randomBytes(6).toString('hex').toUpperCase();
-  const reportType = req.body.reportType;
-  const eventSummary = req.body.eventSummary;
-  const actionTaken = req.body.actionTaken;
-  const location = req.body.location;
-  const time = req.body.time;
-  const date = req.body.date;
-  const reportSummary = req.body.reportSummary;
-  const notes = req.body.notes;
-
-  const newReport = new CaseReport({
-    reportid: reportId,
-    type: reportType,
-    eventSummary: eventSummary,
-    actionTaken: actionTaken,
-    time: time,
-    date: date,
-    summary: reportSummary,
-    notes: notes,
-    location: location
   });
-
-  const result = CaseReport.create(newReport);
-
-  if (result) {
-    console.log('Successfully added a report');
-    res.redirect('/case-report/submit');
-  } else {
-    console.log('Report add failed');
-    res.redirect('/case-report/submit');
-  }
-});
 
 //case-report-details
 app.get('/case-report/details', async function (req, res) {

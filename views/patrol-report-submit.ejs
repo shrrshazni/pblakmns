@@ -75,11 +75,13 @@
 
               <div class="p-4">
                 <!-- file uploader -->
+
                 <form
-                  class="dropzone dropzone-multiple p-2 mb-5"
+                  class="dropzone dropzone-multiple p-0"
                   id="dropzone-multiple"
                   data-dropzone="data-dropzone"
-                  action="#!"
+                  action="/upload"
+                  method="post"
                 >
                   <div class="fallback">
                     <input name="file" type="file" multiple="multiple" />
@@ -148,6 +150,7 @@
                       </div>
                     </div>
                   </div>
+                  <input type="submit" class="btn btn-primary" value="Upload">
                 </form>
 
                 <!-- form >form tag will be merge with file uploader form tag -->
