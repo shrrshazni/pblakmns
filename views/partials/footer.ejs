@@ -60,6 +60,28 @@
         myDropzone.processQueue();
       }
     });
+
+    
+
+   document.getElementById('showToastButton').addEventListener('click', function() {
+    // Disable the button and add the loading class
+    var button = this;
+    button.classList.add('loading');
+    button.disabled = true;
+
+    // Delay showing the specific toast for 2 seconds
+    setTimeout(function() {
+      // Get the specific toast by its id
+      var toast = document.getElementById('alertToast');
+
+      // Show the specific toast by removing the 'd-none' class
+      toast.classList.add('show');
+
+      // Re-enable the button and remove the loading class
+      button.classList.remove('loading');
+      button.disabled = false;
+    }, 1000); // 2000 milliseconds (2 seconds)
+  });
 </script>
 
 </body>

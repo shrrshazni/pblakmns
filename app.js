@@ -12,7 +12,7 @@ const MongoDBSession = require('connect-mongodb-session')(session);
 const crypto = require('crypto');
 const multer = require('multer');
 const path = require('path');
-const fileUpload = require("express-fileupload");
+const fileUpload = require('express-fileupload');
 
 const mongoURI = 'mongodb://localhost:27017/sessions';
 
@@ -54,53 +54,6 @@ main().catch(err => console.log(err));
 async function main() {
   await mongoose.connect('mongodb://localhost:27017/pblakmnsDB');
 }
-
-//EXAMPLE FILE
-
-// Define a schema for your model (e.g., for storing file metadata)
-const FileSchema = new mongoose.Schema({
-  reportId: String,
-  filename: String,
-  path: String
-});
-
-const File = mongoose.model('File', FileSchema);
-
-app.post("/upload", (req, res) => {
-  if (!req.files || Object.keys(req.files).length === 0) {
-    return res.status(400).send("No files were uploaded.");
-  }
-
-  // Loop through the uploaded files
-  for (const file of Object.values(req.files)) {
-    const uploadPath = __dirname + "/uploads/" + file.name;
-    const uploadPath2 = "uploads/" + file.name;
-    const reportId = "This is report id";
-
-    file.mv(uploadPath, (err) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
-
-      // Save file information to the MongoDB
-      const newFile = new File({
-        reportId: reportId,
-        filename: file.name,
-        path: uploadPath2,
-      });
-
-      const result = newFile.save();
-
-      if (result) {
-        console.log("files uploaded!");
-      } else {
-        console.log("file not uploaded");
-      }
-    });
-  }
-
-  res.send("Files uploaded!");
-});
 
 //USER
 
@@ -223,6 +176,48 @@ app.get('/reset-password', function (req, res) {
   res.render('reset-password');
 });
 
+const reportId = crypto.randomBytes(6).toString('hex').toUpperCase();
+
+// For Files
+
+// Define a schema for your model (e.g., for storing file metadata)
+const FileSchema = new mongoose.Schema({
+  reportId: String,
+  filename: String,
+  path: String
+});
+
+const File = mongoose.model('File', FileSchema);
+
+app.post('/upload', (req, res) => {
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).send('No files were uploaded.');
+  }
+
+  // Loop through the uploaded files
+  for (const file of Object.values(req.files)) {
+    const uploadPath = __dirname + '/uploads/' + file.name;
+    const uploadPath2 = 'uploads/' + file.name;
+
+    file.mv(uploadPath, err => {
+      if (err) {
+        return res.status(500).send(err);
+      }
+
+      // Save file information to the MongoDB
+      const newFile = new File({
+        reportId: reportId,
+        filename: file.name,
+        path: uploadPath2
+      });
+
+      const result = newFile.save();
+    });
+  }
+
+  res.send('Files uploaded!');
+});
+
 //PATROL REPORT SECTION
 
 //patrol schema init
@@ -252,7 +247,23 @@ app
       if (checkUser) {
         res.render('patrol-report-submit', {
           currentFullName: checkUser.fullname,
-          currentUser: checkUser.username
+          currentUser: checkUser.username,
+          //validation
+          validationReportType: '',
+          validationStartTime: '',
+          validationEndTime: '',
+          validationDate: '',
+          validationLocation: '',
+          validationReportSummary: '',
+          validationNotes: '',
+          //form name
+          reportType: 'Choose a title report',
+          startTime: '',
+          endTime: '',
+          date: '',
+          location: 'Choose a location',
+          reportSummary: '',
+          notes: ''
         });
       }
     } else {
@@ -260,7 +271,14 @@ app
     }
   })
   .post('/patrol-report/submit', async function (req, res) {
-    const reportId = crypto.randomBytes(6).toString('hex').toUpperCase();
+    var validationReportType = '';
+    var validationStartTime = '';
+    var validationEndTime = '';
+    var validationDate = '';
+    var validationLocation = '';
+    var validationReportSummary = '';
+    var validationNotes = '';
+
     const reportType = req.body.reportType;
     const startTime = req.body.startTime;
     const endTime = req.body.endTime;
@@ -269,34 +287,115 @@ app
     const reportSummary = req.body.reportSummary;
     const notes = req.body.notes;
 
-    var currentUsername = req.session.user.username;
+    const currentUsername = req.session.user.username;
 
     const checkUser = await User.findOne({ username: currentUsername });
 
-    const currentFullName = checkUser.fullname;
-    const currentUser = checkUser.username;
-
-    const newReport = new PatrolReport({
-      reportid: reportId,
-      username: 'PB' + currentUser,
-      madeBy: currentFullName,
-      type: reportType,
-      start: startTime,
-      end: endTime,
-      date: date,
-      summary: reportSummary,
-      notes: notes,
-      location: location
-    });
-
-    const result = PatrolReport.create(newReport);
-
-    if (result) {
-      console.log('Successfully added report.');
-      res.redirect('/patrol-report/submit');
+    // Validate the reportType
+    if (!reportType || reportType === '') {
+      validationReportType = 'is-invalid';
     } else {
-      console.log('Report add failed');
-      res.redirect('/patrol-report/submit');
+      validationReportType = 'is-valid';
+    }
+
+    // Validate the startTime
+    if (!startTime || startTime === '') {
+      validationStartTime = 'is-invalid';
+    } else {
+      validationStartTime = 'is-valid';
+    }
+
+    // Validate the endTime
+    if (!endTime || endTime === '') {
+      validationEndTime = 'is-invalid';
+    } else {
+      validationEndTime = 'is-valid';
+    }
+
+    // Validate the date
+    if (!date || date === '') {
+      validationDate = 'is-invalid';
+    } else {
+      validationDate = 'is-valid';
+    }
+
+    // Validate the location
+    if (!location || location === '') {
+      validationLocation = 'is-invalid';
+    } else {
+      validationLocation = 'is-valid';
+    }
+
+    // Validate the reportSummary
+    if (!reportSummary || reportSummary === '') {
+      validationReportSummary = 'is-invalid';
+    } else {
+      validationReportSummary = 'is-valid';
+    }
+
+    // Validate the notes
+    if (!notes || notes === '') {
+      validationNotes = 'is-invalid';
+    } else {
+      validationNotes = 'is-valid';
+    }
+
+    if (
+      validationReportType === 'is-valid' &&
+      validationStartTime === 'is-valid' &&
+      validationEndTime === 'is-valid' &&
+      validationDate === 'is-valid' &&
+      validationLocation === 'is-valid' &&
+      validationReportSummary === 'is-valid' &&
+      validationNotes === 'is-valid'
+    ) {
+      const currentFullName = checkUser.fullname;
+      const currentUser = checkUser.username;
+
+      const newReport = new PatrolReport({
+        reportid: reportId,
+        username: 'PB' + currentUser,
+        madeBy: currentFullName,
+        type: reportType,
+        start: startTime,
+        end: endTime,
+        date: date,
+        summary: reportSummary,
+        notes: notes,
+        location: location
+      });
+
+      const result = PatrolReport.create(newReport);
+
+      if (result) {
+        console.log('Successfully added report.');
+        res.redirect('/patrol-report/submit');
+      } else {
+        console.log('Report add failed');
+        res.redirect('/patrol-report/submit');
+      }
+    } else {
+      // Redirect to the form with validation errors
+      res.render('patrol-report-submit', {
+        currentFullName: checkUser.fullname,
+        currentUser: checkUser.username,
+        //validation
+        validationReportType: validationReportType,
+        validationDate: validationDate,
+        validationStartTime: validationStartTime,
+        validationEndTime: validationEndTime,
+        validationLocation: validationLocation,
+        validationReportSummary: validationReportSummary,
+        validationNotes: validationNotes,
+        //form na
+        reportType: reportType,
+        startTime: startTime,
+        endTime: endTime,
+        date: date,
+        location: location,
+        reportSummary: reportSummary,
+        notes: notes
+      });
     }
   });
 

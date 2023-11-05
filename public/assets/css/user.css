@@ -1,9 +1,34 @@
-/*-----------------------------------------------
-|   Phoenix buttons
------------------------------------------------*/
-/* -------------------------------------------------------------------------- */
-/*                                Phoenix button                              */
-/* -------------------------------------------------------------------------- */
-/* prettier-ignore */
-/* ----------------------------- Phoenix-buttons ---------------------------- */
-/*# sourceMappingURL=user.css.map */
+/* Add a CSS class for the loading animation */
+.loading {
+  cursor: not-allowed;
+  pointer-events: none;
+  position: relative;
+}
+
+/* Customize the loading spinner animation */
+.loading::after {
+  content: '';
+  border: 3px solid #f3f3f3; /* Light gray border */
+  border-top: 3px solid #007bff; /* Blue border for the spinner */
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite; /* Rotate the spinner */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.loading .button-text {
+  visibility: hidden;
+}
+
+@keyframes spin {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
