@@ -75,17 +75,15 @@
 
               <div class="p-4">
                 <!-- file uploader -->
-
+                <h1>Upload Files</h1>
+                <!-- data-options are the setting for dropzone can find the settings also inside -->
                 <form
                   class="dropzone dropzone-multiple p-0"
-                  id="dropzone-multiple"
+                  id="myDropzone"
                   data-dropzone="data-dropzone"
                   action="/upload"
-                  method="post"
+                  data-options='{"url":"/upload","paramName": "file"}'
                 >
-                  <div class="fallback">
-                    <input name="file" type="file" multiple="multiple" />
-                  </div>
                   <div class="dz-message" data-dz-message="data-dz-message">
                     <img
                       class="me-2"
@@ -150,8 +148,8 @@
                       </div>
                     </div>
                   </div>
-                  <input type="submit" class="btn btn-primary" value="Upload">
                 </form>
+                <button id="uploadButton">Upload Files</button>
 
                 <!-- form >form tag will be merge with file uploader form tag -->
                 <form

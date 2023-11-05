@@ -3,9 +3,13 @@
   <div class="row g-0 justify-content-between align-items-center h-100">
     <div class="col-12 col-sm-auto text-center">
       <p class="mb-0 mt-2 mt-sm-0 text-900">
-        Auxiliary Police of LAKMNS<span class="d-none d-sm-inline-block"></span><span
-          class="d-none d-sm-inline-block mx-1">|</span><br class="d-sm-none" />2023 &copy;<a class="mx-1"
-          href="https://lakmns.org.my/ms/">LAKMNS</a>
+        Auxiliary Police of LAKMNS<span class="d-none d-sm-inline-block"></span
+        ><span class="d-none d-sm-inline-block mx-1">|</span
+        ><br class="d-sm-none" />2023 &copy;<a
+          class="mx-1"
+          href="https://lakmns.org.my/ms/"
+          >LAKMNS</a
+        >
       </p>
     </div>
     <div class="col-12 col-sm-auto text-center">
@@ -36,6 +40,27 @@
 <script src="../vendors/dropzone/dropzone.js"></script>
 <!-- datepicker -->
 <script src="assets/js/flatpickr.js"></script>
+
+<script>
+  // // Configure Dropzone options for the myDropzone instance
+  // Dropzone.options.myDropzone = {
+  //   autoProcessQueue: false, // Set autoProcessQueue to false
+  //   paramName: 'file', // The name to use for the uploaded file in the HTTP request
+  //   maxFilesize: 5, // Maximum file size in megabytes
+  //   acceptedFiles: '.jpg, .jpeg, .png, .gif', // Allowed file types
+  //   addRemoveLinks: true, // Show remove links for uploaded files
+  // };
+  
+  document
+    .getElementById('uploadButton')
+    .addEventListener('click', function () {
+      const myDropzone = Dropzone.forElement('#myDropzone');
+
+      if (myDropzone.getQueuedFiles().length > 0) {
+        myDropzone.processQueue();
+      }
+    });
+</script>
 
 </body>
 

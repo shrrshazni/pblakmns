@@ -11,11 +11,15 @@ const findOrCreate = require('mongoose-findorcreate');
 const MongoDBSession = require('connect-mongodb-session')(session);
 const crypto = require('crypto');
 const multer = require('multer');
+const path = require('path');
+const fileUpload = require("express-fileupload");
 
 const mongoURI = 'mongodb://localhost:27017/sessions';
 
 const app = express();
 
+app.use(fileUpload());
+app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
@@ -55,54 +59,47 @@ async function main() {
 
 // Define a schema for your model (e.g., for storing file metadata)
 const FileSchema = new mongoose.Schema({
+  reportId: String,
   filename: String,
   path: String
 });
 
 const File = mongoose.model('File', FileSchema);
 
-// Set up Multer to handle multiple file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Set the upload directory
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname); // Keep the original filename
-  }
-});
-
-const upload = multer({ storage });
-
-// Serve uploaded files statically
-app.use('/uploads', express.static('uploads'));
-
-// Handle multiple file uploads
-app.post('/upload', upload.array('files', 10), (req, res) => {
-  const files = req.files;
-  if (!files || files.length === 0) {
-    return res.status(400).json({ message: 'No files were uploaded' });
+app.post("/upload", (req, res) => {
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).send("No files were uploaded.");
   }
 
-  const fileData = [];
+  // Loop through the uploaded files
+  for (const file of Object.values(req.files)) {
+    const uploadPath = __dirname + "/uploads/" + file.name;
+    const uploadPath2 = "uploads/" + file.name;
+    const reportId = "This is report id";
 
-  // Process each uploaded file and store their information in an array
-  files.forEach(file => {
-    const newFile = new File({
-      filename: file.originalname,
-      path: file.path
-    });
+    file.mv(uploadPath, (err) => {
+      if (err) {
+        return res.status(500).send(err);
+      }
 
-    const result = File.create(newFile);
-
-    if (result) {
-      fileData.push({
-        filename: file.originalname,
-        path: file.path
+      // Save file information to the MongoDB
+      const newFile = new File({
+        reportId: reportId,
+        filename: file.name,
+        path: uploadPath2,
       });
-    }
-  });
 
-  return res.json({ message: 'Files uploaded successfully', files: fileData });
+      const result = newFile.save();
+
+      if (result) {
+        console.log("files uploaded!");
+      } else {
+        console.log("file not uploaded");
+      }
+    });
+  }
+
+  res.send("Files uploaded!");
 });
 
 //USER
