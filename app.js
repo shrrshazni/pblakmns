@@ -176,6 +176,7 @@ app.get('/reset-password', function (req, res) {
   res.render('reset-password');
 });
 
+// generate random id
 const reportId = crypto.randomBytes(6).toString('hex').toUpperCase();
 
 // For Files
@@ -189,33 +190,40 @@ const FileSchema = new mongoose.Schema({
 
 const File = mongoose.model('File', FileSchema);
 
-app.post('/upload', (req, res) => {
+app.post('/upload', async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
-    return res.status(400).send('No files were uploaded.');
-  }
+    console.log('There is no files selected');
+  } else {
+    // Check if the report ID exists in the database
+    const existingFile = await File.findOne({ reportId: reportId });
 
-  // Loop through the uploaded files
-  for (const file of Object.values(req.files)) {
-    const uploadPath = __dirname + '/uploads/' + file.name;
-    const uploadPath2 = 'uploads/' + file.name;
+    if (!existingFile) {
+      // No file with the report ID found, proceed with file upload
+      for (const file of Object.values(req.files)) {
+        const uploadPath = __dirname + '/uploads/' + file.name;
+        const uploadPath2 = 'uploads/' + file.name;
 
-    file.mv(uploadPath, err => {
-      if (err) {
-        return res.status(500).send(err);
+        file.mv(uploadPath, err => {
+          if (err) {
+            return res.status(500).send(err);
+          }
+
+          // Save file information to the MongoDB
+          const newFile = new File({
+            reportId: reportId,
+            filename: file.name,
+            path: uploadPath2
+          });
+
+          const result = newFile.save();
+        });
       }
-
-      // Save file information to the MongoDB
-      const newFile = new File({
-        reportId: reportId,
-        filename: file.name,
-        path: uploadPath2
-      });
-
-      const result = newFile.save();
-    });
+      console.log('Files uploaded');
+    } else {
+      // File with the report ID already exists
+      console.log('Files already uploaded');
+    }
   }
-
-  res.send('Files uploaded!');
 });
 
 //PATROL REPORT SECTION
@@ -248,6 +256,7 @@ app
         res.render('patrol-report-submit', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
+          reportId: reportId,
           //validation
           validationReportType: '',
           validationStartTime: '',
@@ -257,13 +266,16 @@ app
           validationReportSummary: '',
           validationNotes: '',
           //form name
-          reportType: 'Choose a title report',
+          reportType: '',
           startTime: '',
           endTime: '',
           date: '',
-          location: 'Choose a location',
+          location: '',
           reportSummary: '',
-          notes: ''
+          notes: '',
+          //toast alert
+          toastShow: '',
+          toastMsg: ''
         });
       }
     } else {
@@ -369,33 +381,60 @@ app
 
       if (result) {
         console.log('Successfully added report.');
-        res.redirect('/patrol-report/submit');
+        res.render('patrol-report-submit', {
+          currentFullName: checkUser.fullname,
+          currentUser: checkUser.username,
+          //validation
+          validationReportType: '',
+          validationDate: '',
+          validationStartTime: '',
+          validationEndTime: '',
+          validationLocation: '',
+          validationReportSummary: '',
+          validationNotes: '',
+          //form na
+          reportType: '',
+          startTime: '',
+          endTime: '',
+          date: '',
+          location: '',
+          reportSummary: '',
+          notes: '',
+          //toast alert
+          toastShow: 'show',
+          toastMsg: 'Succesfully submit a report'
+        });
       } else {
         console.log('Report add failed');
         res.redirect('/patrol-report/submit');
       }
     } else {
-      // Redirect to the form with validation errors
-      res.render('patrol-report-submit', {
-        currentFullName: checkUser.fullname,
-        currentUser: checkUser.username,
-        //validation
-        validationReportType: validationReportType,
-        validationDate: validationDate,
-        validationStartTime: validationStartTime,
-        validationEndTime: validationEndTime,
-        validationLocation: validationLocation,
-        validationReportSummary: validationReportSummary,
-        validationNotes: validationNotes,
-        //form na
-        reportType: reportType,
-        startTime: startTime,
-        endTime: endTime,
-        date: date,
-        location: location,
-        reportSummary: reportSummary,
-        notes: notes
-      });
+      setTimeout(() => {
+        // Render the response after the delay
+        res.render('patrol-report-submit', {
+          currentFullName: checkUser.fullname,
+          currentUser: checkUser.username,
+          //validation
+          validationReportType: validationReportType,
+          validationDate: validationDate,
+          validationStartTime: validationStartTime,
+          validationEndTime: validationEndTime,
+          validationLocation: validationLocation,
+          validationReportSummary: validationReportSummary,
+          validationNotes: validationNotes,
+          //form na
+          reportType: reportType,
+          startTime: startTime,
+          endTime: endTime,
+          date: date,
+          location: location,
+          reportSummary: reportSummary,
+          notes: notes,
+          //toast alert
+          toastShow: 'show',
+          toastMsg: 'There is error in your input!'
+        });
+      }, 1000);
     }
   });
 

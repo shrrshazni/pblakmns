@@ -78,7 +78,7 @@
 
                 <!-- data-options are the setting for dropzone can find the settings also inside -->
                 <form
-                  class="dropzone dropzone-multiple p-0"
+                  class="dropzone dropzone-multiple p-0 mb-4"
                   id="myDropzone"
                   data-dropzone="data-dropzone"
                   action="/upload"
@@ -150,25 +150,17 @@
                   </div>
                 </form>
 
-                <!-- button to be edited into submit -->
-                <!-- <button id="uploadButton" class="btn btn-primary">
-                  Upload Files
-                </button> -->
-
-                <button id="showToastButton" class="btn btn-primary">
-                  <div class="button-text">Show Toast</div>
-                </button>
-
                 <!-- form >form tag will be merge with file uploader form tag -->
                 <form
                   action="/patrol-report/submit"
                   method="post"
                   class="row g-3 has-validation"
+                  id="patrolReportForm"
                 >
                   <!-- form title report -->
                   <div class="col-md-4">
                     <label class="form-label" for="validationCustom04"
-                      >Title report</label
+                      >Report Type</label
                     >
 
                     <select
@@ -177,7 +169,7 @@
                       name="reportType"
                     >
                       <option selected="" value="<%= reportType %>">
-                        <%= reportType %>
+                        Choose a report type
                       </option>
                       <option value="Unit Patrol Parameter">
                         Unit Patrol Parameter
@@ -264,7 +256,7 @@
                       name="location"
                     >
                       <option selected="" value="<%= location %>">
-                        <%= location %>
+                        Choose a location
                       </option>
                       <option value="Baitul Makmur I">Baitul Makmur I</option>
                       <option value="Baitul Makmur II">Baitul Makmur II</option>
@@ -365,7 +357,7 @@
       aria-atomic="true"
     >
       <div class="d-flex">
-        <div class="toast-body p-3"></div>
+        <div class="toast-body px-0 py-3"></div>
         <button
           class="btn ms-2 p-0 btn-close-white"
           type="button"
@@ -381,7 +373,7 @@
   <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
     <div class="d-flex">
       <div
-        class="toast align-items-center text-white bg-primary border-0 light"
+        class="toast <%= toastShow %> align-items-center text-white bg-primary border-0 light"
         role="alert"
         data-bs-autohide="false"
         aria-live="assertive"
@@ -389,10 +381,8 @@
         id="alertToast"
       >
         <div class="d-flex">
-          <div class="toast-body p-3">
-            <code class="text-white"
-              >Hello there this is toast notification</code
-            >
+          <div class="toast-body px-0 py-3">
+            <code class="text-white"><%= toastMsg %></code>
           </div>
 
           <button

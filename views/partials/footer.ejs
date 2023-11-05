@@ -49,21 +49,9 @@
   //   maxFilesize: 5, // Maximum file size in megabytes
   //   acceptedFiles: '.jpg, .jpeg, .png, .gif', // Allowed file types
   //   addRemoveLinks: true, // Show remove links for uploaded files
-  // };
-  
-  document
-    .getElementById('uploadButton')
-    .addEventListener('click', function () {
-      const myDropzone = Dropzone.forElement('#myDropzone');
+  // };  
 
-      if (myDropzone.getQueuedFiles().length > 0) {
-        myDropzone.processQueue();
-      }
-    });
-
-    
-
-   document.getElementById('showToastButton').addEventListener('click', function() {
+   document.getElementById('uploadButton').addEventListener('click', function() {
     // Disable the button and add the loading class
     var button = this;
     button.classList.add('loading');
@@ -72,15 +60,26 @@
     // Delay showing the specific toast for 2 seconds
     setTimeout(function() {
       // Get the specific toast by its id
-      var toast = document.getElementById('alertToast');
+      // var toast = document.getElementById('alertToast');
 
-      // Show the specific toast by removing the 'd-none' class
-      toast.classList.add('show');
+      const myDropzone = Dropzone.forElement('#myDropzone');
+
+      if (myDropzone.getQueuedFiles().length > 0) {
+        myDropzone.processQueue();
+      }
+      
+      button.setAttribute('type', 'submit');
+
+      // // Show the specific toast by removing the 'd-none' class
+      // toast.classList.add('show');
 
       // Re-enable the button and remove the loading class
       button.classList.remove('loading');
       button.disabled = false;
-    }, 1000); // 2000 milliseconds (2 seconds)
+    }, 1500); // 2000 milliseconds (2 seconds)
+
+    var formElement = document.getElementById('patrolReportForm');
+    formElement.submit();
   });
 </script>
 
