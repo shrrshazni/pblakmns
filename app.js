@@ -186,8 +186,11 @@ const reportId = crypto.randomBytes(6).toString('hex').toUpperCase();
 // Define a schema for your model (e.g., for storing file metadata)
 const FileSchema = new mongoose.Schema({
   reportId: String,
+  by: String,
   filename: String,
-  path: String
+  path: String,
+  date: String,
+  fileType: String
 });
 
 const File = mongoose.model('File', FileSchema);
@@ -196,25 +199,34 @@ app.post('/upload', async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
     console.log('There is no files selected');
   }
+  // find user full name
+  const currentUsername = req.session.user.username;
+  const checkUser = await User.findOne({ username: currentUsername });
+
   // Check if the report ID exists in the database
   const existingFile = await File.findOne({ reportId: reportId });
 
   if (!existingFile) {
     // No file with the report ID found, proceed with file upload
     for (const file of Object.values(req.files)) {
-      const uploadPath = __dirname + '/uploads/' + file.name;
-      const uploadPath2 = 'uploads/' + file.name;
+      const uploadPath = __dirname + '/public/uploads/' + file.name;
+      const pathFile = 'uploads/' + file.name;
+      const todayDate = date.getDate();
+      const fileType = path.extname(file.name);
 
       file.mv(uploadPath, err => {
         if (err) {
-          return res.status(500).send(err);
+          console.log(err);
         }
 
         // Save file information to the MongoDB
         const newFile = new File({
           reportId: reportId,
+          by: checkUser.fullname,
           filename: file.name,
-          path: uploadPath2
+          path: pathFile,
+          date: todayDate,
+          fileType: fileType
         });
 
         newFile.save();
@@ -231,7 +243,7 @@ app.post('/upload', async (req, res) => {
 
 //patrol schema init
 const patrolReportSchema = new mongoose.Schema({
-  reportid: String,
+  reportId: String,
   username: String,
   madeBy: String,
   type: String,
@@ -366,7 +378,7 @@ app
       const currentUser = checkUser.username;
 
       const newReport = new PatrolReport({
-        reportid: reportId,
+        reportId: reportId,
         username: 'PB' + currentUser,
         madeBy: currentFullName,
         type: reportType,
@@ -410,32 +422,30 @@ app
         res.redirect('/patrol-report/submit');
       }
     } else {
-      setTimeout(() => {
-        // Render the response after the delay
-        res.render('patrol-report-submit', {
-          currentFullName: checkUser.fullname,
-          currentUser: checkUser.username,
-          //validation
-          validationReportType: validationReportType,
-          validationDate: validationDate,
-          validationStartTime: validationStartTime,
-          validationEndTime: validationEndTime,
-          validationLocation: validationLocation,
-          validationReportSummary: validationReportSummary,
-          validationNotes: validationNotes,
-          //form na
-          reportType: reportType,
-          startTime: startTime,
-          endTime: endTime,
-          date: date,
-          location: location,
-          reportSummary: reportSummary,
-          notes: notes,
-          //toast alert
-          toastShow: 'show',
-          toastMsg: 'There is error in your input!'
-        });
-      }, 1000);
+      // Render the response after the delay
+      res.render('patrol-report-submit', {
+        currentFullName: checkUser.fullname,
+        currentUser: checkUser.username,
+        //validation
+        validationReportType: validationReportType,
+        validationDate: validationDate,
+        validationStartTime: validationStartTime,
+        validationEndTime: validationEndTime,
+        validationLocation: validationLocation,
+        validationReportSummary: validationReportSummary,
+        validationNotes: validationNotes,
+        //form na
+        reportType: reportType,
+        startTime: startTime,
+        endTime: endTime,
+        date: date,
+        location: location,
+        reportSummary: reportSummary,
+        notes: notes,
+        //toast alert
+        toastShow: 'show',
+        toastMsg: 'There is error in your input!'
+      });
     }
   });
 
@@ -449,21 +459,43 @@ app.get('/patrol-report/details', async function (req, res) {
 
     if (checkUser) {
       const checkReport = await PatrolReport.findOne({
-        reportid: reportId
+        reportId: reportId
       });
 
       if (checkReport) {
-        res.render('patrol-report-details', {
-          currentFullName: checkUser.fullname,
-          currentUser: checkUser.username,
-          reportType: checkReport.type,
-          madeBy: checkReport.madeBy,
-          pbNumber: checkReport.username,
-          startTime: checkReport.start,
-          endTime: checkReport.end,
-          reportSummary: checkReport.summary,
-          notes: checkReport.notes
-        });
+        const checkFiles = await File.find({ reportId: reportId });
+
+        if (checkFiles.length > 0) {
+          res.render('patrol-report-details', {
+            currentFullName: checkUser.fullname,
+            currentUser: checkUser.username,
+            // patrol report
+            reportType: checkReport.type,
+            madeBy: checkReport.madeBy,
+            pbNumber: checkReport.username,
+            startTime: checkReport.start,
+            endTime: checkReport.end,
+            reportSummary: checkReport.summary,
+            notes: checkReport.notes,
+            // files
+            files: checkFiles
+          });
+        } else {
+          res.render('patrol-report-details', {
+            currentFullName: checkUser.fullname,
+            currentUser: checkUser.username,
+            // patrol report
+            reportType: checkReport.type,
+            madeBy: checkReport.madeBy,
+            pbNumber: checkReport.username,
+            startTime: checkReport.start,
+            endTime: checkReport.end,
+            reportSummary: checkReport.summary,
+            notes: checkReport.notes,
+            // files
+            files: checkFiles
+          });
+        }
       } else {
         res.render('patrol-report-details', {
           currentFullName: checkUser.fullname,

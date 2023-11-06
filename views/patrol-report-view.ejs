@@ -167,8 +167,10 @@
               ></th>
             </tr>
           </thead>
+
           <!-- table content -->
           <tbody class="list" id="project-list-table-body">
+            <% if (Array.isArray(itemReports) && itemReports.length > 0) { %>
             <!-- table item -->
             <% itemReports.forEach(function (item) { %>
             <tr class="position-static">
@@ -177,7 +179,7 @@
               >
                 <a
                   class="fw-bold fs-0"
-                  href="/patrol-report/details?id=<%= item.reportd %>"
+                  href="/patrol-report/details?id=<%= item.reportId %>"
                   ><%= item.type %></a
                 >
               </td>
@@ -219,7 +221,11 @@
                 </div>
               </td>
             </tr>
-            <% }) %>
+            <% }) %> <% } else { %>
+            <tr>
+              <td colspan="7">No patrol reports submitted.</td>
+            </tr>
+            <% } %>
           </tbody>
         </table>
       </div>
