@@ -99,10 +99,15 @@ app.get('/', async function (req, res) {
 
     const checkUser = await User.findOne({ username: currentUsername });
 
+    // generate random id
+    const rid = crypto.randomBytes(6).toString('hex').toUpperCase();
+    console.log('Home rid:' + rid);
+
     if (checkUser) {
       res.render('home', {
         currentFullName: checkUser.fullname,
-        currentUser: checkUser.username
+        currentUser: checkUser.username,
+        rid : crypto.randomBytes(6).toString('hex').toUpperCase()
       });
     }
   } else {
@@ -264,6 +269,9 @@ app
       const currentUsername = req.session.user.username;
 
       const checkUser = await User.findOne({ username: currentUsername });
+      // generate random id
+      const rid = crypto.randomBytes(6).toString('hex').toUpperCase();
+      console.log('Patrol report submit rid:' + rid);
 
       if (checkUser) {
         res.render('patrol-report-submit', {
@@ -457,6 +465,10 @@ app.get('/patrol-report/details', async function (req, res) {
 
     const reportId = req.query.id;
 
+    // generate random id
+    const rid = crypto.randomBytes(6).toString('hex').toUpperCase();
+    console.log('Patrol report details rid:' + rid);
+
     if (checkUser) {
       const checkReport = await PatrolReport.findOne({
         reportId: reportId
@@ -506,7 +518,8 @@ app.get('/patrol-report/details', async function (req, res) {
           startTime: '',
           endTime: '',
           reportSummary: '',
-          notes: ''
+          notes: '',
+          files: ''
         });
       }
     }
@@ -521,6 +534,9 @@ app.get('/patrol-report/view', async function (req, res) {
     var currentUsername = req.session.user.username;
 
     const checkUser = await User.findOne({ username: currentUsername });
+    // generate random id
+    const rid = crypto.randomBytes(6).toString('hex').toUpperCase();
+    console.log('Patrol report view rid:' + rid);
 
     if (checkUser) {
       const itemReports = await PatrolReport.find({});
@@ -582,9 +598,11 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
     var currentUsername = req.session.user.username;
     const checkUser = await User.findOne({ username: currentUsername });
 
-    const customListName = _.upperCase(req.params.customListName);
+    // generate random id
+    const rid = crypto.randomBytes(6).toString('hex').toUpperCase();
+    console.log('Custom patrol report vie rid:' + rid);
 
-    console.log(customListName);
+    const customListName = _.upperCase(req.params.customListName);
 
     if (checkUser) {
       const itemReports = await PatrolReport.find({});
@@ -929,17 +947,354 @@ app.get('/case-report/view', async function (req, res) {
 
 // SCHEDULE
 
+// case schema init
+const scheduleSchema = new mongoose.Schema({
+  location: String,
+  scheduleTitle: String,
+  month: String,
+  startDate: String,
+  endDate: String,
+  status: String
+});
+
+const Schedule = mongoose.model('Schedule', scheduleSchema);
+
+// schedule submit
+
+app.get('/schedule/submit', async function (req, res) {
+  if (req.isAuthenticated()) {
+    var currentUsername = req.session.user.username;
+
+    const checkUser = await User.findOne({ username: currentUsername });
+    // generate random id
+    const rid = crypto.randomBytes(6).toString('hex').toUpperCase();
+    console.log('Schedule rid:' + rid);
+
+    if (checkUser) {
+      res.render('schedule-submit', {
+        currentFullName: checkUser.fullname,
+        currentUser: checkUser.username,
+        reportId: reportId,
+        //validation
+        validationReportType: '',
+        validationStartTime: '',
+        validationEndTime: '',
+        validationDate: '',
+        validationLocation: '',
+        validationReportSummary: '',
+        validationNotes: '',
+        //form name
+        reportType: '',
+        startTime: '',
+        endTime: '',
+        date: '',
+        location: '',
+        reportSummary: '',
+        notes: '',
+        //toast alert
+        toastShow: '',
+        toastMsg: ''
+      });
+    }
+  } else {
+    res.redirect('/sign-in');
+  }
+});
+
 app.get('/schedule', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
 
     const checkUser = await User.findOne({ username: currentUsername });
 
+    // generate random id
+    const rid = crypto.randomBytes(6).toString('hex').toUpperCase();
+    console.log('Schedule view rid:' + rid);
+
     if (checkUser) {
-      res.render('schedule', {
-        currentFullName: checkUser.fullname,
-        currentUser: checkUser.username
+      const itemReports = await PatrolReport.find({});
+      const itemBMI = await PatrolReport.find({ location: 'Baitul Makmur I' });
+      const itemBMII = await PatrolReport.find({
+        location: 'Baitul Makmur II'
       });
+      const itemJM = await PatrolReport.find({ location: 'Jamek Mosque' });
+      const itemCM = await PatrolReport.find({ location: 'City Mosque' });
+      const itemRS = await PatrolReport.find({ location: 'Raudhatul Sakinah' });
+
+      if (itemReports.length > 0) {
+        res.render('schedule', {
+          currentFullName: checkUser.fullname,
+          currentUser: checkUser.username,
+          itemReports: itemReports,
+          totalReports: itemReports.length,
+          amountBMI: itemBMI.length,
+          amountBMII: itemBMII.length,
+          amountJM: itemJM.length,
+          amountCM: itemCM.length,
+          amountRS: itemRS.length,
+          topNav: 'All',
+          classActive1: 'active',
+          classActive2: '',
+          classActive3: '',
+          classActive4: '',
+          classActive5: '',
+          classActive6: ''
+        });
+      } else {
+        res.render('schedule', {
+          currentFullName: checkUser.fullname,
+          currentUser: checkUser.username,
+          itemReports: 'There is no patrol report submitted yet.',
+          totalReports: '0',
+          amountBMI: '0',
+          amountBMII: '0',
+          amountJM: '0',
+          amountCM: '0',
+          amountRS: '0',
+          topNav: 'All',
+          classActive1: 'active',
+          classActive2: '',
+          classActive3: '',
+          classActive4: '',
+          classActive5: '',
+          classActive6: ''
+        });
+      }
+    }
+  } else {
+    res.redirect('/sign-in');
+  }
+});
+
+app.get('/schedule/:customListName', async function (req, res) {
+  if (req.isAuthenticated()) {
+    var currentUsername = req.session.user.username;
+    const checkUser = await User.findOne({ username: currentUsername });
+
+    const customListName = _.upperCase(req.params.customListName);
+    // generate random id
+    const rid = crypto.randomBytes(6).toString('hex').toUpperCase();
+    console.log('Schedule custom view rid:' + rid);
+
+    if (checkUser) {
+      const itemReports = await PatrolReport.find({});
+      const itemBMI = await PatrolReport.find({ location: 'Baitul Makmur I' });
+      const itemBMII = await PatrolReport.find({
+        location: 'Baitul Makmur II'
+      });
+      const itemJM = await PatrolReport.find({ location: 'Jamek Mosque' });
+      const itemCM = await PatrolReport.find({ location: 'City Mosque' });
+      const itemRS = await PatrolReport.find({ location: 'Raudhatul Sakinah' });
+
+      // check customlistname
+      if (customListName === 'BMI') {
+        // view for baitul makmur 1
+        if (itemReports.length > 0) {
+          res.render('schedule', {
+            currentFullName: checkUser.fullname,
+            currentUser: checkUser.username,
+            itemReports: itemBMI,
+            totalReports: itemBMI.length,
+            amountBMI: itemBMI.length,
+            amountBMII: itemBMII.length,
+            amountJM: itemJM.length,
+            amountCM: itemCM.length,
+            amountRS: itemRS.length,
+            topNav: 'Baitul Makmur I',
+            classActive1: '',
+            classActive2: 'active',
+            classActive3: '',
+            classActive4: '',
+            classActive5: '',
+            classActive6: ''
+          });
+        } else {
+          res.render('schedule', {
+            currentFullName: checkUser.fullname,
+            currentUser: checkUser.username,
+            itemReports: 'There is no patrol report submitted yet.',
+            totalReports: '0',
+            amountBMI: '0',
+            amountBMII: '0',
+            amountJM: '0',
+            amountCM: '0',
+            amountRS: '0',
+            topNav: 'Baitul Makmur I',
+            classActive1: '',
+            classActive2: 'active',
+            classActive3: '',
+            classActive4: '',
+            classActive5: '',
+            classActive6: ''
+          });
+        }
+      } else if (customListName === 'BMII') {
+        // view for baitul makmur 2
+        if (itemReports.length > 0) {
+          res.render('schedule', {
+            currentFullName: checkUser.fullname,
+            currentUser: checkUser.username,
+            itemReports: itemBMII,
+            totalReports: itemBMII.length,
+            amountBMI: itemBMI.length,
+            amountBMII: itemBMII.length,
+            amountJM: itemJM.length,
+            amountCM: itemCM.length,
+            amountRS: itemRS.length,
+            topNav: 'Baitul Makmur II',
+            classActive1: '',
+            classActive2: '',
+            classActive3: 'active',
+            classActive4: '',
+            classActive5: '',
+            classActive6: ''
+          });
+        } else {
+          res.render('schedule', {
+            currentFullName: checkUser.fullname,
+            currentUser: checkUser.username,
+            itemReports: 'There is no patrol report submitted yet.',
+            totalReports: '0',
+            amountBMI: '0',
+            amountBMII: '0',
+            amountJM: '0',
+            amountCM: '0',
+            amountRS: '0',
+            topNav: 'Baitul Makmur II',
+            classActive1: '',
+            classActive2: '',
+            classActive3: 'active',
+            classActive4: '',
+            classActive5: '',
+            classActive6: ''
+          });
+        }
+      } else if (customListName === 'JM') {
+        // view for jamek mosque
+        if (itemReports.length > 0) {
+          res.render('schedule', {
+            currentFullName: checkUser.fullname,
+            currentUser: checkUser.username,
+            itemReports: itemJM,
+            totalReports: itemJM.length,
+            amountBMI: itemBMI.length,
+            amountBMII: itemBMII.length,
+            amountJM: itemJM.length,
+            amountCM: itemCM.length,
+            amountRS: itemRS.length,
+            topNav: 'Jamek Mosque',
+            classActive1: '',
+            classActive2: '',
+            classActive3: '',
+            classActive4: 'active',
+            classActive5: '',
+            classActive6: ''
+          });
+        } else {
+          res.render('schedule', {
+            currentFullName: checkUser.fullname,
+            currentUser: checkUser.username,
+            itemReports: 'There is no patrol report submitted yet.',
+            totalReports: '0',
+            amountBMI: '0',
+            amountBMII: '0',
+            amountJM: '0',
+            amountCM: '0',
+            amountRS: '0',
+            topNav: 'Jamek Mosque',
+            classActive1: '',
+            classActive2: '',
+            classActive3: '',
+            classActive4: 'active',
+            classActive5: '',
+            classActive6: ''
+          });
+        }
+      } else if (customListName === 'CM') {
+        // view for city mosque
+        if (itemReports.length > 0) {
+          res.render('schedule', {
+            currentFullName: checkUser.fullname,
+            currentUser: checkUser.username,
+            itemReports: itemCM,
+            totalReports: itemCM.length,
+            amountBMI: itemBMI.length,
+            amountBMII: itemBMII.length,
+            amountJM: itemJM.length,
+            amountCM: itemCM.length,
+            amountRS: itemRS.length,
+            topNav: 'City Mosque',
+            classActive1: '',
+            classActive2: '',
+            classActive3: '',
+            classActive4: '',
+            classActive5: 'active',
+            classActive6: ''
+          });
+        } else {
+          res.render('schedule', {
+            currentFullName: checkUser.fullname,
+            currentUser: checkUser.username,
+            itemReports: 'There is no patrol report submitted yet.',
+            totalReports: '0',
+            amountBMI: '0',
+            amountBMII: '0',
+            amountJM: '0',
+            amountCM: '0',
+            amountRS: '0',
+            topNav: 'City Mosque',
+            classActive1: '',
+            classActive2: '',
+            classActive3: '',
+            classActive4: '',
+            classActive5: 'active',
+            classActive6: ''
+          });
+        }
+      } else if (customListName === 'RS') {
+        // view for raudhatul sakinah
+        if (itemReports.length > 0) {
+          res.render('schedule', {
+            currentFullName: checkUser.fullname,
+            currentUser: checkUser.username,
+            itemReports: itemRS,
+            totalReports: itemRS.length,
+            amountBMI: itemBMI.length,
+            amountBMII: itemBMII.length,
+            amountJM: itemJM.length,
+            amountCM: itemCM.length,
+            amountRS: itemRS.length,
+            topNav: 'Raudhatul Sakinah',
+            classActive1: '',
+            classActive2: '',
+            classActive3: '',
+            classActive4: '',
+            classActive5: '',
+            classActive6: 'active'
+          });
+        } else {
+          res.render('schedule', {
+            currentFullName: checkUser.fullname,
+            currentUser: checkUser.username,
+            itemReports: 'There is no patrol report submitted yet.',
+            totalReports: '0',
+            amountBMI: '0',
+            amountBMII: '0',
+            amountJM: '0',
+            amountCM: '0',
+            amountRS: '0',
+            topNav: 'Raudhatul Sakinah',
+            classActive1: '',
+            classActive2: '',
+            classActive3: '',
+            classActive4: '',
+            classActive5: '',
+            classActive6: 'active'
+          });
+        }
+      } else {
+        res.redirect('/home');
+      }
     }
   } else {
     res.redirect('/sign-in');
@@ -953,6 +1308,10 @@ app.get('/social/profile', async function (req, res) {
     var currentUsername = req.session.user.username;
 
     const checkUser = await User.findOne({ username: currentUsername });
+
+    // generate random id
+    const rid = crypto.randomBytes(6).toString('hex').toUpperCase();
+    console.log('Profile rid:' + rid);
 
     if (checkUser) {
       res.render('profile', {
@@ -972,6 +1331,10 @@ app.get('/social/settings', async function (req, res) {
     var currentUsername = req.session.user.username;
 
     const checkUser = await User.findOne({ username: currentUsername });
+
+    // generate random id
+    const rid = crypto.randomBytes(6).toString('hex').toUpperCase();
+    console.log('Settings rid:' + rid);
 
     if (checkUser) {
       res.render('settings', {

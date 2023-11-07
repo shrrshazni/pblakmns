@@ -1,223 +1,263 @@
 <%- include("partials/header") %> <%- include("partials/navbar") %>
 
 <div class="content">
-  <!-- header top section -->
   <nav class="mb-2" aria-label="breadcrumb">
     <ol class="breadcrumb mb-0">
       <li class="breadcrumb-item active">Schedule</li>
       <li class="breadcrumb-item active">View</li>
+      <li class="breadcrumb-item active"><%= topNav %></li>
     </ol>
   </nav>
 
-  <!-- title -->
-  <div class="row gx-6 gy-3 mb-4 align-items-center">
-    <div class="col-auto">
-      <h2 class="mb-0">
-        Schedule<span class="fw-normal text-700 ms-3">(32)</span>
-      </h2>
-    </div>
-    <div class="col-auto">
-      <a
-        class="btn btn-primary px-5"
-        href="../../apps/project-management/create-new.html"
-        ><i class="fa-solid fa-plus me-2"></i>Add new schedule</a
+  <div class="mb-9">
+    <div
+      id="projectSummary"
+      data-list='{"valueNames":["schedule","month","startDate","endDate","status"],"page":6,"pagination":true}'
+    >
+      <div class="row mb-4 gx-6 gy-3 align-items-center">
+        <div class="col-auto">
+          <h2 class="mb-0">
+            Schedule<span class="fw-normal text-700 ms-3"
+              >(<%= totalReports %>)</span
+            >
+          </h2>
+        </div>
+        <div class="col-auto">
+          <a class="btn btn-primary px-5" href="/patrol-report/submit"
+            ><i class="fa-solid fa-plus me-2"></i>Add new schedule</a
+          >
+        </div>
+      </div>
+      <div class="row g-3 justify-content-between align-items-end mb-4">
+        <div class="col-12 col-sm-auto">
+          <ul class="nav nav-links mx-n2">
+            <li class="nav-item">
+              <a
+                class="nav-link px-2 py-1 <%= classActive1 %>"
+                aria-current="page"
+                href="/patrol-report/view"
+                ><span>All</span
+                ><span class="text-700 fw-semi-bold"
+                  >(<%= totalReports %>)</span
+                ></a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link px-2 py-1 <%= classActive2 %>"
+                href="/patrol-report/view/bmi"
+                ><span>Baitul Makmur I</span
+                ><span class="text-700 fw-semi-bold"
+                  >(<%= amountBMI %>)</span
+                ></a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link px-2 py-1 <%= classActive3 %>"
+                href="/patrol-report/view/bmii"
+                ><span>Baitul Makmur II</span
+                ><span class="text-700 fw-semi-bold"
+                  >(<%= amountBMII %>)</span
+                ></a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link px-2 py-1 <%= classActive4 %>"
+                href="/patrol-report/view/jm"
+                ><span>Jamek Mosque</span
+                ><span class="text-700 fw-semi-bold">(<%= amountJM %>)</span></a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link px-2 py-1 <%= classActive5 %>"
+                href="/patrol-report/view/cm"
+                ><span>City Mosque</span
+                ><span class="text-700 fw-semi-bold">(<%= amountCM %>)</span></a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link px-2 py-1 <%= classActive6 %>"
+                href="/patrol-report/view/rs"
+                ><span>Raudhatul Sakinah</span
+                ><span class="text-700 fw-semi-bold">(<%= amountRS %>)</span></a
+              >
+            </li>
+          </ul>
+        </div>
+        <div class="col-12 col-sm-auto">
+          <div class="d-flex align-items-center">
+            <div class="search-box me-0">
+              <form
+                class="position-relative"
+                data-bs-toggle="search"
+                data-bs-display="static"
+              >
+                <input
+                  class="form-control search-input search"
+                  type="search"
+                  placeholder="Search schedule"
+                  aria-label="Search"
+                />
+                <span class="fas fa-search search-box-icon"></span>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive scrollbar">
+        <table class="table fs--1 mb-0 border-top border-200">
+          <thead>
+            <tr>
+              <th
+                class="sort white-space-nowrap align-middle ps-0"
+                scope="col"
+                data-sort="schedule"
+                style="width: 30%"
+              >
+                SCHEDULE TITLE
+              </th>
+              <th
+                class="sort align-middle ps-3"
+                scope="col"
+                data-sort="month"
+                style="width: 10%"
+              >
+                MONTH
+              </th>
+              <th
+                class="sort align-middle ps-3"
+                scope="col"
+                data-sort="startDate"
+                style="width: 10%"
+              >
+                START PATROL
+              </th>
+              <th
+                class="sort align-middle ps-3"
+                scope="col"
+                data-sort="endDate"
+                style="width: 12%"
+              >
+                END PATROL
+              </th>
+              <th
+                class="sort align-middle text-end"
+                scope="col"
+                data-sort="status"
+                style="width: 10%"
+              >
+                STATUS
+              </th>
+              <th
+                class="sort align-middle text-end"
+                scope="col"
+                style="width: 10%"
+              ></th>
+            </tr>
+          </thead>
+
+          <!-- table content -->
+          <tbody class="list" id="project-list-table-body">
+            <% if (Array.isArray(itemReports) && itemReports.length > 0) { %>
+            <!-- table item -->
+            <% itemReports.forEach(function (item) { %>
+            <tr class="position-static">
+              <td
+                class="align-middle time white-space-nowrap ps-0 schedule py-4"
+              >
+                <a
+                  class="fw-bold fs-0"
+                  href="/patrol-report/details?id=<%= item.reportId %>"
+                  ><%= item.type %></a
+                >
+              </td>
+              <td class="align-middle white-space-nowrap month ps-3 py-4">
+                <p class="mb-0 fs--1 text-900"><%= item.madeBy %></p>
+              </td>
+              <td class="align-middle white-space-nowrap startDate ps-3 py-4">
+                <p class="mb-0 fs--1 text-900"><%= item.start %></p>
+              </td>
+              <td class="align-middle white-space-nowrap endDate ps-3 py-4">
+                <p class="fw-bo text-900 fs--1 mb-0"><%= item.end %></p>
+              </td>
+              <td class="align-middle white-space-nowrap text-end status">
+                <span class="badge badge-phoenix fs--2 badge-phoenix-primary"
+                  ><%= item.username %></span
+                >
+              </td>
+              <td class="align-middle text-end white-space-nowrap pe-0 action">
+                <div class="ms-10">
+                  <button
+                    class="btn btn-primary btn-icon flex-shrink-0"
+                    data-bs-toggle="modal"
+                    data-bs-target="#schedule-modal"
+                  >
+                    <span class="fa-solid fa-chevron-right"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <% }) %> <% } else { %>
+            <tr>
+              <td colspan="7">No schedule submitted.</td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+      <div
+        class="d-flex flex-wrap align-items-center justify-content-between py-3 pe-0 fs--1 border-bottom border-200"
       >
-    </div>
-  </div>
-
-  <!-- location sections -->
-  <div class="row justify-content-between align-items-end mb-4 g-3">
-    <div class="col-12 col-sm-auto">
-      <ul class="nav nav-links mx-n2">
-        <li class="nav-item">
-          <a class="nav-link px-2 py-1 active" aria-current="page" href="#"
-            ><span>All</span><span class="text-700 fw-semi-bold">(32)</span></a
-          >
-        </li>
-        <li class="nav-item">
-          <a class="nav-link px-2 py-1" href="#"
-            ><span>Baitul Makmur I</span
-            ><span class="text-700 fw-semi-bold">(total amount)</span></a
-          >
-        </li>
-        <li class="nav-item">
-          <a class="nav-link px-2 py-1" href="#"
-            ><span>Baitul Makmur II</span
-            ><span class="text-700 fw-semi-bold">(total amount)</span></a
-          >
-        </li>
-        <li class="nav-item">
-          <a class="nav-link px-2 py-1" href="#"
-            ><span>Jamek Mosque</span
-            ><span class="text-700 fw-semi-bold">(total amount)</span></a
-          >
-        </li>
-        <li class="nav-item">
-          <a class="nav-link px-2 py-1" href="#"
-            ><span>City Mosque</span
-            ><span class="text-700 fw-semi-bold">(total amount)</span></a
-          >
-        </li>
-        <li class="nav-item">
-          <a class="nav-link px-2 py-1" href="#"
-            ><span>Raudhatul Sakinah</span
-            ><span class="text-700 fw-semi-bold">(total amount)</span></a
-          >
-        </li>
-      </ul>
-    </div>
-
-    <!-- search -->
-    <div class="col-12 col-sm-auto">
-      <div class="d-flex align-items-center">
-        <div class="search-box me-0">
-          <form
-            class="position-relative"
-            data-bs-toggle="search"
-            data-bs-display="static"
-          >
-            <input
-              class="form-control search-input search"
-              type="search"
-              placeholder="Search projects"
-              aria-label="Search"
-            />
-            <span class="fas fa-search search-box-icon"></span>
-          </form>
+        <div class="d-flex">
+          <p
+            class="mb-0 d-none d-sm-block me-3 fw-semi-bold text-900"
+            data-list-info="data-list-info"
+          ></p>
+          <a class="fw-semi-bold" href="#!" data-list-view="*"
+            >View all<span
+              class="fas fa-angle-right ms-1"
+              data-fa-transform="down-1"
+            ></span></a
+          ><a class="fw-semi-bold d-none" href="#!" data-list-view="less"
+            >View Less<span
+              class="fas fa-angle-right ms-1"
+              data-fa-transform="down-1"
+            ></span
+          ></a>
+        </div>
+        <div class="d-flex">
+          <button class="page-link" data-list-pagination="prev">
+            <span class="fas fa-chevron-left"></span>
+          </button>
+          <ul class="mb-0 pagination"></ul>
+          <button class="page-link pe-0" data-list-pagination="next">
+            <span class="fas fa-chevron-right"></span>
+          </button>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- card view content -->
-  <div
-    class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xxl-4 g-3 mb-9"
-  >
-    <!-- card body-1 -->
-    <div class="col">
-      <div class="card h-100 hover-actions-trigger">
-        <div class="card-body">
-          <div class="d-flex align-items-center">
-            <h4 class="mb-2 line-clamp-1 lh-sm flex-1 me-5">Schedule Title</h4>
-            <div class="hover-actions top-0 end-0 mt-4 me-4">
-              <button
-                class="btn btn-primary btn-icon flex-shrink-0"
-                data-bs-toggle="modal"
-                data-bs-target="#schedule-modal-1"
-              >
-                <span class="fa-solid fa-chevron-right"></span>
-              </button>
-            </div>
-          </div>
-          <span class="badge badge-phoenix fs--2 mb-4 badge-phoenix-success"
-            >completed</span
-          >
-          <div class="d-flex align-items-center mb-3">
-            <span
-              class="fa-solid fa-credit-card me-2 text-700 fs--1 fw-extra-bold"
-            ></span>
-            <p class="fw-bold mb-0 lh-1">
-              Month : <span class="ms-1 text-1100">November</span>
-            </p>
-          </div>
-
-          <div class="d-flex align-items-center mt-3">
-            <p class="mb-0 fw-bold fs--1">
-              Start date :<span class="fw-semi-bold text-600 ms-1">
-                17th Nov. 2020</span
-              >
-            </p>
-          </div>
-          <div class="d-flex align-items-center mt-2">
-            <p class="mb-0 fw-bold fs--1">
-              End date :
-              <span class="fw-semi-bold text-600 ms-1"> 21st May 2028</span>
-            </p>
-          </div>
-
-          <div class="d-block align-items-center mt-3">
-            <h5>Notes</h5>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              Pellentesque odio leo, porta eu sagittis sit amet, luctus in
-              risus. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- card body-1 -->
-    <div class="col">
-      <div class="card h-100 hover-actions-trigger">
-        <div class="card-body">
-          <div class="d-flex align-items-center">
-            <h4 class="mb-2 line-clamp-1 lh-sm flex-1 me-5">
-              Schedule Title 2
-            </h4>
-            <div class="hover-actions top-0 end-0 mt-4 me-4">
-              <button
-                class="btn btn-primary btn-icon flex-shrink-0"
-                data-bs-toggle="modal"
-                data-bs-target="#schedule-modal-2"
-              >
-                <span class="fa-solid fa-chevron-right"></span>
-              </button>
-            </div>
-          </div>
-          <span class="badge badge-phoenix fs--2 mb-4 badge-phoenix-warning"
-            >Updated</span
-          >
-          <div class="d-flex align-items-center mb-3">
-            <span
-              class="fa-solid fa-credit-card me-2 text-700 fs--1 fw-extra-bold"
-            ></span>
-            <p class="fw-bold mb-0 lh-1">
-              Month : <span class="ms-1 text-1100">November</span>
-            </p>
-          </div>
-
-          <div class="d-flex align-items-center mt-3">
-            <p class="mb-0 fw-bold fs--1">
-              Start date :<span class="fw-semi-bold text-600 ms-1">
-                17th Nov. 2020</span
-              >
-            </p>
-          </div>
-          <div class="d-flex align-items-center mt-2">
-            <p class="mb-0 fw-bold fs--1">
-              End date :
-              <span class="fw-semi-bold text-600 ms-1"> 21st May 2028</span>
-            </p>
-          </div>
-
-          <div class="d-block align-items-center mt-3">
-            <h5>Notes</h5>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              Pellentesque odio leo, porta eu sagittis sit amet, luctus in
-              risus. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- schedule modal 1 -->
-  <div
-    class="modal fade"
-    id="schedule-modal-1"
-    tabindex="-1"
-    aria-labelledby="projectsCardViewModal"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-md">
-      <div class="modal-content overflow-hidden">
-        <div class="modal-body p-5">
-          <div class="row g-5">
-            <div class="col-12">
-              <!-- modal header -->
+<!-- schedule modal 2 -->
+<div
+  class="modal fade"
+  id="schedule-modal"
+  tabindex="-1"
+  aria-labelledby="schedule-modal"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-md modal-dialog-centered">
+    <div class="modal-content overflow-hidden">
+      <div class="modal-body p-5">
+        <div class="row g-5">
+          <div class="col-12">
+            <div class="modal-header border-bottom-none p-0">
               <div class="mb-3">
                 <h3 class="fw-bolder lh-sm">Schedule Title</h3>
                 <p class="text-1000 fw-semi-bold mb-0">
@@ -225,165 +265,66 @@
                 </p>
               </div>
 
-              <!-- notes -->
-              <div class="border border-300 p-3 mb-4">
-                <div class="d-flex mb-2">
-                  <p class="mb-0 fw-bold fs--1">
-                    Start date :<span class="fw-semi-bold text-600 ms-1">
-                      17th Nov. 2020</span
-                    >
-                  </p>
-                </div>
-                <div class="d-flex align-items-center">
-                  <p class="mb-0 fw-bold fs--1">
-                    End date :
-                    <span class="fw-semi-bold text-600 ms-1">
-                      21st May 2028</span
-                    >
-                  </p>
-                </div>
-              </div>
+              <!-- button close -->
+              <button
+                class="btn p-1 mt-n7"
+                type="button"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <span class="fas fa-times fs--1"></span>
+              </button>
+            </div>
 
-              <!-- downlaod or view the file -->
-              <div class="mb-6">
-                <div class="d-flex align-items-center mb-2">
-                  <h4 class="me-3">Notes</h4>
-                  <button class="btn btn-link p-0">
-                    <span class="fa-solid fa-pen"></span>
-                  </button>
-                </div>
-                <p class="text-1000">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Pellentesque odio leo, porta eu sagittis sit amet, luctus in
-                  risus. Lorem ipsum dolor sit amet, consectetur adipiscing
-                  elit.
+            <!-- notes -->
+            <div class="border border-300 p-3 mb-4">
+              <div class="d-flex mb-2">
+                <p class="mb-0 fw-bold fs--1">
+                  Start date :<span class="fw-semi-bold text-600 ms-1">
+                    17th Nov. 2020</span
+                  >
                 </p>
               </div>
-
-              <div class="bg-100 rounded-2 p-4 mb-3">
-                <div class="row justify-contnet-between g-0 gy-2 pb-3">
-                  <div class="col-12 col-sm">
-                    <p class="fs--1 text-800 mb-2">
-                      <a class="fw-semi-bold" href="#!">Full name (username) </a
-                      >uploaded a file
-                    </p>
-                    <img
-                      class="rounded-2 mb-2"
-                      src="../../assets/img/generic/42.png"
-                      alt=""
-                      width="220"
-                    />
-                    <p class="text-1000 fw-semi-bold fs--1 mb-0">
-                      Name of the file
-                    </p>
-                  </div>
-                  <div class="col-12 col-sm-auto">
-                    <p class="text-800 fw-semi-bold fs--2 mb-0">
-                      Oct 3 at 4:38 pm (Uploaded date-time)
-                    </p>
-                  </div>
-                </div>
+              <div class="d-flex align-items-center">
+                <p class="mb-0 fw-bold fs--1">
+                  End date :
+                  <span class="fw-semi-bold text-600 ms-1"> 21st May 2028</span>
+                </p>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- schedule modal 2 -->
-  <div
-    class="modal fade"
-    id="schedule-modal-2"
-    tabindex="-1"
-    aria-labelledby="projectsCardViewModal"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-md">
-      <div class="modal-content overflow-hidden">
-        <div class="modal-body p-5">
-          <div class="row g-5">
-            <div class="col-12">
-              <div class="modal-header border-bottom-none p-0">
-                <div class="mb-3">
-                  <h3 class="fw-bolder lh-sm">Schedule Title</h3>
-                  <p class="text-1000 fw-semi-bold mb-0">
-                    For month,<a class="ms-1 fw-bold" href="#!">November</a>
-                  </p>
-                </div>
-
-                <!-- button close -->
-                <button
-                  class="btn p-1 mt-n7"
-                  type="button"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                >
-                  <span class="fas fa-times fs--1"></span>
+            <!-- downlaod or view the file -->
+            <div class="mb-6">
+              <div class="d-flex align-items-center mb-2">
+                <h4 class="me-3">Notes</h4>
+                <button class="btn btn-link p-0">
+                  <span class="fa-solid fa-pen"></span>
                 </button>
               </div>
+              <p class="text-1000">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Pellentesque odio leo, porta eu sagittis sit amet, luctus in
+                risus. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              </p>
+            </div>
 
-              <!-- notes -->
-              <div class="border border-300 p-3 mb-4">
-                <div class="d-flex mb-2">
-                  <p class="mb-0 fw-bold fs--1">
-                    Start date :<span class="fw-semi-bold text-600 ms-1">
-                      17th Nov. 2020</span
-                    >
+            <div class="bg-100 rounded-2 p-4 mb-3">
+              <div class="row justify-contnet-between g-0 gy-2 pb-3">
+                <div class="col-12 col-sm">
+                  <p class="fs--1 text-800 mb-2">
+                    <a class="fw-semi-bold" href="#!">Full name (username) </a
+                    >uploaded a file
+                  </p>
+                  <!-- 16:9 aspect ratio -->
+
+                  <p class="text-1000 fw-semi-bold fs--1 mb-0">
+                    Name of the file
                   </p>
                 </div>
-                <div class="d-flex align-items-center">
-                  <p class="mb-0 fw-bold fs--1">
-                    End date :
-                    <span class="fw-semi-bold text-600 ms-1">
-                      21st May 2028</span
-                    >
+                <div class="col-12 col-sm-auto">
+                  <p class="text-800 fw-semi-bold fs--2 mb-0">
+                    Oct 3 at 4:38 pm (Uploaded date-time)
                   </p>
-                </div>
-              </div>
-
-              <!-- downlaod or view the file -->
-              <div class="mb-6">
-                <div class="d-flex align-items-center mb-2">
-                  <h4 class="me-3">Notes</h4>
-                  <button class="btn btn-link p-0">
-                    <span class="fa-solid fa-pen"></span>
-                  </button>
-                </div>
-                <p class="text-1000">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Pellentesque odio leo, porta eu sagittis sit amet, luctus in
-                  risus. Lorem ipsum dolor sit amet, consectetur adipiscing
-                  elit.
-                </p>
-              </div>
-
-              <div class="bg-100 rounded-2 p-4 mb-3">
-                <div class="row justify-contnet-between g-0 gy-2 pb-3">
-                  <div class="col-12 col-sm">
-                    <p class="fs--1 text-800 mb-2">
-                      <a class="fw-semi-bold" href="#!">Full name (username) </a
-                      >uploaded a file
-                    </p>
-                    <!-- 16:9 aspect ratio -->
-                    <div
-                      class="ratio ratio-1x1"
-                    >
-                      <iframe
-                        class="embed-responsive-item"
-                        src="assets/uploads/after-you-jojo-moyes.pdf"
-                        width="100%"
-                      ></iframe>
-                    </div>
-                    <p class="text-1000 fw-semi-bold fs--1 mb-0">
-                      Name of the file
-                    </p>
-                  </div>
-                  <div class="col-12 col-sm-auto">
-                    <p class="text-800 fw-semi-bold fs--2 mb-0">
-                      Oct 3 at 4:38 pm (Uploaded date-time)
-                    </p>
-                  </div>
                 </div>
               </div>
             </div>
