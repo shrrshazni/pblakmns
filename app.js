@@ -10,11 +10,12 @@ const passportLocalMongoose = require('passport-local-mongoose');
 const findOrCreate = require('mongoose-findorcreate');
 const MongoDBSession = require('connect-mongodb-session')(session);
 const crypto = require('crypto');
-const multer = require('multer');
+const fs = require('fs');
 const path = require('path');
 const fileUpload = require('express-fileupload');
 // getdate
 const date = require('./public/assets/js/date');
+const { string } = require('yargs');
 
 const mongoURI = 'mongodb://localhost:27017/sessions';
 
@@ -99,15 +100,11 @@ app.get('/', async function (req, res) {
 
     const checkUser = await User.findOne({ username: currentUsername });
 
-    // generate random id
-    const rid = crypto.randomBytes(6).toString('hex').toUpperCase();
-    console.log('Home rid:' + rid);
-
     if (checkUser) {
       res.render('home', {
         currentFullName: checkUser.fullname,
         currentUser: checkUser.username,
-        rid : crypto.randomBytes(6).toString('hex').toUpperCase()
+        rid: crypto.randomBytes(6).toString('hex').toUpperCase()
       });
     }
   } else {
@@ -183,10 +180,7 @@ app.get('/reset-password', function (req, res) {
   res.render('reset-password');
 });
 
-// generate random id
-const reportId = crypto.randomBytes(6).toString('hex').toUpperCase();
-
-// For Files
+// FILES
 
 // Define a schema for your model (e.g., for storing file metadata)
 const FileSchema = new mongoose.Schema({
@@ -277,7 +271,7 @@ app
         res.render('patrol-report-submit', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
-          reportId: reportId,
+          reportId: rid,
           //validation
           validationReportType: '',
           validationStartTime: '',
@@ -593,6 +587,7 @@ app.get('/patrol-report/view', async function (req, res) {
   }
 });
 
+// view custom name list other locations
 app.get('/patrol-report/view/:customListName', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -947,59 +942,476 @@ app.get('/case-report/view', async function (req, res) {
 
 // SCHEDULE
 
-// case schema init
+// schedule schema init
 const scheduleSchema = new mongoose.Schema({
+  reportId: String,
+  by: String,
   location: String,
   scheduleTitle: String,
   month: String,
   startDate: String,
   endDate: String,
-  status: String
+  status: String,
+  notes : String
 });
 
 const Schedule = mongoose.model('Schedule', scheduleSchema);
 
-// schedule submit
+// file schedule schema init
 
-app.get('/schedule/submit', async function (req, res) {
-  if (req.isAuthenticated()) {
-    var currentUsername = req.session.user.username;
+const fileScheduleSchema = new mongoose.Schema({
+  reportId: String,
+  by: String,
+  filename: String,
+  path: String,
+  date: String,
+  fileType: String
+});
+
+const FileSchedule = mongoose.model('FileSchedule', fileScheduleSchema);
+
+// schedule file upload
+app.post('/upload-schedule', async (req, res) => {
+  if (!req.files || Object.keys(req.files).length === 0) {
+    console.log('There is no files selected');
+  } else {
+    // find user full name
+    const currentUsername = req.session.user.username;
+    const checkUser = await User.findOne({ username: currentUsername });
+
+    // find current confirm report id
+    const confirmRid = req.body.fileReportId;
+
+    // Check if the report ID exists in the database
+    const existingFile = await FileSchedule.findOne({ reportId: confirmRid });
+
+    if (!existingFile) {
+      // No file with the report ID found, proceed with file upload
+      for (const file of Object.values(req.files)) {
+        const uploadPath = __dirname + '/public/uploads/' + file.name;
+        const pathFile = 'uploads/' + file.name;
+        const todayDate = date.getDate();
+        const fileType = path.extname(file.name);
+
+        file.mv(uploadPath, err => {
+          if (err) {
+            console.log(err);
+          }
+
+          // Save file information to the MongoDB
+          const newFile = new FileSchedule({
+            reportId: confirmRid,
+            by: checkUser.fullname,
+            filename: file.name,
+            path: pathFile,
+            date: todayDate,
+            fileType: fileType
+          });
+
+          newFile.save();
+        });
+      }
+      console.log('Files uploaded');
+    } else {
+      // File with the report ID already exists
+      console.log('Files already uploaded');
+    }
+  }
+});
+
+// schedule submit
+app
+  .get('/schedule/submit', async function (req, res) {
+    if (req.isAuthenticated()) {
+      var currentUsername = req.session.user.username;
+
+      const checkUser = await User.findOne({ username: currentUsername });
+
+      const confirmRid = req.query.rid;
+      console.log(confirmRid);
+
+      if (checkUser) {
+        res.render('schedule-submit', {
+          currentFullName: checkUser.fullname,
+          currentUser: checkUser.username,
+          reportId: confirmRid,
+          //validation
+          validationScheduleTitle: '',
+          validationStartDate: '',
+          validationEndDate: '',
+          validationMonth: '',
+          validationLocation: '',
+          validationStatus: '',
+          //form name
+          scheduleTitle: '',
+          startDate: '',
+          endDate: '',
+          month: '',
+          location: '',
+          status: '',
+          //toast alert
+          toastShow: '',
+          toastMsg: ''
+        });
+      }
+    } else {
+      res.redirect('/sign-in');
+    }
+  })
+  .post('/schedule/submit', async function (req, res) {
+    var validationScheduleTitle = '';
+    var validationStartDate = '';
+    var validationEndDate = '';
+    var validationMonth = '';
+    var validationLocation = '';
+    var validationStatus = '';
+    var validationNotes = '';
+
+    const scheduleTitle = req.body.scheduleTitle;
+    const startDate = req.body.startDate;
+    const endDate = req.body.endDate;
+    const location = req.body.location;
+    const month = req.body.month;
+    const status = req.body.status;
+    const notes = req.body.notes;
+
+    const currentUsername = req.session.user.username;
+    const confirmRid = req.body.confirmRid;
 
     const checkUser = await User.findOne({ username: currentUsername });
-    // generate random id
-    const rid = crypto.randomBytes(6).toString('hex').toUpperCase();
-    console.log('Schedule rid:' + rid);
 
-    if (checkUser) {
+    // Validate the scheduleTitle
+    if (!scheduleTitle || scheduleTitle === '') {
+      validationScheduleTitle = 'is-invalid';
+    } else {
+      validationScheduleTitle = 'is-valid';
+    }
+
+    // Validate the startDate
+    if (!startDate || startDate === '') {
+      validationStartDate = 'is-invalid';
+    } else {
+      validationStartDate = 'is-valid';
+    }
+
+    // Validate the endDate
+    if (!endDate || endDate === '') {
+      validationEndDate = 'is-invalid';
+    } else {
+      validationEndDate = 'is-valid';
+    }
+
+    // Validate the month
+    if (!month || month === '') {
+      validationMonth = 'is-invalid';
+    } else {
+      validationMonth = 'is-valid';
+    }
+
+    // Validate the location
+    if (!location || location === '') {
+      validationLocation = 'is-invalid';
+    } else {
+      validationLocation = 'is-valid';
+    }
+
+    // Validate the status
+    if (!status || status === '') {
+      validationStatus = 'is-invalid';
+    } else {
+      validationStatus = 'is-valid';
+    }
+
+    // Validate the notes
+    if (!notes || notes === '') {
+      validationNotes = 'is-invalid';
+    } else {
+      validationNotes = 'is-valid';
+    }
+
+    if (
+      validationScheduleTitle === 'is-valid' &&
+      validationStartDate === 'is-valid' &&
+      validationEndDate === 'is-valid' &&
+      validationMonth === 'is-valid' &&
+      validationLocation === 'is-valid' &&
+      validationStatus === 'is-valid' &&
+      validationNotes === 'is-valid'
+    ) {
+      const currentUser = checkUser.username;
+
+      const newSchedule = new Schedule({
+        reportId: confirmRid,
+        by: currentUser,
+        location: location,
+        scheduleTitle: scheduleTitle,
+        month: month,
+        startDate: startDate,
+        endDate: endDate,
+        status: status,
+        notes : notes
+      });
+
+      const existing = await Schedule.findOne({ reportId: confirmRid });
+
+      if (!existing) {
+        const result = Schedule.create(newSchedule);
+
+        if (result) {
+          // sucessfully added report
+          console.log('Successfully added report!');
+
+          const checkUser = await User.findOne({ username: currentUsername });
+
+          if (checkUser) {
+            // schedules
+            const itemSchedules = await Schedule.find({});
+            const itemBMI = await Schedule.find({
+              location: 'Baitul Makmur I'
+            });
+            const itemBMII = await Schedule.find({
+              location: 'Baitul Makmur II'
+            });
+            const itemJM = await Schedule.find({ location: 'Jamek Mosque' });
+            const itemCM = await Schedule.find({ location: 'City Mosque' });
+            const itemRS = await Schedule.find({
+              location: 'Raudhatul Sakinah'
+            });
+
+            // schedules file
+            const itemFiles = await FileSchedule.find({});
+
+            if (itemSchedules.length > 0) {
+              res.render('schedule', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                itemFiles: itemFiles,
+                itemSchedules: itemSchedules,
+                totalSchedules: itemSchedules.length,
+                amountBMI: itemBMI.length,
+                amountBMII: itemBMII.length,
+                amountJM: itemJM.length,
+                amountCM: itemCM.length,
+                amountRS: itemRS.length,
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated rid
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Submit schedule successful!'
+              });
+            } else {
+              res.render('schedule', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                itemFiles: '',
+                itemSchedules: '',
+                totalSchedules: '0',
+                amountBMI: '0',
+                amountBMII: '0',
+                amountJM: '0',
+                amountCM: '0',
+                amountRS: '0',
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated rid
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Submit schedule successful!'
+              });
+            }
+          }
+        } else {
+          // failed added report
+          console.log('Report add failed!');
+
+          const checkUser = await User.findOne({ username: currentUsername });
+
+          if (checkUser) {
+            // schedules
+            const itemSchedules = await Schedule.find({});
+            const itemBMI = await Schedule.find({
+              location: 'Baitul Makmur I'
+            });
+            const itemBMII = await Schedule.find({
+              location: 'Baitul Makmur II'
+            });
+            const itemJM = await Schedule.find({ location: 'Jamek Mosque' });
+            const itemCM = await Schedule.find({ location: 'City Mosque' });
+            const itemRS = await Schedule.find({
+              location: 'Raudhatul Sakinah'
+            });
+
+            // schedules file
+            const itemFiles = await FileSchedule.find({});
+
+            if (itemSchedules.length > 0) {
+              res.render('schedule', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                itemFiles: itemFiles,
+                itemSchedules: itemSchedules,
+                totalSchedules: itemSchedules.length,
+                amountBMI: itemBMI.length,
+                amountBMII: itemBMII.length,
+                amountJM: itemJM.length,
+                amountCM: itemCM.length,
+                amountRS: itemRS.length,
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated rid
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Add schedule failed!'
+              });
+            } else {
+              res.render('schedule', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                itemFiles: '',
+                itemSchedules: '',
+                totalSchedules: '0',
+                amountBMI: '0',
+                amountBMII: '0',
+                amountJM: '0',
+                amountCM: '0',
+                amountRS: '0',
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated rid
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Add schedule failed!'
+              });
+            }
+          }
+        }
+      } else {
+        console.log('There is existing schedule.');
+
+        const checkUser = await User.findOne({ username: currentUsername });
+
+        if (checkUser) {
+          // schedules
+          const itemSchedules = await Schedule.find({});
+          const itemBMI = await Schedule.find({
+            location: 'Baitul Makmur I'
+          });
+          const itemBMII = await Schedule.find({
+            location: 'Baitul Makmur II'
+          });
+          const itemJM = await Schedule.find({ location: 'Jamek Mosque' });
+          const itemCM = await Schedule.find({ location: 'City Mosque' });
+          const itemRS = await Schedule.find({
+            location: 'Raudhatul Sakinah'
+          });
+
+          // schedules file
+          const itemFiles = await FileSchedule.find({});
+
+          if (itemSchedules.length > 0) {
+            res.render('schedule', {
+              currentFullName: checkUser.fullname,
+              currentUser: checkUser.username,
+              itemFiles: itemFiles,
+              itemSchedules: itemSchedules,
+              totalSchedules: itemSchedules.length,
+              amountBMI: itemBMI.length,
+              amountBMII: itemBMII.length,
+              amountJM: itemJM.length,
+              amountCM: itemCM.length,
+              amountRS: itemRS.length,
+              topNav: 'All',
+              classActive1: 'active',
+              classActive2: '',
+              classActive3: '',
+              classActive4: '',
+              classActive5: '',
+              classActive6: '',
+              // generated rid
+              rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+              // toast alert
+              toastShow: 'show',
+              toastMsg: 'There is existing schedule!'
+            });
+          } else {
+            res.render('schedule', {
+              currentFullName: checkUser.fullname,
+              currentUser: checkUser.username,
+              itemFiles: '',
+              itemSchedules: '',
+              totalSchedules: '0',
+              amountBMI: '0',
+              amountBMII: '0',
+              amountJM: '0',
+              amountCM: '0',
+              amountRS: '0',
+              topNav: 'All',
+              classActive1: 'active',
+              classActive2: '',
+              classActive3: '',
+              classActive4: '',
+              classActive5: '',
+              classActive6: '',
+              // generated rid
+              rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+              // toast alert
+              toastShow: 'show',
+              toastMsg: 'There is existing schedule!'
+            });
+          }
+        }
+      }
+    } else {
       res.render('schedule-submit', {
         currentFullName: checkUser.fullname,
         currentUser: checkUser.username,
-        reportId: reportId,
+        reportId: confirmRid,
         //validation
-        validationReportType: '',
-        validationStartTime: '',
-        validationEndTime: '',
-        validationDate: '',
-        validationLocation: '',
-        validationReportSummary: '',
-        validationNotes: '',
+        validationScheduleTitle: validationScheduleTitle,
+        validationStartDate: validationStartDate,
+        validationEndDate: validationEndDate,
+        validationMonth: validationMonth,
+        validationLocation: validationLocation,
+        validationStatus: validationStatus,
+        validationNotes : validationNotes,
         //form name
-        reportType: '',
-        startTime: '',
-        endTime: '',
-        date: '',
-        location: '',
-        reportSummary: '',
-        notes: '',
+        scheduleTitle: scheduleTitle,
+        startDate: startDate,
+        endDate: endDate,
+        month: month,
+        location: location,
+        status: status,
         //toast alert
-        toastShow: '',
-        toastMsg: ''
+        toastShow: 'show',
+        toastMsg: 'There is error in your input!'
       });
     }
-  } else {
-    res.redirect('/sign-in');
-  }
-});
+  });
 
 app.get('/schedule', async function (req, res) {
   if (req.isAuthenticated()) {
@@ -1007,26 +1419,27 @@ app.get('/schedule', async function (req, res) {
 
     const checkUser = await User.findOne({ username: currentUsername });
 
-    // generate random id
-    const rid = crypto.randomBytes(6).toString('hex').toUpperCase();
-    console.log('Schedule view rid:' + rid);
-
     if (checkUser) {
-      const itemReports = await PatrolReport.find({});
-      const itemBMI = await PatrolReport.find({ location: 'Baitul Makmur I' });
-      const itemBMII = await PatrolReport.find({
+      // schedules
+      const itemSchedules = await Schedule.find({});
+      const itemBMI = await Schedule.find({ location: 'Baitul Makmur I' });
+      const itemBMII = await Schedule.find({
         location: 'Baitul Makmur II'
       });
-      const itemJM = await PatrolReport.find({ location: 'Jamek Mosque' });
-      const itemCM = await PatrolReport.find({ location: 'City Mosque' });
-      const itemRS = await PatrolReport.find({ location: 'Raudhatul Sakinah' });
+      const itemJM = await Schedule.find({ location: 'Jamek Mosque' });
+      const itemCM = await Schedule.find({ location: 'City Mosque' });
+      const itemRS = await Schedule.find({ location: 'Raudhatul Sakinah' });
 
-      if (itemReports.length > 0) {
+      // schedules file
+      const itemFiles = await FileSchedule.find({});
+
+      if (itemSchedules.length > 0) {
         res.render('schedule', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
-          itemReports: itemReports,
-          totalReports: itemReports.length,
+          itemFiles: itemFiles,
+          itemSchedules: itemSchedules,
+          totalSchedules: itemSchedules.length,
           amountBMI: itemBMI.length,
           amountBMII: itemBMII.length,
           amountJM: itemJM.length,
@@ -1038,14 +1451,20 @@ app.get('/schedule', async function (req, res) {
           classActive3: '',
           classActive4: '',
           classActive5: '',
-          classActive6: ''
+          classActive6: '',
+          // generated rid
+          rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+          // toast alert
+          toastShow: '',
+          toastMsg: ''
         });
       } else {
         res.render('schedule', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
-          itemReports: 'There is no patrol report submitted yet.',
-          totalReports: '0',
+          itemFiles: '',
+          itemSchedules: '',
+          totalSchedules: '0',
           amountBMI: '0',
           amountBMII: '0',
           amountJM: '0',
@@ -1057,7 +1476,12 @@ app.get('/schedule', async function (req, res) {
           classActive3: '',
           classActive4: '',
           classActive5: '',
-          classActive6: ''
+          classActive6: '',
+          // generated rid
+          rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+          // toast alert
+          toastShow: '',
+          toastMsg: ''
         });
       }
     }
@@ -1072,29 +1496,31 @@ app.get('/schedule/:customListName', async function (req, res) {
     const checkUser = await User.findOne({ username: currentUsername });
 
     const customListName = _.upperCase(req.params.customListName);
-    // generate random id
-    const rid = crypto.randomBytes(6).toString('hex').toUpperCase();
-    console.log('Schedule custom view rid:' + rid);
 
     if (checkUser) {
-      const itemReports = await PatrolReport.find({});
-      const itemBMI = await PatrolReport.find({ location: 'Baitul Makmur I' });
-      const itemBMII = await PatrolReport.find({
+      // schedules
+      const itemSchedules = await Schedule.find({});
+      const itemBMI = await Schedule.find({ location: 'Baitul Makmur I' });
+      const itemBMII = await Schedule.find({
         location: 'Baitul Makmur II'
       });
-      const itemJM = await PatrolReport.find({ location: 'Jamek Mosque' });
-      const itemCM = await PatrolReport.find({ location: 'City Mosque' });
-      const itemRS = await PatrolReport.find({ location: 'Raudhatul Sakinah' });
+      const itemJM = await Schedule.find({ location: 'Jamek Mosque' });
+      const itemCM = await Schedule.find({ location: 'City Mosque' });
+      const itemRS = await Schedule.find({ location: 'Raudhatul Sakinah' });
+
+      // schedules file
+      const itemFiles = await FileSchedule.find({});
 
       // check customlistname
       if (customListName === 'BMI') {
         // view for baitul makmur 1
-        if (itemReports.length > 0) {
+        if (itemSchedules.length > 0) {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
-            itemReports: itemBMI,
-            totalReports: itemBMI.length,
+            itemFiles: itemFiles,
+            itemSchedules: itemBMI,
+            totalSchedules: itemSchedules.length,
             amountBMI: itemBMI.length,
             amountBMII: itemBMII.length,
             amountJM: itemJM.length,
@@ -1106,14 +1532,20 @@ app.get('/schedule/:customListName', async function (req, res) {
             classActive3: '',
             classActive4: '',
             classActive5: '',
-            classActive6: ''
+            classActive6: '',
+            // generated rid
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         } else {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
-            itemReports: 'There is no patrol report submitted yet.',
-            totalReports: '0',
+            itemFiles: '',
+            itemSchedules: '',
+            totalSchedules: '0',
             amountBMI: '0',
             amountBMII: '0',
             amountJM: '0',
@@ -1125,17 +1557,23 @@ app.get('/schedule/:customListName', async function (req, res) {
             classActive3: '',
             classActive4: '',
             classActive5: '',
-            classActive6: ''
+            classActive6: '',
+            // generated rid
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         }
       } else if (customListName === 'BMII') {
         // view for baitul makmur 2
-        if (itemReports.length > 0) {
+        if (itemSchedules.length > 0) {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
-            itemReports: itemBMII,
-            totalReports: itemBMII.length,
+            itemFiles: itemFiles,
+            itemSchedules: itemBMII,
+            totalSchedules: itemSchedules.length,
             amountBMI: itemBMI.length,
             amountBMII: itemBMII.length,
             amountJM: itemJM.length,
@@ -1147,14 +1585,20 @@ app.get('/schedule/:customListName', async function (req, res) {
             classActive3: 'active',
             classActive4: '',
             classActive5: '',
-            classActive6: ''
+            classActive6: '',
+            // generated rid
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         } else {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
-            itemReports: 'There is no patrol report submitted yet.',
-            totalReports: '0',
+            itemFiles: '',
+            itemSchedules: '',
+            totalSchedules: '0',
             amountBMI: '0',
             amountBMII: '0',
             amountJM: '0',
@@ -1166,17 +1610,23 @@ app.get('/schedule/:customListName', async function (req, res) {
             classActive3: 'active',
             classActive4: '',
             classActive5: '',
-            classActive6: ''
+            classActive6: '',
+            // generated rid
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         }
       } else if (customListName === 'JM') {
         // view for jamek mosque
-        if (itemReports.length > 0) {
+        if (itemSchedules.length > 0) {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
-            itemReports: itemJM,
-            totalReports: itemJM.length,
+            itemFiles: itemFiles,
+            itemSchedules: itemJM,
+            totalSchedules: itemSchedules.length,
             amountBMI: itemBMI.length,
             amountBMII: itemBMII.length,
             amountJM: itemJM.length,
@@ -1188,14 +1638,20 @@ app.get('/schedule/:customListName', async function (req, res) {
             classActive3: '',
             classActive4: 'active',
             classActive5: '',
-            classActive6: ''
+            classActive6: '',
+            // generated rid
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         } else {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
-            itemReports: 'There is no patrol report submitted yet.',
-            totalReports: '0',
+            itemFiles: '',
+            itemSchedules: '',
+            totalSchedules: '0',
             amountBMI: '0',
             amountBMII: '0',
             amountJM: '0',
@@ -1207,17 +1663,23 @@ app.get('/schedule/:customListName', async function (req, res) {
             classActive3: '',
             classActive4: 'active',
             classActive5: '',
-            classActive6: ''
+            classActive6: '',
+            // generated rid
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         }
       } else if (customListName === 'CM') {
         // view for city mosque
-        if (itemReports.length > 0) {
+        if (itemSchedules.length > 0) {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
-            itemReports: itemCM,
-            totalReports: itemCM.length,
+            itemFiles: itemFiles,
+            itemSchedules: itemCM,
+            totalSchedules: itemSchedules.length,
             amountBMI: itemBMI.length,
             amountBMII: itemBMII.length,
             amountJM: itemJM.length,
@@ -1229,14 +1691,20 @@ app.get('/schedule/:customListName', async function (req, res) {
             classActive3: '',
             classActive4: '',
             classActive5: 'active',
-            classActive6: ''
+            classActive6: '',
+            // generated rid
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         } else {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
-            itemReports: 'There is no patrol report submitted yet.',
-            totalReports: '0',
+            itemFiles: '',
+            itemSchedules: '',
+            totalSchedules: '0',
             amountBMI: '0',
             amountBMII: '0',
             amountJM: '0',
@@ -1248,17 +1716,23 @@ app.get('/schedule/:customListName', async function (req, res) {
             classActive3: '',
             classActive4: '',
             classActive5: 'active',
-            classActive6: ''
+            classActive6: '',
+            // generated rid
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         }
       } else if (customListName === 'RS') {
-        // view for raudhatul sakinah
-        if (itemReports.length > 0) {
+        // view for city mosque
+        if (itemSchedules.length > 0) {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
-            itemReports: itemRS,
-            totalReports: itemRS.length,
+            itemFiles: itemFiles,
+            itemSchedules: itemRS,
+            totalSchedules: itemSchedules.length,
             amountBMI: itemBMI.length,
             amountBMII: itemBMII.length,
             amountJM: itemJM.length,
@@ -1270,14 +1744,20 @@ app.get('/schedule/:customListName', async function (req, res) {
             classActive3: '',
             classActive4: '',
             classActive5: '',
-            classActive6: 'active'
+            classActive6: 'active',
+            // generated rid
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         } else {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
-            itemReports: 'There is no patrol report submitted yet.',
-            totalReports: '0',
+            itemFiles: '',
+            itemSchedules: '',
+            totalSchedules: '0',
             amountBMI: '0',
             amountBMII: '0',
             amountJM: '0',
@@ -1289,7 +1769,12 @@ app.get('/schedule/:customListName', async function (req, res) {
             classActive3: '',
             classActive4: '',
             classActive5: '',
-            classActive6: 'active'
+            classActive6: 'active',
+            // generated rid
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         }
       } else {

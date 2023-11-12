@@ -18,12 +18,12 @@
         <div class="col-auto">
           <h2 class="mb-0">
             Schedule<span class="fw-normal text-700 ms-3"
-              >(<%= totalReports %>)</span
+              >(<%= totalSchedules %>)</span
             >
           </h2>
         </div>
         <div class="col-auto">
-          <a class="btn btn-primary px-5" href="/patrol-report/submit"
+          <a class="btn btn-primary px-5" href="/schedule/submit?rid=<%= rid %>"
             ><i class="fa-solid fa-plus me-2"></i>Add new schedule</a
           >
         </div>
@@ -35,17 +35,17 @@
               <a
                 class="nav-link px-2 py-1 <%= classActive1 %>"
                 aria-current="page"
-                href="/patrol-report/view"
+                href="/schedule"
                 ><span>All</span
                 ><span class="text-700 fw-semi-bold"
-                  >(<%= totalReports %>)</span
+                  >(<%= totalSchedules %>)</span
                 ></a
               >
             </li>
             <li class="nav-item">
               <a
                 class="nav-link px-2 py-1 <%= classActive2 %>"
-                href="/patrol-report/view/bmi"
+                href="/schedule/bmi"
                 ><span>Baitul Makmur I</span
                 ><span class="text-700 fw-semi-bold"
                   >(<%= amountBMI %>)</span
@@ -55,7 +55,7 @@
             <li class="nav-item">
               <a
                 class="nav-link px-2 py-1 <%= classActive3 %>"
-                href="/patrol-report/view/bmii"
+                href="/schedule/bmii"
                 ><span>Baitul Makmur II</span
                 ><span class="text-700 fw-semi-bold"
                   >(<%= amountBMII %>)</span
@@ -65,7 +65,7 @@
             <li class="nav-item">
               <a
                 class="nav-link px-2 py-1 <%= classActive4 %>"
-                href="/patrol-report/view/jm"
+                href="/schedule/jm"
                 ><span>Jamek Mosque</span
                 ><span class="text-700 fw-semi-bold">(<%= amountJM %>)</span></a
               >
@@ -73,7 +73,7 @@
             <li class="nav-item">
               <a
                 class="nav-link px-2 py-1 <%= classActive5 %>"
-                href="/patrol-report/view/cm"
+                href="/schedule/cm"
                 ><span>City Mosque</span
                 ><span class="text-700 fw-semi-bold">(<%= amountCM %>)</span></a
               >
@@ -81,7 +81,7 @@
             <li class="nav-item">
               <a
                 class="nav-link px-2 py-1 <%= classActive6 %>"
-                href="/patrol-report/view/rs"
+                href="/schedule/rs"
                 ><span>Raudhatul Sakinah</span
                 ><span class="text-700 fw-semi-bold">(<%= amountRS %>)</span></a
               >
@@ -135,15 +135,15 @@
                 data-sort="startDate"
                 style="width: 10%"
               >
-                START PATROL
+                START DATE
               </th>
               <th
                 class="sort align-middle ps-3"
                 scope="col"
                 data-sort="endDate"
-                style="width: 12%"
+                style="width: 10%"
               >
-                END PATROL
+                END DATE
               </th>
               <th
                 class="sort align-middle text-end"
@@ -163,31 +163,33 @@
 
           <!-- table content -->
           <tbody class="list" id="project-list-table-body">
-            <% if (Array.isArray(itemReports) && itemReports.length > 0) { %>
+            <% if (Array.isArray(itemSchedules) && itemSchedules.length > 0) {
+            %>
             <!-- table item -->
-            <% itemReports.forEach(function (item) { %>
+            <% itemSchedules.forEach(function (item) { %>
             <tr class="position-static">
               <td
                 class="align-middle time white-space-nowrap ps-0 schedule py-4"
               >
                 <a
                   class="fw-bold fs-0"
-                  href="/patrol-report/details?id=<%= item.reportId %>"
-                  ><%= item.type %></a
+                  data-bs-toggle="modal"
+                  data-bs-target="#schedule-modal-<%= item.reportId %>"
+                  ><%= item.scheduleTitle %></a
                 >
               </td>
               <td class="align-middle white-space-nowrap month ps-3 py-4">
-                <p class="mb-0 fs--1 text-900"><%= item.madeBy %></p>
+                <p class="mb-0 fs--1 text-900"><%= item.month %></p>
               </td>
               <td class="align-middle white-space-nowrap startDate ps-3 py-4">
-                <p class="mb-0 fs--1 text-900"><%= item.start %></p>
+                <p class="mb-0 fs--1 text-900"><%= item.startDate %></p>
               </td>
               <td class="align-middle white-space-nowrap endDate ps-3 py-4">
-                <p class="fw-bo text-900 fs--1 mb-0"><%= item.end %></p>
+                <p class="fw-bo text-900 fs--1 mb-0"><%= item.endDate %></p>
               </td>
               <td class="align-middle white-space-nowrap text-end status">
-                <span class="badge badge-phoenix fs--2 badge-phoenix-primary"
-                  ><%= item.username %></span
+                <span class="badge badge-phoenix fs--2 badge-phoenix-success"
+                  ><%= item.status %></span
                 >
               </td>
               <td class="align-middle text-end white-space-nowrap pe-0 action">
@@ -195,7 +197,7 @@
                   <button
                     class="btn btn-primary btn-icon flex-shrink-0"
                     data-bs-toggle="modal"
-                    data-bs-target="#schedule-modal"
+                    data-bs-target="#schedule-modal-<%= item.reportId %>"
                   >
                     <span class="fa-solid fa-chevron-right"></span>
                   </button>
@@ -244,10 +246,126 @@
   </div>
 </div>
 
-<!-- schedule modal 2 -->
+<% if (Array.isArray(itemSchedules) && itemSchedules.length > 0) { %> <%
+itemSchedules.forEach(function (item) { %>
 <div
   class="modal fade"
-  id="schedule-modal"
+  id="schedule-modal-<%= item.reportId %>"
+  tabindex="-1"
+  aria-labelledby="schedule-modal"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-md modal-dialog-centered">
+    <div class="modal-content overflow-hidden">
+      <div class="modal-body p-5">
+        <div class="row g-5">
+          <div class="col-12">
+            <div class="modal-header border-bottom-none p-0">
+              <div class="mb-3">
+                <h3 class="fw-bolder lh-sm"><%= item.scheduleTitle %></h3>
+                <p class="text-1000 fw-semi-bold mb-0">
+                  For month,<a class="ms-1 fw-bold" href="#!"
+                    ><%= item.month %></a
+                  >
+                </p>
+              </div>
+
+              <!-- button close -->
+              <button
+                class="btn p-1 mt-n7"
+                type="button"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <span class="fas fa-times fs--1"></span>
+              </button>
+            </div>
+
+            <!-- notes -->
+            <div class="mb-4 py-3">
+              <div class="d-flex mb-2">
+                <p class="mb-0 fw-bold fs--1">
+                  Start date :<span class="fw-semi-bold text-600 ms-1">
+                    <%= item.startDate%></span
+                  >
+                </p>
+              </div>
+              <div class="d-flex align-items-center">
+                <p class="mb-0 fw-bold fs--1">
+                  End date :
+                  <span class="fw-semi-bold text-600 ms-1"
+                    ><%= item.endDate%></span
+                  >
+                </p>
+              </div>
+            </div>
+
+            <!-- downlaod or view the file -->
+            <div class="mb-6">
+              <div class="d-flex align-items-center mb-2">
+                <h4 class="me-3">Notes</h4>
+                <button class="btn btn-link p-0">
+                  <span class="fa-solid fa-pen"></span>
+                </button>
+              </div>
+              <p class="text-1000"><%= item.notes %></p>
+            </div>
+
+            <% if (Array.isArray(itemFiles) && itemFiles.length > 0) {
+            %> <% itemFiles.forEach(function (item2) { %>
+            <% if (item2.reportId === item.reportId) {%>
+            <div class="bg-100 rounded-2 p-4 mb-3">
+              <div class="row justify-content-between g-0 gy-2 pb-3">
+                <div class="col-12 col-sm">
+                  <p class="fs--1 text-800 mb-2">
+                    <a class="fw-semi-bold" href="#!"><%= item2.by %> </a
+                    >uploaded a file
+                  </p>
+
+                  <p class="text-1000 fw-semi-bold fs--1 mb-0">
+                    <%= item2.filename %>
+                  </p>
+                </div>
+                <div class="col-12 col-sm-auto">
+                  <p class="text-800 fw-semi-bold fs--2 mb-0">
+                    <%= item2.date %>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <% } %>
+            <% }) %> <% } else { %>
+              <div class="bg-100 rounded-2 p-4 mb-3">
+              <div class="row justify-content-between g-0 gy-2 pb-3">
+                <div class="col-12 col-sm">
+                  <p class="fs--1 text-800 mb-2">
+                    <a class="fw-semi-bold" href="#!">There is no file uploaded </a
+                    >
+                  </p>
+
+                  <p class="text-1000 fw-semi-bold fs--1 mb-0">
+                    None
+                  </p>
+                </div>
+                <div class="col-12 col-sm-auto">
+                  <p class="text-800 fw-semi-bold fs--2 mb-0">
+                    None
+                  </p>
+                </div>
+              </div>
+            </div>
+            <% } %>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<% }) %> <% } else { %>
+<div
+  class="modal fade"
+  id="schedule-modal-"
   tabindex="-1"
   aria-labelledby="schedule-modal"
   aria-hidden="true"
@@ -261,7 +379,7 @@
               <div class="mb-3">
                 <h3 class="fw-bolder lh-sm">Schedule Title</h3>
                 <p class="text-1000 fw-semi-bold mb-0">
-                  For month,<a class="ms-1 fw-bold" href="#!">November</a>
+                  For month,<a class="ms-1 fw-bold" href="#!">None</a>
                 </p>
               </div>
 
@@ -281,14 +399,14 @@
               <div class="d-flex mb-2">
                 <p class="mb-0 fw-bold fs--1">
                   Start date :<span class="fw-semi-bold text-600 ms-1">
-                    17th Nov. 2020</span
+                    None</span
                   >
                 </p>
               </div>
               <div class="d-flex align-items-center">
                 <p class="mb-0 fw-bold fs--1">
                   End date :
-                  <span class="fw-semi-bold text-600 ms-1"> 21st May 2028</span>
+                  <span class="fw-semi-bold text-600 ms-1"> None</span>
                 </p>
               </div>
             </div>
@@ -296,16 +414,12 @@
             <!-- downlaod or view the file -->
             <div class="mb-6">
               <div class="d-flex align-items-center mb-2">
-                <h4 class="me-3">Notes</h4>
+                <h4 class="me-3">None</h4>
                 <button class="btn btn-link p-0">
                   <span class="fa-solid fa-pen"></span>
                 </button>
               </div>
-              <p class="text-1000">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Pellentesque odio leo, porta eu sagittis sit amet, luctus in
-                risus. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              </p>
+              <p class="text-1000">None</p>
             </div>
 
             <div class="bg-100 rounded-2 p-4 mb-3">
@@ -330,6 +444,35 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+<% } %>
+<!-- toast alert -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+  <div class="d-flex">
+    <div
+      class="toast <%= toastShow %> align-items-center text-white bg-primary border-0 light"
+      role="alert"
+      data-bs-autohide="false"
+      aria-live="assertive"
+      aria-atomic="true"
+      id="alertToast"
+    >
+      <div class="d-flex">
+        <div class="toast-body p-3">
+          <code class="text-white"><%= toastMsg %></code>
+        </div>
+
+        <button
+          class="btn ms-2 p-0 btn-close-white"
+          type="button"
+          data-bs-dismiss="toast"
+          aria-label="Close"
+        >
+          <span class="uil uil-times fs-1"></span>
+        </button>
       </div>
     </div>
   </div>

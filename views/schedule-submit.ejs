@@ -40,8 +40,8 @@
                   class="dropzone dropzone-multiple p-0 mb-4"
                   id="myDropzone"
                   data-dropzone="data-dropzone"
-                  action="/upload"
-                  data-options='{"url":"/upload","paramName": "file"}'
+                  action="/upload-schedule"
+                  data-options='{"url":"/upload-schedule","paramName": "file"}'
                 >
                   <div class="dz-message" data-dz-message="data-dz-message">
                     <img
@@ -107,16 +107,21 @@
                       </div>
                     </div>
                   </div>
+                  <input
+                    type="text"
+                    style="display: none"
+                    value="<%= reportId %>"
+                    name="fileReportId"
+                  />
                 </form>
-                
+
                 <!-- form >form tag will be merge with file uploader form tag -->
                 <form
-                  action="/patrol-report/submit"
+                  action="/schedule/submit"
                   method="post"
                   class="row g-3 has-validation"
                   id="patrolReportForm"
                 >
-
                   <div class="col-md-6">
                     <label class="form-label" for="validationCustom01">
                       Schedule Title
@@ -124,24 +129,27 @@
 
                     <input
                       type="text"
-                      class="form-control"
+                      class="form-control <%= validationScheduleTitle%>"
                       id="validationCustom01"
                       name="scheduleTitle"
                       placeholder="Enter title here"
+                      value="<%= scheduleTitle %>"
                     />
                   </div>
 
                   <div class="col-md-3">
-                    <label class="form-label" for="datepicker1">Start Date</label>
+                    <label class="form-label" for="datepicker1"
+                      >Start Date</label
+                    >
 
                     <input
-                      class="form-control <%= validationDate %> datetimepicker flatpickr-input"
+                      class="form-control <%= validationStartDate %> datetimepicker flatpickr-input"
                       id="datepicker1"
                       type="text"
                       placeholder="day / month / year"
                       data-options='{"dateFormat":"d/m/y","disableMobile":true,"allowInput":true}'
-                      name="date"
-                      value="<%= date %>"
+                      name="startDate"
+                      value="<%= startDate %>"
                     />
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">
@@ -153,13 +161,13 @@
                     <label class="form-label" for="datepicker2">End Date</label>
 
                     <input
-                      class="form-control <%= validationDate %> datetimepicker flatpickr-input"
+                      class="form-control <%= validationEndDate %> datetimepicker flatpickr-input"
                       id="datepicker2"
                       type="text"
                       placeholder="day / month / year"
                       data-options='{"dateFormat":"d/m/y","disableMobile":true,"allowInput":true}'
-                      name="date"
-                      value="<%= date %>"
+                      name="endDate"
+                      value="<%= endDate %>"
                     />
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">
@@ -174,11 +182,11 @@
                     >
 
                     <select
-                      class="form-select <%= validationReportType %>"
+                      class="form-select <%= validationMonth %>"
                       id="validationCustom06"
-                      name="reportType"
+                      name="month"
                     >
-                      <option selected="" value="<%= reportType %>">
+                      <option selected="" value="<%= month %>">
                         Choose a month
                       </option>
                       <option value="January">January</option>
@@ -225,7 +233,6 @@
                     </div>
                   </div>
 
-                  
                   <!-- form status -->
                   <div class="col-md-4">
                     <label class="form-label" for="validationCustom06"
@@ -233,11 +240,11 @@
                     >
 
                     <select
-                      class="form-select <%= validationReportType %>"
+                      class="form-select <%= validationStatus %>"
                       id="validationCustom06"
-                      name="reportType"
+                      name="status"
                     >
-                      <option selected="" value="<%= reportType %>">
+                      <option selected="" value="<%= status %>">
                         Choose a status
                       </option>
                       <option value="Completed">Completed</option>
@@ -247,6 +254,32 @@
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">Please select a status.</div>
                   </div>
+
+                  <div class="col-12 gy-4">
+                    <label class="form-label" for="floatingProjectDescription2"
+                      >Notes</label
+                    >
+                    <textarea
+                      class="form-control <%= validationNotes %>"
+                      id="floatingProjectDescription2"
+                      placeholder="Leave a note here"
+                      style="height: 64px"
+                      name="notes"
+                    >
+<%= notes %></textarea
+                    >
+                    <div class="valid-feedback">Looks good!</div>
+                    <div class="invalid-feedback">
+                      Please enter a note here.
+                    </div>
+                  </div>
+
+                  <input
+                    type="text"
+                    style="display: none"
+                    name="confirmRid"
+                    value="<%= reportId %>"
+                  />
 
                   <!-- Submit button -->
                   <div class="col-12">
@@ -281,29 +314,6 @@
             </li>
           </ul>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- status code-to-copy -->
-  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
-    <div
-      class="toast align-items-center text-white bg-dark border-0 light"
-      id="icon-copied-toast"
-      role="alert"
-      aria-live="assertive"
-      aria-atomic="true"
-    >
-      <div class="d-flex">
-        <div class="toast-body px-0 py-3"></div>
-        <button
-          class="btn ms-2 p-0 btn-close-white"
-          type="button"
-          data-bs-dismiss="toast"
-          aria-label="Close"
-        >
-          <span class="uil uil-times fs-1"></span>
-        </button>
       </div>
     </div>
   </div>
