@@ -197,44 +197,48 @@ const File = mongoose.model('File', FileSchema);
 app.post('/upload', async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
     console.log('There is no files selected');
-  }
-  // find user full name
-  const currentUsername = req.session.user.username;
-  const checkUser = await User.findOne({ username: currentUsername });
-
-  // Check if the report ID exists in the database
-  const existingFile = await File.findOne({ reportId: reportId });
-
-  if (!existingFile) {
-    // No file with the report ID found, proceed with file upload
-    for (const file of Object.values(req.files)) {
-      const uploadPath = __dirname + '/public/uploads/' + file.name;
-      const pathFile = 'uploads/' + file.name;
-      const todayDate = date.getDate();
-      const fileType = path.extname(file.name);
-
-      file.mv(uploadPath, err => {
-        if (err) {
-          console.log(err);
-        }
-
-        // Save file information to the MongoDB
-        const newFile = new File({
-          reportId: reportId,
-          by: checkUser.fullname,
-          filename: file.name,
-          path: pathFile,
-          date: todayDate,
-          fileType: fileType
-        });
-
-        newFile.save();
-      });
-    }
-    console.log('Files uploaded');
   } else {
-    // File with the report ID already exists
-    console.log('Files already uploaded');
+    // find user full name
+    const currentUsername = req.session.user.username;
+    const checkUser = await User.findOne({ username: currentUsername });
+
+    // find rid
+    const confirmRid = req.body.fileReportId;
+
+    // Check if the report ID exists in the database
+    const existingFile = await File.findOne({ reportId: confirmRid });
+
+    if (!existingFile) {
+      // No file with the report ID found, proceed with file upload
+      for (const file of Object.values(req.files)) {
+        const uploadPath = __dirname + '/public/uploads/' + file.name;
+        const pathFile = 'uploads/' + file.name;
+        const todayDate = date.getDate();
+        const fileType = path.extname(file.name);
+
+        file.mv(uploadPath, err => {
+          if (err) {
+            console.log(err);
+          }
+
+          // Save file information to the MongoDB
+          const newFile = new File({
+            reportId: confirmRid,
+            by: checkUser.fullname,
+            filename: file.name,
+            path: pathFile,
+            date: todayDate,
+            fileType: fileType
+          });
+
+          newFile.save();
+        });
+      }
+      console.log('Files uploaded');
+    } else {
+      // File with the report ID already exists
+      console.log('Files already uploaded');
+    }
   }
 });
 
@@ -263,15 +267,14 @@ app
       const currentUsername = req.session.user.username;
 
       const checkUser = await User.findOne({ username: currentUsername });
-      // generate random id
-      const rid = crypto.randomBytes(6).toString('hex').toUpperCase();
-      console.log('Patrol report submit rid:' + rid);
+
+      const confirmRid = req.query.rid;
 
       if (checkUser) {
         res.render('patrol-report-submit', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
-          reportId: rid,
+          reportId: confirmRid,
           //validation
           validationReportType: '',
           validationStartTime: '',
@@ -313,6 +316,9 @@ app
     const date = req.body.date;
     const reportSummary = req.body.reportSummary;
     const notes = req.body.notes;
+
+    // generated rid
+    const confirmRid = req.body.confirmRid;
 
     const currentUsername = req.session.user.username;
 
@@ -380,7 +386,7 @@ app
       const currentUser = checkUser.username;
 
       const newReport = new PatrolReport({
-        reportId: reportId,
+        reportId: confirmRid,
         username: 'PB' + currentUser,
         madeBy: currentFullName,
         type: reportType,
@@ -392,36 +398,225 @@ app
         location: location
       });
 
-      const result = PatrolReport.create(newReport);
+      const existing = await PatrolReport.findOne({ reportId: confirmRid });
 
-      if (result) {
-        console.log('Successfully added report.');
-        res.render('patrol-report-submit', {
-          currentFullName: checkUser.fullname,
-          currentUser: checkUser.username,
-          //validation
-          validationReportType: '',
-          validationDate: '',
-          validationStartTime: '',
-          validationEndTime: '',
-          validationLocation: '',
-          validationReportSummary: '',
-          validationNotes: '',
-          //form na
-          reportType: '',
-          startTime: '',
-          endTime: '',
-          date: '',
-          location: '',
-          reportSummary: '',
-          notes: '',
-          //toast alert
-          toastShow: 'show',
-          toastMsg: 'Succesfully submit a report'
-        });
+      if (!existing) {
+        const result = PatrolReport.create(newReport);
+
+        if (result) {
+          console.log('Successfully added report.');
+
+          const checkUser = await User.findOne({ username: currentUsername });
+
+          if (checkUser) {
+            const itemReports = await PatrolReport.find({});
+            const itemBMI = await PatrolReport.find({
+              location: 'Baitul Makmur I'
+            });
+            const itemBMII = await PatrolReport.find({
+              location: 'Baitul Makmur II'
+            });
+            const itemJM = await PatrolReport.find({
+              location: 'Jamek Mosque'
+            });
+            const itemCM = await PatrolReport.find({ location: 'City Mosque' });
+            const itemRS = await PatrolReport.find({
+              location: 'Raudhatul Sakinah'
+            });
+
+            if (itemReports.length > 0) {
+              res.render('patrol-report-view', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                itemReports: itemReports,
+                totalReports: itemReports.length,
+                amountBMI: itemBMI.length,
+                amountBMII: itemBMII.length,
+                amountJM: itemJM.length,
+                amountCM: itemCM.length,
+                amountRS: itemRS.length,
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated random id
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Submit report successful!'
+              });
+            } else {
+              res.render('patrol-report-view', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                itemReports: 'There is no patrol report submitted yet.',
+                totalReports: '0',
+                amountBMI: '0',
+                amountBMII: '0',
+                amountJM: '0',
+                amountCM: '0',
+                amountRS: '0',
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated random id
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Submit report successful!'
+              });
+            }
+          }
+        } else {
+          console.log('Add report failed');
+
+          const checkUser = await User.findOne({ username: currentUsername });
+
+          if (checkUser) {
+            const itemReports = await PatrolReport.find({});
+            const itemBMI = await PatrolReport.find({
+              location: 'Baitul Makmur I'
+            });
+            const itemBMII = await PatrolReport.find({
+              location: 'Baitul Makmur II'
+            });
+            const itemJM = await PatrolReport.find({
+              location: 'Jamek Mosque'
+            });
+            const itemCM = await PatrolReport.find({ location: 'City Mosque' });
+            const itemRS = await PatrolReport.find({
+              location: 'Raudhatul Sakinah'
+            });
+
+            if (itemReports.length > 0) {
+              res.render('patrol-report-view', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                itemReports: itemReports,
+                totalReports: itemReports.length,
+                amountBMI: itemBMI.length,
+                amountBMII: itemBMII.length,
+                amountJM: itemJM.length,
+                amountCM: itemCM.length,
+                amountRS: itemRS.length,
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated random id
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Add report failed!'
+              });
+            } else {
+              res.render('patrol-report-view', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                itemReports: 'There is no patrol report submitted yet.',
+                totalReports: '0',
+                amountBMI: '0',
+                amountBMII: '0',
+                amountJM: '0',
+                amountCM: '0',
+                amountRS: '0',
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated random id
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Add report failed!'
+              });
+            }
+          }
+        }
       } else {
-        console.log('Report add failed');
-        res.redirect('/patrol-report/submit');
+        console.log('There is existing report!');
+
+        const checkUser = await User.findOne({ username: currentUsername });
+
+        if (checkUser) {
+          const itemReports = await PatrolReport.find({});
+          const itemBMI = await PatrolReport.find({
+            location: 'Baitul Makmur I'
+          });
+          const itemBMII = await PatrolReport.find({
+            location: 'Baitul Makmur II'
+          });
+          const itemJM = await PatrolReport.find({
+            location: 'Jamek Mosque'
+          });
+          const itemCM = await PatrolReport.find({ location: 'City Mosque' });
+          const itemRS = await PatrolReport.find({
+            location: 'Raudhatul Sakinah'
+          });
+
+          if (itemReports.length > 0) {
+            res.render('patrol-report-view', {
+              currentFullName: checkUser.fullname,
+              currentUser: checkUser.username,
+              itemReports: itemReports,
+              totalReports: itemReports.length,
+              amountBMI: itemBMI.length,
+              amountBMII: itemBMII.length,
+              amountJM: itemJM.length,
+              amountCM: itemCM.length,
+              amountRS: itemRS.length,
+              topNav: 'All',
+              classActive1: 'active',
+              classActive2: '',
+              classActive3: '',
+              classActive4: '',
+              classActive5: '',
+              classActive6: '',
+              // generated random id
+              rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+              // toast alert
+              toastShow: 'show',
+              toastMsg: 'There is an exisitng report!'
+            });
+          } else {
+            res.render('patrol-report-view', {
+              currentFullName: checkUser.fullname,
+              currentUser: checkUser.username,
+              itemReports: 'There is no patrol report submitted yet.',
+              totalReports: '0',
+              amountBMI: '0',
+              amountBMII: '0',
+              amountJM: '0',
+              amountCM: '0',
+              amountRS: '0',
+              topNav: 'All',
+              classActive1: 'active',
+              classActive2: '',
+              classActive3: '',
+              classActive4: '',
+              classActive5: '',
+              classActive6: '',
+              // generated random id
+              rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+              // toast alert
+              toastShow: 'show',
+              toastMsg: 'There is an existing report!'
+            });
+          }
+        }
       }
     } else {
       // Render the response after the delay
@@ -528,9 +723,6 @@ app.get('/patrol-report/view', async function (req, res) {
     var currentUsername = req.session.user.username;
 
     const checkUser = await User.findOne({ username: currentUsername });
-    // generate random id
-    const rid = crypto.randomBytes(6).toString('hex').toUpperCase();
-    console.log('Patrol report view rid:' + rid);
 
     if (checkUser) {
       const itemReports = await PatrolReport.find({});
@@ -559,7 +751,12 @@ app.get('/patrol-report/view', async function (req, res) {
           classActive3: '',
           classActive4: '',
           classActive5: '',
-          classActive6: ''
+          classActive6: '',
+          // generated random id
+          rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+          // toast alert
+          toastShow: '',
+          toastMsg: ''
         });
       } else {
         res.render('patrol-report-view', {
@@ -578,7 +775,12 @@ app.get('/patrol-report/view', async function (req, res) {
           classActive3: '',
           classActive4: '',
           classActive5: '',
-          classActive6: ''
+          classActive6: '',
+          // generated random id
+          rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+          // toast alert
+          toastShow: '',
+          toastMsg: ''
         });
       }
     }
@@ -592,10 +794,6 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
     const checkUser = await User.findOne({ username: currentUsername });
-
-    // generate random id
-    const rid = crypto.randomBytes(6).toString('hex').toUpperCase();
-    console.log('Custom patrol report vie rid:' + rid);
 
     const customListName = _.upperCase(req.params.customListName);
 
@@ -617,7 +815,7 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             itemReports: itemBMI,
-            totalReports: itemBMI.length,
+            totalReports: itemReports.length,
             amountBMI: itemBMI.length,
             amountBMII: itemBMII.length,
             amountJM: itemJM.length,
@@ -629,7 +827,12 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
             classActive3: '',
             classActive4: '',
             classActive5: '',
-            classActive6: ''
+            classActive6: '',
+            // generated random id
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         } else {
           res.render('patrol-report-view', {
@@ -648,7 +851,12 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
             classActive3: '',
             classActive4: '',
             classActive5: '',
-            classActive6: ''
+            classActive6: '',
+            // generated random id
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         }
       } else if (customListName === 'BMII') {
@@ -658,7 +866,7 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             itemReports: itemBMII,
-            totalReports: itemBMII.length,
+            totalReports: itemReports.length,
             amountBMI: itemBMI.length,
             amountBMII: itemBMII.length,
             amountJM: itemJM.length,
@@ -670,7 +878,12 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
             classActive3: 'active',
             classActive4: '',
             classActive5: '',
-            classActive6: ''
+            classActive6: '',
+            // generated random id
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         } else {
           res.render('patrol-report-view', {
@@ -689,7 +902,12 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
             classActive3: 'active',
             classActive4: '',
             classActive5: '',
-            classActive6: ''
+            classActive6: '',
+            // generated random id
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         }
       } else if (customListName === 'JM') {
@@ -699,7 +917,7 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             itemReports: itemJM,
-            totalReports: itemJM.length,
+            totalReports: itemReports.length,
             amountBMI: itemBMI.length,
             amountBMII: itemBMII.length,
             amountJM: itemJM.length,
@@ -711,7 +929,12 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
             classActive3: '',
             classActive4: 'active',
             classActive5: '',
-            classActive6: ''
+            classActive6: '',
+            // generated random id
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         } else {
           res.render('patrol-report-view', {
@@ -730,7 +953,12 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
             classActive3: '',
             classActive4: 'active',
             classActive5: '',
-            classActive6: ''
+            classActive6: '',
+            // generated random id
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         }
       } else if (customListName === 'CM') {
@@ -740,7 +968,7 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             itemReports: itemCM,
-            totalReports: itemCM.length,
+            totalReports: itemReports.length,
             amountBMI: itemBMI.length,
             amountBMII: itemBMII.length,
             amountJM: itemJM.length,
@@ -752,7 +980,12 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
             classActive3: '',
             classActive4: '',
             classActive5: 'active',
-            classActive6: ''
+            classActive6: '',
+            // generated random id
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         } else {
           res.render('patrol-report-view', {
@@ -771,7 +1004,12 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
             classActive3: '',
             classActive4: '',
             classActive5: 'active',
-            classActive6: ''
+            classActive6: '',
+            // generated random id
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         }
       } else if (customListName === 'RS') {
@@ -781,7 +1019,7 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             itemReports: itemRS,
-            totalReports: itemRS.length,
+            totalReports: itemReports.length,
             amountBMI: itemBMI.length,
             amountBMII: itemBMII.length,
             amountJM: itemJM.length,
@@ -793,7 +1031,12 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
             classActive3: '',
             classActive4: '',
             classActive5: '',
-            classActive6: 'active'
+            classActive6: 'active',
+            // generated random id
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         } else {
           res.render('patrol-report-view', {
@@ -812,7 +1055,12 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
             classActive3: '',
             classActive4: '',
             classActive5: '',
-            classActive6: 'active'
+            classActive6: 'active',
+            // generated random id
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         }
       } else {
@@ -952,7 +1200,7 @@ const scheduleSchema = new mongoose.Schema({
   startDate: String,
   endDate: String,
   status: String,
-  notes : String
+  notes: String
 });
 
 const Schedule = mongoose.model('Schedule', scheduleSchema);
@@ -1028,7 +1276,6 @@ app
       const checkUser = await User.findOne({ username: currentUsername });
 
       const confirmRid = req.query.rid;
-      console.log(confirmRid);
 
       if (checkUser) {
         res.render('schedule-submit', {
@@ -1042,6 +1289,7 @@ app
           validationMonth: '',
           validationLocation: '',
           validationStatus: '',
+          validationNotes: '',
           //form name
           scheduleTitle: '',
           startDate: '',
@@ -1049,6 +1297,7 @@ app
           month: '',
           location: '',
           status: '',
+          notes: '',
           //toast alert
           toastShow: '',
           toastMsg: ''
@@ -1149,7 +1398,7 @@ app
         startDate: startDate,
         endDate: endDate,
         status: status,
-        notes : notes
+        notes: notes
       });
 
       const existing = await Schedule.findOne({ reportId: confirmRid });
@@ -1398,7 +1647,7 @@ app
         validationMonth: validationMonth,
         validationLocation: validationLocation,
         validationStatus: validationStatus,
-        validationNotes : validationNotes,
+        validationNotes: validationNotes,
         //form name
         scheduleTitle: scheduleTitle,
         startDate: startDate,

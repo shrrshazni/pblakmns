@@ -23,7 +23,9 @@
           </h2>
         </div>
         <div class="col-auto">
-          <a class="btn btn-primary px-5" href="/patrol-report/submit"
+          <a
+            class="btn btn-primary px-5"
+            href="/patrol-report/submit?rid=<%= rid %>"
             ><i class="fa-solid fa-plus me-2"></i>Add new report</a
           >
         </div>
@@ -108,7 +110,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="table-responsive scrollbar">
         <table class="table fs--1 mb-0 border-top border-200">
           <thead>
@@ -259,6 +261,35 @@
             <span class="fas fa-chevron-right"></span>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- toast alert -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+  <div class="d-flex">
+    <div
+      class="toast <%= toastShow %> align-items-center text-white bg-primary border-0 light"
+      role="alert"
+      data-bs-autohide="false"
+      aria-live="assertive"
+      aria-atomic="true"
+      id="alertToast"
+    >
+      <div class="d-flex">
+        <div class="toast-body p-3">
+          <code class="text-white"><%= toastMsg %></code>
+        </div>
+
+        <button
+          class="btn ms-2 p-0 btn-close-white"
+          type="button"
+          data-bs-dismiss="toast"
+          aria-label="Close"
+        >
+          <span class="uil uil-times fs-1"></span>
+        </button>
       </div>
     </div>
   </div>

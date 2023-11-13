@@ -311,15 +311,15 @@ itemSchedules.forEach(function (item) { %>
               <p class="text-1000"><%= item.notes %></p>
             </div>
 
-            <% if (Array.isArray(itemFiles) && itemFiles.length > 0) {
-            %> <% itemFiles.forEach(function (item2) { %>
-            <% if (item2.reportId === item.reportId) {%>
+            <% if (Array.isArray(itemFiles) && itemFiles.length > 0) { %> <%
+            itemFiles.forEach(function (item2) { %> <% if (item2.reportId ===
+            item.reportId) {%>
             <div class="bg-100 rounded-2 p-4 mb-3">
               <div class="row justify-content-between g-0 gy-2 pb-3">
                 <div class="col-12 col-sm">
                   <p class="fs--1 text-800 mb-2">
                     <a class="fw-semi-bold" href="#!"><%= item2.by %> </a
-                    >uploaded a file
+                    >uploaded a file on <strong> <%= item2.date %></strong>
                   </p>
 
                   <p class="text-1000 fw-semi-bold fs--1 mb-0">
@@ -327,35 +327,46 @@ itemSchedules.forEach(function (item) { %>
                   </p>
                 </div>
                 <div class="col-12 col-sm-auto">
-                  <p class="text-800 fw-semi-bold fs--2 mb-0">
-                    <%= item2.date %>
-                  </p>
+                  <div class="font-sans-serif btn-reveal-trigger">
+                    <button
+                      class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal"
+                      type="button"
+                      data-bs-toggle="dropdown"
+                      data-boundary="window"
+                      aria-haspopup="true"
+                      aria-expanded="false"
+                      data-bs-reference="parent"
+                    >
+                      <span class="fas fa-ellipsis-h"></span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end py-2">
+                      <a class="dropdown-item" href="#!">Edit</a
+                      ><a class="dropdown-item text-danger" href="#!">Delete</a
+                      ><a class="dropdown-item" href="#!">Download</a
+                      ><a class="dropdown-item" href="#!">Report abuse</a>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-            <% } %>
-            <% }) %> <% } else { %>
-              <div class="bg-100 rounded-2 p-4 mb-3">
+            <% } %> <% }) %> <% } else { %>
+            <div class="bg-100 rounded-2 p-4 mb-3">
               <div class="row justify-content-between g-0 gy-2 pb-3">
                 <div class="col-12 col-sm">
                   <p class="fs--1 text-800 mb-2">
-                    <a class="fw-semi-bold" href="#!">There is no file uploaded </a
-                    >
+                    <a class="fw-semi-bold" href="#!"
+                      >There is no file uploaded
+                    </a>
                   </p>
 
-                  <p class="text-1000 fw-semi-bold fs--1 mb-0">
-                    None
-                  </p>
+                  <p class="text-1000 fw-semi-bold fs--1 mb-0">None</p>
                 </div>
                 <div class="col-12 col-sm-auto">
-                  <p class="text-800 fw-semi-bold fs--2 mb-0">
-                    None
-                  </p>
+                  <p class="text-800 fw-semi-bold fs--2 mb-0">None</p>
                 </div>
               </div>
             </div>
             <% } %>
-
           </div>
         </div>
       </div>
@@ -449,6 +460,7 @@ itemSchedules.forEach(function (item) { %>
   </div>
 </div>
 <% } %>
+
 <!-- toast alert -->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
   <div class="d-flex">
