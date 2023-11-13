@@ -1,7 +1,7 @@
 <%- include("partials/header") %> <%- include("partials/navbar") %>
 
 <div class="content">
-  <div class="row g-2">
+  <div class="row g-4">
     <!-- profile card -->
     <div class="col-12 col-xl-7">
       <div class="pb-9">
@@ -58,32 +58,32 @@
             <div class="row justify-content-xl-between">
               <div class="col-auto">
                 <div class="d-flex flex-wrap mb-3 align-items-center">
-                  <h3 class="me-2">Full Name</h3>
-                  <span class="fw-semi-bold fs-1 text-1100">@pbnumber</span>
+                  <h3 class="me-2"><%= currentFullName %></h3>
+                  <span class="fw-semi-bold fs--1 text-1100 badge badge-phoenix badge-phoenix-primary">PB<%= currentUser %></span>
                 </div>
               </div>
               <div class="mb-4">
-                <h5>example@email.com</h5>
-                <h5>contact number</h5>
+                <h5 class="mb-2"><%= email || 'Email not added' %></h5>
+                <h5><%= phone || 'Phone not added' %></h5>
               </div>
               <div class="col-auto">
                 <div class="row g-2">
                   <div class="col-auto order-xxl-1">
                     <button class="btn btn-primary lh-1">
                       <span class="fa-solid fa-plus me-2"></span>Total Report
-                      (amount)
+                      (<%= amountTotalReports %>)
                     </button>
                   </div>
                   <div class="col-auto order-xxl-2">
                     <button class="btn btn-phoenix-primary lh-1">
                       <span class="fa-solid fa-book me-2"></span>Patrol Report
-                      (amount)
+                      (<%= amountPatrol %>)
                     </button>
                   </div>
                   <div class="col-auto order-xxl-3">
                     <button class="btn btn-phoenix-primary lh-1">
                       <span class="fa-solid fa-suitcase me-2"></span>Case Report
-                      (amount)
+                      (<%= amountCase  %>)
                     </button>
                   </div>
                 </div>

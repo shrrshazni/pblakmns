@@ -12,12 +12,12 @@
   <div class="mb-9">
     <div
       id="projectSummary"
-      data-list='{"valueNames":["reportType","madeBy","date","startPatrol","endPatrol","pbNumber"],"page":6,"pagination":true}'
+      data-list='{"valueNames":["reportType","madeBy","date","time","pbNumber"],"page":6,"pagination":true}'
     >
       <div class="row mb-4 gx-6 gy-3 align-items-center">
         <div class="col-auto">
           <h2 class="mb-0">
-            Patrol Report<span class="fw-normal text-700 ms-3"
+            Case Report<span class="fw-normal text-700 ms-3"
               >(<%= totalReports %>)</span
             >
           </h2>
@@ -25,7 +25,7 @@
         <div class="col-auto">
           <a
             class="btn btn-primary px-5"
-            href="/patrol-report/submit?rid=<%= rid %>"
+            href="/case-report/submit?rid=<%= rid %>"
             ><i class="fa-solid fa-plus me-2"></i>Add new report</a
           >
         </div>
@@ -37,7 +37,7 @@
               <a
                 class="nav-link px-2 py-1 <%= classActive1 %>"
                 aria-current="page"
-                href="/patrol-report/view"
+                href="/case-report/view"
                 ><span>All</span
                 ><span class="text-700 fw-semi-bold"
                   >(<%= totalReports %>)</span
@@ -47,7 +47,7 @@
             <li class="nav-item">
               <a
                 class="nav-link px-2 py-1 <%= classActive2 %>"
-                href="/patrol-report/view/bmi"
+                href="/case-report/view/bmi"
                 ><span>Baitul Makmur I</span
                 ><span class="text-700 fw-semi-bold"
                   >(<%= amountBMI %>)</span
@@ -57,7 +57,7 @@
             <li class="nav-item">
               <a
                 class="nav-link px-2 py-1 <%= classActive3 %>"
-                href="/patrol-report/view/bmii"
+                href="/case-report/view/bmii"
                 ><span>Baitul Makmur II</span
                 ><span class="text-700 fw-semi-bold"
                   >(<%= amountBMII %>)</span
@@ -67,7 +67,7 @@
             <li class="nav-item">
               <a
                 class="nav-link px-2 py-1 <%= classActive4 %>"
-                href="/patrol-report/view/jm"
+                href="/case-report/view/jm"
                 ><span>Jamek Mosque</span
                 ><span class="text-700 fw-semi-bold">(<%= amountJM %>)</span></a
               >
@@ -75,7 +75,7 @@
             <li class="nav-item">
               <a
                 class="nav-link px-2 py-1 <%= classActive5 %>"
-                href="/patrol-report/view/cm"
+                href="/case-report/view/cm"
                 ><span>City Mosque</span
                 ><span class="text-700 fw-semi-bold">(<%= amountCM %>)</span></a
               >
@@ -83,7 +83,7 @@
             <li class="nav-item">
               <a
                 class="nav-link px-2 py-1 <%= classActive6 %>"
-                href="/patrol-report/view/rs"
+                href="/case-report/view/rs"
                 ><span>Raudhatul Sakinah</span
                 ><span class="text-700 fw-semi-bold">(<%= amountRS %>)</span></a
               >
@@ -142,18 +142,10 @@
               <th
                 class="sort align-middle ps-3"
                 scope="col"
-                data-sort="startPatrol"
+                data-sort="time"
                 style="width: 15%"
               >
                 START PATROL
-              </th>
-              <th
-                class="sort align-middle ps-3"
-                scope="col"
-                data-sort="endPatrol"
-                style="width: 12%"
-              >
-                END PATROL
               </th>
               <th
                 class="sort align-middle text-end"
@@ -182,7 +174,7 @@
               >
                 <a
                   class="fw-bold fs-0"
-                  href="/patrol-report/details?id=<%= item.reportId %>"
+                  href="/case-report/details?id=<%= item.reportId %>"
                   ><%= item.type %></a
                 >
               </td>
@@ -192,15 +184,12 @@
               <td class="align-middle white-space-nowrap date ps-3 py-4">
                 <p class="mb-0 fs--1 text-900"><%= item.date %></p>
               </td>
-              <td class="align-middle white-space-nowrap startPatrol ps-3 py-4">
-                <p class="mb-0 fs--1 text-900"><%= item.start %></p>
-              </td>
-              <td class="align-middle white-space-nowrap endPatrol ps-3 py-4">
-                <p class="fw-bo text-900 fs--1 mb-0"><%= item.end %></p>
+              <td class="align-middle white-space-nowrap time ps-3 py-4">
+                <p class="mb-0 fs--1 text-900"><%= item.time %></p>
               </td>
               <td class="align-middle white-space-nowrap text-end pbNumber">
                 <span class="badge badge-phoenix fs--2 badge-phoenix-primary"
-                  ><%= item.username %></span
+                  >PB<%= item.username %></span
                 >
               </td>
               <td class="align-middle text-end white-space-nowrap pe-0 action">
@@ -226,7 +215,7 @@
             </tr>
             <% }) %> <% } else { %>
             <tr>
-              <td colspan="7">No patrol reports submitted.</td>
+              <td colspan="7">No case reports submitted.</td>
             </tr>
             <% } %>
           </tbody>

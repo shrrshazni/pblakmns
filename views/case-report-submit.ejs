@@ -76,14 +76,12 @@
               <div class="p-4">
                 <!-- file uploader -->
                 <form
-                  class="dropzone dropzone-multiple p-2 mb-5"
-                  id="dropzone-multiple"
+                  class="dropzone dropzone-multiple p-0 mb-4"
+                  id="myDropzone2"
                   data-dropzone="data-dropzone"
-                  action="#!"
+                  action="/upload-case"
+                  data-options='{"url":"/upload-case","paramName": "file"}'
                 >
-                  <div class="fallback">
-                    <input name="file" type="file" multiple="multiple" />
-                  </div>
                   <div class="dz-message" data-dz-message="data-dz-message">
                     <img
                       class="me-2"
@@ -148,14 +146,20 @@
                       </div>
                     </div>
                   </div>
+                  <input
+                    type="text"
+                    style="display: none;"
+                    value="<%= reportId %>"
+                    name="fileReportId"
+                  />
                 </form>
 
                 <!-- form >form tag will be merge with file uploader form tag -->
                 <form
                   action="/case-report/submit"
                   method="post"
-                  class="row g-3 needs-validation"
-                  novalidate="novalidate"
+                  class="row g-3 has-validation"
+                  id="caseReportForm"
                 >
                   <!-- form title report -->
                   <div class="col-md-4">
@@ -164,12 +168,14 @@
                     >
 
                     <select
-                      class="form-select"
+                      class="form-select <%= validationReportType %>"
                       id="validationCustom04"
                       required=""
                       name="reportType"
                     >
-                      <option selected="" value="">Choose title report</option>
+                      <option selected="" value="<%= reportType %>">
+                        Choose title report
+                      </option>
                       <option value="Criminal Case">
                         Criminal Case Report
                       </option>
@@ -184,13 +190,14 @@
                     <label class="form-label" for="datepicker1">Date</label>
 
                     <input
-                      class="form-control datetimepicker flatpickr-input"
+                      class="form-control <%= validationDate %> datetimepicker flatpickr-input"
                       id="datepicker1"
                       type="text"
                       placeholder="day/month/year"
                       data-options='{"dateFormat":"d/m/y","disableMobile":true,"allowInput":true}'
                       required="required"
                       name="date"
+                      value="<%= date %>"
                     />
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">
@@ -199,16 +206,17 @@
                   </div>
 
                   <div class="col-md-4">
-                    <label class="form-label" for="timepicker2"></label>
+                    <label class="form-label" for="timepicker2">Time</label>
 
                     <input
-                      class="form-control datetimepicker flatpickr-input"
+                      class="form-control <%= validationTime %> datetimepicker flatpickr-input"
                       id="timepicker2"
                       type="text"
                       placeholder="hour : minute"
                       data-options='{"enableTime":true,"noCalendar":true,"dateFormat":"H:i","disableMobile":true,"allowInput":true}'
                       required="required"
                       name="time"
+                      value="<%= time %>"
                     />
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">
@@ -222,12 +230,14 @@
                     >
 
                     <select
-                      class="form-select"
+                      class="form-select <%= validationLocation %>"
                       id="validationCustom05"
                       required=""
                       name="location"
                     >
-                      <option selected="" value="">Choose location</option>
+                      <option selected="" value="<%= location %>">
+                        Choose location
+                      </option>
                       <option value="Baitul Makmur I">Baitul Makmur I</option>
                       <option value="Baitul Makmur II">Baitul Makmur II</option>
                       <option value="Jamek Mosque">Jamek Mosque</option>
@@ -248,11 +258,12 @@
                     >
 
                     <input
-                      class="form-control"
+                      class="form-control <%= validationStaffOnDuty %>"
                       id="validationCustom03"
                       type="text"
                       required=""
                       name="staffs"
+                      value="<%= staffOnDuty %>"
                     />
                     <div class="invalid-feedback">
                       Please provide a staff assigned.
@@ -264,13 +275,15 @@
                       >Event Summary</label
                     >
                     <textarea
-                      class="form-control"
+                      class="form-control <%= validationEventSummary %>"
                       id="floatingProjectDescription1"
                       placeholder="Leave a summary report here"
                       style="height: 64px"
                       required="required"
                       name="eventSummary"
-                    ></textarea>
+                    >
+<%= eventSummary %></textarea
+                    >
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">
                       Please enter a event summary here.
@@ -282,13 +295,15 @@
                       >Action Taken</label
                     >
                     <textarea
-                      class="form-control"
+                      class="form-control <%= validationActionTaken %>"
                       id="floatingProjectDescription1"
                       placeholder="Leave a summary report here"
                       style="height: 64px"
                       required="required"
                       name="actionTaken"
-                    ></textarea>
+                    >
+<%= actionTaken %></textarea
+                    >
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">
                       Please enter action taken here.
@@ -300,22 +315,35 @@
                       >Summary Report</label
                     >
                     <textarea
-                      class="form-control"
+                      class="form-control <%= validationReportSummary %>"
                       id="floatingProjectDescription2"
                       placeholder="Leave a note here"
                       style="height: 128px"
                       required="required"
                       name="reportSummary"
-                    ></textarea>
+                    >
+<%= reportSummary %></textarea
+                    >
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">
                       Please enter summary report here.
                     </div>
                   </div>
 
+                  <input
+                    type="text"
+                    style="display: none;"
+                    value="<%= reportId %>"
+                    name="confirmRid"
+                  />
+
                   <!-- Submit button -->
                   <div class="col-12">
-                    <button class="btn btn-primary" type="submit">
+                    <button
+                      id="uploadButtonCase"
+                      class="btn btn-primary"
+                      type="submit"
+                    >
                       Submit form
                     </button>
                   </div>
@@ -344,28 +372,57 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
 
-    <!-- status code-to-copy -->
-    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
-      <div
-        class="toast align-items-center text-white bg-dark border-0 light"
-        id="icon-copied-toast"
-        role="alert"
-        aria-live="assertive"
-        aria-atomic="true"
-      >
-        <div class="d-flex">
-          <div class="toast-body p-3"></div>
-          <button
-            class="btn-close btn-close-white me-2 m-auto"
-            type="button"
-            data-bs-dismiss="toast"
-            aria-label="Close"
-          ></button>
+<!-- status code-to-copy -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+  <div
+    class="toast align-items-center text-white bg-dark border-0 light"
+    id="icon-copied-toast"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+  >
+    <div class="d-flex">
+      <div class="toast-body p-3"></div>
+      <button
+        class="btn-close btn-close-white me-2 m-auto"
+        type="button"
+        data-bs-dismiss="toast"
+        aria-label="Close"
+      ></button>
+    </div>
+  </div>
+</div>
+
+<!-- toast alert -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+  <div class="d-flex">
+    <div
+      class="toast <%= toastShow %> align-items-center text-white bg-primary border-0 light"
+      role="alert"
+      data-bs-autohide="false"
+      aria-live="assertive"
+      aria-atomic="true"
+      id="alertToast"
+    >
+      <div class="d-flex">
+        <div class="toast-body p-3">
+          <code class="text-white"><%= toastMsg %></code>
         </div>
+
+        <button
+          class="btn ms-2 p-0 btn-close-white"
+          type="button"
+          data-bs-dismiss="toast"
+          aria-label="Close"
+        >
+          <span class="uil uil-times fs-1"></span>
+        </button>
       </div>
     </div>
   </div>
-
-  <%-include("partials/navbar-script.ejs") %> <%-include("partials/footer") %>
 </div>
+
+<%-include("partials/navbar-script.ejs") %> <%-include("partials/footer") %>
