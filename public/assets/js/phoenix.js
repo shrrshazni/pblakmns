@@ -1777,7 +1777,7 @@
             thumbnailWidth: null,
             thumbnailHeight: null,
             maxFilesize: 5,
-            maxFiles: 10,
+            maxFiles: 5,
             uploadMultiple: true,
             parallelUploads: 10,
             autoProcessQueue: false,

@@ -13,7 +13,7 @@
       </p>
     </div>
     <div class="col-12 col-sm-auto text-center">
-      <p class="mb-0 text-600">v1.1.0</p>
+      <p class="mb-0 text-600">V1.1.0</p>
     </div>
   </div>
 </footer>
@@ -36,97 +36,94 @@
 <script src="/vendors/leaflet.markercluster/leaflet.markercluster.js"></script>
 <script src="/vendors/leaflet.tilelayer.colorfilter/leaflet-tilelayer-colorfilter.min.js"></script>
 <script src="/assets/js/ecommerce-dashboard.js"></script>
+<!-- jquery -->
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+  crossorigin="anonymous"
+></script>
 <!-- file uploader -->
 <script src="/vendors/dropzone/dropzone.js"></script>
 <!-- datepicker -->
 <script src="/assets/js/flatpickr.js"></script>
 
 <script>
+  $('#uploadButtonPatrol').on('click', function () {
+    var button = $(this);
+    button.addClass('loading').prop('disabled', true);
 
-  document.getElementById('uploadButtonPatrol').addEventListener('click', function() {
-    // Disable the button and add the loading class
-    var button = this;
-    button.classList.add('loading');
-    button.disabled = true;
-
-    // Delay showing the specific toast for 2 seconds
-    setTimeout(function() {
-      // Get the specific toast by its id
-      // var toast = document.getElementById('alertToast');
-      
-      button.setAttribute('type', 'submit');
-
-      // Re-enable the button and remove the loading class
-      button.classList.remove('loading');
-      button.disabled = false;
-    }, 2000); // 2000 milliseconds (2 seconds)
+    setTimeout(function () {
+      // var toast = $('#alertToast');
+      button.prop('type', 'submit');
+      button.removeClass('loading').prop('disabled', false);
+    }, 2000);
 
     var myDropzone1 = Dropzone.forElement('#myDropzone1');
 
-      if (myDropzone1.getQueuedFiles().length > 0) {
-        myDropzone1.processQueue();
-      }
-      
-    var formElement1 = document.getElementById('patrolReportForm');
-    formElement1.submit();
+    if (myDropzone1.getQueuedFiles().length > 0) {
+      myDropzone1.processQueue();
+    }
   });
 
-   document.getElementById('uploadButtonCase').addEventListener('click', function() {
+  document
+    .getElementById('uploadButtonCase')
+    .addEventListener('click', function () {
+      // Disable the button and add the loading class
+      var button = this;
+      button.classList.add('loading');
+      button.disabled = true;
 
-    // Disable the button and add the loading class
-    var button = this;
-    button.classList.add('loading');
-    button.disabled = true;
+      // Delay showing the specific toast for 2 seconds
+      setTimeout(function () {
+        // Get the specific toast by its id
+        // var toast = document.getElementById('alertToast');
 
-    // Delay showing the specific toast for 2 seconds
-    setTimeout(function() {
-      // Get the specific toast by its id
-      // var toast = document.getElementById('alertToast');
-      
-      button.setAttribute('type', 'submit');
+        button.setAttribute('type', 'submit');
 
-      // Re-enable the button and remove the loading class
-      button.classList.remove('loading');
-      button.disabled = false;
-    }, 2000); // 2000 milliseconds (2 seconds)
+        // Re-enable the button and remove the loading class
+        button.classList.remove('loading');
+        button.disabled = false;
+      }, 2000); // 2000 milliseconds (2 seconds)
 
-    var myDropzone2 = Dropzone.forElement('#myDropzone2');
+      var myDropzone2 = Dropzone.forElement('#myDropzone2');
 
       if (myDropzone2.getQueuedFiles().length > 0) {
         myDropzone2.processQueue();
       }
-      
-    var formElement2 = document.getElementById('caseReportForm');
-    formElement2.submit();
-  });
 
-  document.getElementById('uploadButtonSchedule').addEventListener('click', function() {
-    // Disable the button and add the loading class
-    var button = this;
-    button.classList.add('loading');
-    button.disabled = true;
+      var formElement2 = document.getElementById('caseReportForm');
+      formElement2.submit();
+    });
 
-    // Delay showing the specific toast for 2 seconds
-    setTimeout(function() {
-      // Get the specific toast by its id
-      // var toast = document.getElementById('alertToast');
-      
-      button.setAttribute('type', 'submit');
+  document
+    .getElementById('uploadButtonSchedule')
+    .addEventListener('click', function () {
+      // Disable the button and add the loading class
+      var button = this;
+      button.classList.add('loading');
+      button.disabled = true;
 
-      // Re-enable the button and remove the loading class
-      button.classList.remove('loading');
-      button.disabled = false;
-    }, 2000); // 2000 milliseconds (2 seconds)
+      // Delay showing the specific toast for 2 seconds
+      setTimeout(function () {
+        // Get the specific toast by its id
+        // var toast = document.getElementById('alertToast');
 
-    var myDropzone3 = Dropzone.forElement('#myDropzone3');
+        button.setAttribute('type', 'submit');
+
+        // Re-enable the button and remove the loading class
+        button.classList.remove('loading');
+        button.disabled = false;
+      }, 2000); // 2000 milliseconds (2 seconds)
+
+      var myDropzone3 = Dropzone.forElement('#myDropzone3');
 
       if (myDropzone3.getQueuedFiles().length > 0) {
         myDropzone3.processQueue();
       }
-      
-    var formElement3 = document.getElementById('scheduleReportForm');
-    formElement3.submit();
-  });
+
+      var formElement3 = document.getElementById('scheduleReportForm');
+      formElement3.submit();
+    });
 </script>
 
 </body>

@@ -2434,6 +2434,7 @@ app
         month: month,
         location: location,
         status: status,
+        notes: notes,
         //toast alert
         toastShow: 'show',
         toastMsg: 'There is error in your input!'
