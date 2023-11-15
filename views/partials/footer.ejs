@@ -1,4 +1,3 @@
-</main>
 <footer class="footer position-absolute d-print-none">
   <div class="row g-0 justify-content-between align-items-center h-100">
     <div class="col-12 col-sm-auto text-center">
@@ -48,84 +47,130 @@
 <script src="/assets/js/flatpickr.js"></script>
 
 <script>
-  $('#uploadButtonPatrol').on('click', function () {
-    var button = $(this);
-    button.addClass('loading').prop('disabled', true);
+  $(document).ready(function () {
+    // PATROL REPORT SUBMIT
 
-    setTimeout(function () {
-      // var toast = $('#alertToast');
-      button.prop('type', 'submit');
-      button.removeClass('loading').prop('disabled', false);
-    }, 2000);
+    // Function to show the toast
+    function showDropzoneFilesToast(content) {
+      $('#dropzoneAlertContent').text(content);
 
-    var myDropzone1 = Dropzone.forElement('#myDropzone1');
-
-    if (myDropzone1.getQueuedFiles().length > 0) {
-      myDropzone1.processQueue();
+      var toast = new bootstrap.Toast(
+        document.getElementById('alertUploadToast')
+      );
+      toast.show();
     }
+
+    var myDropzone = Dropzone.forElement('#myDropzone');
+
+    $('#uploadButton').on('click', function () {
+      var button = $(this);
+      button.addClass('loading').prop('disabled', true);
+
+      setTimeout(function () {
+        // files upload process queue
+
+        if (myDropzone.getQueuedFiles().length > 0) {
+          // If files are present, show the toast with appropriate content
+          showDropzoneFilesToast('Files has been uploaded');
+          // Process the Dropzone queue
+          myDropzone.processQueue();
+        } else {
+          // If no files are present, show the toast with different content
+          showDropzoneFilesToast('No files selected');
+        }
+
+        // var toast = $('#alertToast');
+        button.prop('type', 'submit');
+        button.removeClass('loading').prop('disabled', false);
+      }, 2000);
+    });
+
+    // var myDropzone2 = Dropzone.forElement('#myDropzone2');
+
+    // $('#uploadButtonCase').on('click', function () {
+    //   var button = $(this);
+    //   button.addClass('loading').prop('disabled', true);
+
+    //   setTimeout(function () {
+    //     // files upload process queue
+
+    //     if (myDropzone2.getQueuedFiles().length > 0) {
+    //       // If files are present, show the toast with appropriate content
+    //       showDropzoneFilesToast('Files has been uploaded');
+    //       // Process the Dropzone queue
+    //       myDropzone2.processQueue();
+    //     } else {
+    //       // If no files are present, show the toast with different content
+    //       showDropzoneFilesToast('No files selected');
+    //     }
+
+    //     // var toast = $('#alertToast');
+    //     button.prop('type', 'submit');
+    //     button.removeClass('loading').prop('disabled', false);
+    //   }, 2000);
+    // });
+
   });
 
-  document
-    .getElementById('uploadButtonCase')
-    .addEventListener('click', function () {
-      // Disable the button and add the loading class
-      var button = this;
-      button.classList.add('loading');
-      button.disabled = true;
+  // document
+  //   .getElementById('uploadButtonCase')
+  //   .addEventListener('click', function () {
+  //     // Disable the button and add the loading class
+  //     var button = this;
+  //     button.classList.add('loading');
+  //     button.disabled = true;
 
-      // Delay showing the specific toast for 2 seconds
-      setTimeout(function () {
-        // Get the specific toast by its id
-        // var toast = document.getElementById('alertToast');
+  //     // Delay showing the specific toast for 2 seconds
+  //     setTimeout(function () {
+  //       // Get the specific toast by its id
+  //       // var toast = document.getElementById('alertToast');
 
-        button.setAttribute('type', 'submit');
+  //       button.setAttribute('type', 'submit');
 
-        // Re-enable the button and remove the loading class
-        button.classList.remove('loading');
-        button.disabled = false;
-      }, 2000); // 2000 milliseconds (2 seconds)
+  //       // Re-enable the button and remove the loading class
+  //       button.classList.remove('loading');
+  //       button.disabled = false;
+  //     }, 2000); // 2000 milliseconds (2 seconds)
 
-      var myDropzone2 = Dropzone.forElement('#myDropzone2');
+  //     var myDropzone2 = Dropzone.forElement('#myDropzone2');
 
-      if (myDropzone2.getQueuedFiles().length > 0) {
-        myDropzone2.processQueue();
-      }
+  //     if (myDropzone2.getQueuedFiles().length > 0) {
+  //       myDropzone2.processQueue();
+  //     }
 
-      var formElement2 = document.getElementById('caseReportForm');
-      formElement2.submit();
-    });
+  //     var formElement2 = document.getElementById('caseReportForm');
+  //     formElement2.submit();
+  //   });
 
-  document
-    .getElementById('uploadButtonSchedule')
-    .addEventListener('click', function () {
-      // Disable the button and add the loading class
-      var button = this;
-      button.classList.add('loading');
-      button.disabled = true;
+  // document
+  //   .getElementById('uploadButtonSchedule')
+  //   .addEventListener('click', function () {
+  //     // Disable the button and add the loading class
+  //     var button = this;
+  //     button.classList.add('loading');
+  //     button.disabled = true;
 
-      // Delay showing the specific toast for 2 seconds
-      setTimeout(function () {
-        // Get the specific toast by its id
-        // var toast = document.getElementById('alertToast');
+  //     // Delay showing the specific toast for 2 seconds
+  //     setTimeout(function () {
+  //       // Get the specific toast by its id
+  //       // var toast = document.getElementById('alertToast');
 
-        button.setAttribute('type', 'submit');
+  //       button.setAttribute('type', 'submit');
 
-        // Re-enable the button and remove the loading class
-        button.classList.remove('loading');
-        button.disabled = false;
-      }, 2000); // 2000 milliseconds (2 seconds)
+  //       // Re-enable the button and remove the loading class
+  //       button.classList.remove('loading');
+  //       button.disabled = false;
+  //     }, 2000); // 2000 milliseconds (2 seconds)
 
-      var myDropzone3 = Dropzone.forElement('#myDropzone3');
+  //     var myDropzone3 = Dropzone.forElement('#myDropzone3');
 
-      if (myDropzone3.getQueuedFiles().length > 0) {
-        myDropzone3.processQueue();
-      }
+  //     if (myDropzone3.getQueuedFiles().length > 0) {
+  //       myDropzone3.processQueue();
+  //     }
 
-      var formElement3 = document.getElementById('scheduleReportForm');
-      formElement3.submit();
-    });
+  //     var formElement3 = document.getElementById('scheduleReportForm');
+  //     formElement3.submit();
+  //   });
 </script>
 
-</body>
-
-</html>
+<!-- to be added later close tag for body and html -->

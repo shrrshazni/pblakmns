@@ -195,6 +195,24 @@ const FileSchema = new mongoose.Schema({
 
 const File = mongoose.model('File', FileSchema);
 
+//PATROL REPORT SECTION
+
+//patrol schema init
+const patrolReportSchema = new mongoose.Schema({
+  reportId: String,
+  username: String,
+  madeBy: String,
+  type: String,
+  start: String,
+  end: String,
+  date: String,
+  summary: String,
+  notes: String,
+  location: String
+});
+
+const PatrolReport = mongoose.model('PatrolReport', patrolReportSchema);
+
 // for upload report files
 app.post('/upload-patrol', async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
@@ -243,24 +261,6 @@ app.post('/upload-patrol', async (req, res) => {
     }
   }
 });
-
-//PATROL REPORT SECTION
-
-//patrol schema init
-const patrolReportSchema = new mongoose.Schema({
-  reportId: String,
-  username: String,
-  madeBy: String,
-  type: String,
-  start: String,
-  end: String,
-  date: String,
-  summary: String,
-  notes: String,
-  location: String
-});
-
-const PatrolReport = mongoose.model('PatrolReport', patrolReportSchema);
 
 // view
 app.get('/patrol-report/view', async function (req, res) {
@@ -988,7 +988,8 @@ app
         validationLocation: validationLocation,
         validationReportSummary: validationReportSummary,
         validationNotes: validationNotes,
-        //form na
+        //form 
+        reportId: confirmRid,
         reportType: reportType,
         startTime: startTime,
         endTime: endTime,
@@ -1878,7 +1879,8 @@ app
         validationEventSummary: validationEventSummary,
         validationActionTaken: validationActionTaken,
         validationStaffOnDuty: validationStaffOnDuty,
-        //form na
+        //form
+        reportId : confirmRid,
         reportType: reportType,
         time: time,
         date: date,
@@ -2428,6 +2430,7 @@ app
         validationStatus: validationStatus,
         validationNotes: validationNotes,
         //form name
+        reportId : confirmRid,
         scheduleTitle: scheduleTitle,
         startDate: startDate,
         endDate: endDate,

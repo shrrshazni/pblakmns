@@ -12,8 +12,8 @@
   </nav>
   <h2 class="mb-2 lh-sm">Submit Report</h2>
   <p class="text-700 lead mb-2">
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis vitae sem at
-    tellus finibus ornare eget eget massa.
+    A case report is an official document detailing information about an
+    incident, investigation, and outcomes
   </p>
 
   <div class="mt-4">
@@ -32,139 +32,21 @@
                     Case Report Form
                   </h4>
                 </div>
-                <div class="col col-md-auto">
-                  <nav
-                    class="nav nav-underline justify-content-end doc-tab-nav align-items-center"
-                    role="tablist"
-                  >
-                    <button
-                      class="btn btn-link px-2 text-900 copy-code-btn"
-                      type="button"
-                    >
-                      <span class="fas fa-copy me-1"></span>Copy Example</button
-                    ><a
-                      class="btn btn-sm btn-phoenix-primary code-btn ms-2"
-                      data-bs-toggle="collapse"
-                      href="#patrol-report"
-                      role="button"
-                      aria-controls="accordion-example-code"
-                      aria-expanded="false"
-                    >
-                      <span class="me-2" data-feather="code"></span>View</a
-                    ><a class="btn btn-sm btn-phoenix-primary preview-btn ms-2"
-                      ><span class="me-2" data-feather="eye"></span>Close</a
-                    >
-                  </nav>
-                </div>
               </div>
             </div>
             <div class="card-body p-0">
-              <!-- upper section -->
-              <div class="collapse code-collapse" id="patrol-report">
-                <pre
-                  class="scrollbar bg-200 p-3"
-                  style="max-height: 420px"
-                ><code class="code-to-copy">
-                          ELorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur ornare pretium eros, quis mattis nisi sollicitudin
-                          in. Vestibulum vel urna congue, bibendum lacus a, dignissim elit. Morbi nec consequat massa. Proin dictum a urna quis
-                          pulvinar. Integer feugiat sapien lectus, quis aliquet lectus consectetur quis. Phasellus arcu leo, aliquet ac metus
-                          vitae, finibus hendrerit magna. Quisque auctor risus ut enim facilisis vestibulum. Ut accumsan tellus sit amet urna
-                          mattis malesuada. Donec in tellus nulla.
-                </code></pre>
-              </div>
-
               <div class="p-4">
-                <!-- file uploader -->
-                <form
-                  class="dropzone dropzone-multiple p-0 mb-4"
-                  id="myDropzone2"
-                  data-dropzone="data-dropzone"
-                  action="/upload-case"
-                  data-options='{"url":"/upload-case","paramName": "file"}'
-                >
-                  <div class="dz-message" data-dz-message="data-dz-message">
-                    <img
-                      class="me-2"
-                      src="../../../assets/img/icons/cloud-upload.svg"
-                      width="25"
-                      alt=""
-                    />Drop your files here
-                  </div>
-                  <div
-                    class="dz-preview dz-preview-multiple m-0 d-flex flex-column"
-                  >
-                    <div class="d-flex mb-3 pb-3 border-bottom media">
-                      <div class="border border-300 p-2 rounded-2 me-2">
-                        <img
-                          class="rounded-2 dz-image"
-                          src="../../../assets/img/icons/file.png"
-                          alt="..."
-                          data-dz-thumbnail="data-dz-thumbnail"
-                        />
-                      </div>
-                      <div class="flex-1 d-flex flex-between-center">
-                        <div>
-                          <h6 data-dz-name="data-dz-name"></h6>
-                          <div class="d-flex align-items-center">
-                            <p
-                              class="mb-0 fs--1 text-400 lh-1"
-                              data-dz-size="data-dz-size"
-                            ></p>
-                            <div class="dz-progress">
-                              <span
-                                class="dz-upload"
-                                data-dz-uploadprogress=""
-                              ></span>
-                            </div>
-                          </div>
-                          <span
-                            class="fs--2 text-danger"
-                            data-dz-errormessage="data-dz-errormessage"
-                          ></span>
-                        </div>
-                        <div class="dropdown font-sans-serif">
-                          <button
-                            class="btn btn-link text-600 btn-sm dropdown-toggle btn-reveal dropdown-caret-none"
-                            type="button"
-                            data-bs-toggle="dropdown"
-                            aria-haspopup="true"
-                            aria-expanded="false"
-                          >
-                            <span class="fas fa-ellipsis-h"></span>
-                          </button>
-                          <div
-                            class="dropdown-menu dropdown-menu-end border py-2"
-                          >
-                            <a
-                              class="dropdown-item"
-                              href="#!"
-                              data-dz-remove="data-dz-remove"
-                              >Remove File</a
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <input
-                    type="text"
-                    style="display: none;"
-                    value="<%= reportId %>"
-                    name="fileReportId"
-                  />
-                </form>
-
                 <!-- form >form tag will be merge with file uploader form tag -->
                 <form
                   action="/case-report/submit"
                   method="post"
                   class="row g-3 has-validation"
-                  id="caseReportForm"
+                  id="reportForm"
                 >
                   <!-- form title report -->
                   <div class="col-md-4">
                     <label class="form-label" for="validationCustom04"
-                      >Title report</label
+                      >Title Report</label
                     >
 
                     <select
@@ -275,7 +157,7 @@
                       >Event Summary</label
                     >
                     <textarea
-                      class="form-control <%= validationEventSummary %>"
+                      class="form-control <%= validationEventSummary %> scrollbar-overlay"
                       id="floatingProjectDescription1"
                       placeholder="Leave a summary report here"
                       style="height: 64px"
@@ -295,7 +177,7 @@
                       >Action Taken</label
                     >
                     <textarea
-                      class="form-control <%= validationActionTaken %>"
+                      class="form-control <%= validationActionTaken %> scrollbar-overlay"
                       id="floatingProjectDescription1"
                       placeholder="Leave a summary report here"
                       style="height: 64px"
@@ -315,7 +197,7 @@
                       >Summary Report</label
                     >
                     <textarea
-                      class="form-control <%= validationReportSummary %>"
+                      class="form-control <%= validationReportSummary %> scrollbar-overlay mb-3"
                       id="floatingProjectDescription2"
                       placeholder="Leave a note here"
                       style="height: 128px"
@@ -332,7 +214,7 @@
 
                   <input
                     type="text"
-                    style="display: none;"
+                    style="display: none"
                     value="<%= reportId %>"
                     name="confirmRid"
                   />
@@ -340,12 +222,20 @@
                   <!-- Submit button -->
                   <div class="col-12">
                     <button
-                      id="uploadButtonCase"
                       class="btn btn-primary"
                       type="submit"
+                      id="submitReport"
                     >
                       Submit form
                     </button>
+                    <a
+                      role="button"
+                      class="btn btn-phoenix-primary bg-transparent border border-0 mx-2"
+                      id="addFiles"
+                      data-bs-toggle="modal"
+                      data-bs-target="#verticallyCentered"
+                      >Add files +</a
+                    >
                   </div>
                 </form>
               </div>
@@ -364,9 +254,13 @@
             data-doc-nav="data-doc-nav"
           >
             <li class="nav-item">
-              <a class="nav-link" href="#unit-patrol-report-form"
-                >Case Report Form</a
-              >
+              <a class="nav-link" href="#reportForm">Report Form</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#addFiles">Add Files</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#submitReport">Submit Form</a>
             </li>
           </ul>
         </div>
@@ -384,19 +278,23 @@
     aria-live="assertive"
     aria-atomic="true"
   >
-    <div class="d-flex">
-      <div class="toast-body p-3"></div>
+    <div class="d-flex justify-content-between">
+      <div class="toast-body px-0 py-3"></div>
       <button
-        class="btn-close btn-close-white me-2 m-auto"
+        class="btn ms-2 p-0 btn-close-white"
         type="button"
         data-bs-dismiss="toast"
         aria-label="Close"
-      ></button>
+      >
+        <span class="uil uil-times fs-1"></span>
+      </button>
     </div>
   </div>
 </div>
 
-<!-- toast alert -->
+<!-- TOAST ALERT -->
+
+<!-- alert toast -->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
   <div class="d-flex">
     <div
@@ -407,8 +305,8 @@
       aria-atomic="true"
       id="alertToast"
     >
-      <div class="d-flex">
-        <div class="toast-body p-3">
+      <div class="d-flex justify-content-between">
+        <div class="toast-body px-0 py-3">
           <code class="text-white"><%= toastMsg %></code>
         </div>
 
@@ -420,6 +318,152 @@
         >
           <span class="uil uil-times fs-1"></span>
         </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+
+<!-- modal for upload files -->
+<div
+  class="modal fade scrollbar-overlay"
+  id="verticallyCentered"
+  tabindex="-1"
+  aria-labelledby="verticallyCenteredModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-md">
+    <div class="modal-content">
+      <div class="modal-header border border-0">
+        <h5 class="modal-title" id="verticallyCenteredModalLabel">
+          Upload Files
+        </h5>
+        <button
+          class="btn p-1"
+          type="button"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <span class="fas fa-times fs--1"></span>
+        </button>
+      </div>
+
+      <div class="modal-body p-3">
+        <!-- file uploader -->
+        <!-- data-options are the setting for dropzone can find the settings also inside -->
+        <form
+          class="dropzone dropzone-multiple p-0 mb-4"
+          id="myDropzone"
+          data-dropzone="data-dropzone"
+          action="/upload-case"
+          data-options='{"url":"/upload-case","paramName": "file"}'
+        >
+          <div class="dz-message" data-dz-message="data-dz-message">
+            <img
+              class="me-2"
+              src="../../../assets/img/icons/cloud-upload.svg"
+              width="25"
+              alt=""
+            />Drop your files here
+          </div>
+          <div class="dz-preview dz-preview-multiple m-0 d-flex flex-column">
+            <div class="d-flex mb-3 pb-3 border-bottom media">
+              <div class="border border-300 p-2 rounded-2 me-2">
+                <img
+                  class="rounded-2 dz-image"
+                  src="../../../assets/img/icons/file.png"
+                  alt="..."
+                  data-dz-thumbnail="data-dz-thumbnail"
+                />
+              </div>
+              <div class="flex-1 d-flex flex-between-center">
+                <div>
+                  <h6 data-dz-name="data-dz-name"></h6>
+                  <div class="d-flex align-items-center">
+                    <p
+                      class="mb-0 fs--1 text-400 lh-1"
+                      data-dz-size="data-dz-size"
+                    ></p>
+                    <div class="dz-progress">
+                      <span class="dz-upload" data-dz-uploadprogress=""></span>
+                    </div>
+                  </div>
+                  <span
+                    class="fs--2 text-danger"
+                    data-dz-errormessage="data-dz-errormessage"
+                  ></span>
+                </div>
+                <div class="dropdown font-sans-serif">
+                  <button
+                    class="btn btn-link text-600 btn-sm dropdown-toggle btn-reveal dropdown-caret-none"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    <span class="fas fa-ellipsis-h"></span>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-end border py-2">
+                    <a
+                      class="dropdown-item"
+                      href="#!"
+                      data-dz-remove="data-dz-remove"
+                      >Remove File</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <input
+            type="text"
+            style="display: none"
+            value="<%= reportId %>"
+            name="fileReportId"
+          />
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" type="submit" id="uploadButton">
+          <i class="fa fa-upload" aria-hidden="true"></i>&nbsp;&nbsp;Upload
+        </button>
+        <button
+          class="btn btn-outline-primary"
+          type="button"
+          data-bs-dismiss="modal"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- alert toast upload -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+    <div class="d-flex">
+      <div
+        class="toast align-items-center text-white bg-primary border-0 light"
+        role="alert"
+        data-bs-autohide="false"
+        aria-live="assertive"
+        aria-atomic="true"
+        id="alertUploadToast"
+      >
+        <div class="d-flex justify-content-between">
+          <div class="toast-body px-0 py-3">
+            <code id="dropzoneAlertContent" class="text-white"></code>
+          </div>
+
+          <button
+            class="btn ms-2 p-0 btn-close-white"
+            type="button"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          >
+            <span class="uil uil-times fs-1"></span>
+          </button>
+        </div>
       </div>
     </div>
   </div>

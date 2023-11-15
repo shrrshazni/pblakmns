@@ -28,7 +28,11 @@
             <div class="card-header p-4 border-bottom border-300 bg-soft">
               <div class="row g-3 justify-content-between align-items-center">
                 <div class="col-12 col-md">
-                  <h4 class="text-900 mb-0" data-anchor="data-anchor">
+                  <h4
+                    class="text-900 mb-0"
+                    data-anchor="data-anchor"
+                    id="header-patrol"
+                  >
                     Patrol Report Form
                   </h4>
                 </div>
@@ -52,7 +56,8 @@
                     >
                       <span class="me-2" data-feather="eye"></span>Preview</a
                     ><a class="btn btn-sm btn-phoenix-primary preview-btn ms-2"
-                      ><span class="me-2" data-feather="minimize-2"></span>Close</a
+                      ><span class="me-2" data-feather="minimize-2"></span
+                      >Close</a
                     >
                   </nav>
                 </div>
@@ -62,14 +67,36 @@
               <!-- upper section -->
               <div class="collapse code-collapse" id="patrol-report">
                 <pre
-                  class="scrollbar bg-200"
-                  style="max-height: 420px"
+                  class="scrollbar- bg-200"
+                  style="min-height: 100%; padding: none"
                 ><code class="code-to-copy">
-                   Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed auctor eget justo. Curabitur id fermentum neque. Nulla facilisi.
-                   Nunc vitae augue vel ex tincidunt ultricies. Duis nec tincidunt nisl. Vivamus id vehicula odio, eget lacinia risus. Aenean fringilla, 
-                   nunc ac tristique cursus, sem purus venenatis nunc, in dignissim dolor velit ac odio. Cras sollicitudin purus eu sapien facilisis, sit amet suscipit 
-                   nulla dignissim. Morbi nec varius quam, a consectetur justo. Pellentesque quis metus eget dui malesuada facilisis ac eu arcu. Vestibulum nec varius lectus. 
-                   Vivamus auctor quam nec tincidunt.
+                 Unit Patrol Location
+                 Report Summary
+                 Saya (Nama Penuh) bersama (Nama Penuh) telah membuat rondaan dilokai di kediaman dan aset
+                 LAKMNS dan mendapati semua lokasi dalam keadaan baik dan terkawal.
+
+                 Unit Patrol Parameter
+                 Report Summary
+                 Saya (Nama Penuh) bersama (Nama Penuh) telah membuat rondaan parameter berkala dan statik.
+                 Lokasi rondaan dari stau tempat ke satu tempat untuk pemantauan adalah di sekitar tempat 
+                 letak kereta, perkarangan luar (Nama Tempat) dan tinjauan kenderaan secara rawak melaporkan
+                 lokasi dalam keadaan baik dan selamat.
+
+                 Shift Member Patrol Location
+                 Report Summary
+                 Contoh 1 - Saya (Nama Penuh) bersama dengan (Nama Penuh) telah melaksanakan rondaan dilokasi
+                 (Nama Tempat) dan mendapati dalam keadaan baik dan terkawal.
+                 Contoh 2 - Saya (Nama Penuh) bersama dengan (Nama Penuh) telah melaksanakan rondaan dilokasi
+                 kediaman CEO LAKMNS dan mendapati dalam keadaan baik dan terkawal. (Ini adalah laporan sewaktu
+                 menaik dan menurunkan bendera di kediaman CEO)
+
+                 Notes
+                 Contoh 1 - Semasa rondaan dilaksanakan, pintu utama pejabat Jabatan Gutan, aras 11 tidak di tutup.
+                 Contoh 2 - (Sekiranya laporan kes yang berat sebagai contoh yang melibatkan kecurian, kerosakan,
+                 khianat, kemalangan Case Report dengan membuat catatan di sini seperti berikut) : Sila rujuk laporan 
+                 di dalam "Case Report" berdasarkan tarikh, masa dan pbnumber.
+                 Contoh 3 - (Untuk penugasan menaik dan menurunkan bendera serta rondaan kediaman CEO adalah seperti
+                 berikut) : "Bendera telah dinaikkan pada jam 0600hrs"
                 </code></pre>
               </div>
 
@@ -95,11 +122,11 @@
                       <option selected="" value="<%= reportType %>">
                         Choose a report type
                       </option>
-                      <option value="Unit Patrol Parameter">
-                        Unit Patrol Parameter
-                      </option>
                       <option value="Unit Patrol Location">
                         Unit Patrol Location
+                      </option>
+                      <option value="Unit Patrol Parameter">
+                        Unit Patrol Parameter
                       </option>
                       <option value="Shift Member Patrol Location">
                         Shift Member Patrol Location
@@ -201,7 +228,7 @@
                       >Patrol Summary Report</label
                     >
                     <textarea
-                      class="form-control <%= validationReportSummary %>"
+                      class="form-control <%= validationReportSummary %> scrollbar-overlay"
                       id="floatingProjectDescription1"
                       placeholder="Leave a summary report here"
                       style="height: 128px"
@@ -220,7 +247,7 @@
                       >Notes</label
                     >
                     <textarea
-                      class="form-control <%= validationNotes %>"
+                      class="form-control <%= validationNotes %> scrollbar-overlay"
                       id="floatingProjectDescription2"
                       placeholder="Leave a note here"
                       style="height: 64px"
@@ -243,12 +270,17 @@
 
                   <!-- Submit button -->
                   <div class="col-12">
-                    <button class="btn btn-primary" type="submit">
+                    <button
+                      class="btn btn-primary"
+                      type="submit"
+                      id="submitReport"
+                    >
                       Submit form
                     </button>
                     <a
                       role="button"
                       class="btn btn-phoenix-primary bg-transparent border border-0 mx-2"
+                      id="addFiles"
                       data-bs-toggle="modal"
                       data-bs-target="#verticallyCentered"
                       >Add files +</a
@@ -271,27 +303,65 @@
             data-doc-nav="data-doc-nav"
           >
             <li class="nav-item">
-              <a class="nav-link" href="#unit-patrol-report-form"
-                >Patrol Report Form</a
-              >
+              <a class="nav-link" href="#header-patrol">Report Example</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#reportForm">Report Form</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#addFiles">Add Files</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#submitReport">Submit Form</a>
             </li>
           </ul>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- status code-to-copy -->
-  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+<!-- TOAST ALERT -->
+
+<!-- status code-to-copy -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+  <div
+    class="toast align-items-center text-white bg-dark border-0 light"
+    id="icon-copied-toast"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+  >
+    <div class="d-flex justify-content-between">
+      <div class="toast-body px-0 py-3"></div>
+      <button
+        class="btn ms-2 p-0 btn-close-white"
+        type="button"
+        data-bs-dismiss="toast"
+        aria-label="Close"
+      >
+        <span class="uil uil-times fs-1"></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- alert toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+  <div class="d-flex">
     <div
-      class="toast align-items-center text-white bg-dark border-0 light"
-      id="icon-copied-toast"
+      class="toast <%= toastShow %> align-items-center text-white bg-primary border-0 light"
       role="alert"
+      data-bs-autohide="false"
       aria-live="assertive"
       aria-atomic="true"
+      id="alertToast"
     >
-      <div class="d-flex">
-        <div class="toast-body px-0 py-3"></div>
+      <div class="d-flex justify-content-between">
+        <div class="toast-body px-0 py-3">
+          <code class="text-white"><%= toastMsg %></code>
+        </div>
+
         <button
           class="btn ms-2 p-0 btn-close-white"
           type="button"
@@ -303,36 +373,9 @@
       </div>
     </div>
   </div>
-
-  <!-- alert toast -->
-  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
-    <div class="d-flex">
-      <div
-        class="toast <%= toastShow %> align-items-center text-white bg-primary border-0 light"
-        role="alert"
-        data-bs-autohide="false"
-        aria-live="assertive"
-        aria-atomic="true"
-        id="alertToast"
-      >
-        <div class="d-flex">
-          <div class="toast-body p-3">
-            <code class="text-white"><%= toastMsg %></code>
-          </div>
-
-          <button
-            class="btn ms-2 p-0 btn-close-white"
-            type="button"
-            data-bs-dismiss="toast"
-            aria-label="Close"
-          >
-            <span class="uil uil-times fs-1"></span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
+
+<!-- MODAL -->
 
 <!-- modal for upload files -->
 <div
@@ -358,12 +401,12 @@
         </button>
       </div>
 
-      <div class="modal-body p-5">
+      <div class="modal-body p-3">
         <!-- file uploader -->
         <!-- data-options are the setting for dropzone can find the settings also inside -->
         <form
           class="dropzone dropzone-multiple p-0 mb-4"
-          id="myDropzone1"
+          id="myDropzone"
           data-dropzone="data-dropzone"
           action="/upload-patrol"
           data-options='{"url":"/upload-patrol","paramName": "file"}'
@@ -434,7 +477,7 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-primary" type="submit" id="uploadButtonPatrol">
+        <button class="btn btn-primary" type="submit" id="uploadButton">
           <i class="fa fa-upload" aria-hidden="true"></i>&nbsp;&nbsp;Upload
         </button>
         <button
@@ -447,6 +490,36 @@
       </div>
     </div>
   </div>
+
+  <!-- alert toast upload -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+    <div class="d-flex">
+      <div
+        class="toast align-items-center text-white bg-primary border-0 light"
+        role="alert"
+        data-bs-autohide="false"
+        aria-live="assertive"
+        aria-atomic="true"
+        id="alertUploadToast"
+      >
+        <div class="d-flex justify-content-between">
+          <div class="toast-body px-0 py-3">
+            <code id="dropzoneAlertContent" class="text-white"></code>
+          </div>
+
+          <button
+            class="btn ms-2 p-0 btn-close-white"
+            type="button"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          >
+            <span class="uil uil-times fs-1"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 </div>
 
 <%-include("partials/navbar-script.ejs") %> <%-include("partials/footer") %>
