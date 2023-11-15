@@ -181,6 +181,27 @@ app.get('/reset-password', function (req, res) {
   res.render('reset-password');
 });
 
+// ACTIVITY
+
+const ActivitySchema = new mongoose.Schema({
+  time: String,
+  by: String,
+  username: String,
+  type: String,
+  title: String,
+  about: String
+});
+
+const Activity = mongoose.model('Activity', ActivitySchema);
+
+// DATE-ACTIVITY
+const DateActivitySchema = new mongoose.Schema({
+  date: String,
+  items: [ActivitySchema]
+});
+
+const DateActivity = mongoose.model('Date', DateActivitySchema);
+
 // FILES
 
 // Define a schema for your model (e.g., for storing file metadata)
@@ -627,6 +648,9 @@ app
 
       const confirmRid = req.query.rid;
 
+      const currentTime = date.getCurrentTime();
+      const currentDate = date.getDateYear();
+
       if (checkUser) {
         res.render('patrol-report-submit', {
           currentFullName: checkUser.fullname,
@@ -648,6 +672,8 @@ app
           location: '',
           reportSummary: '',
           notes: '',
+          currentDate: currentDate,
+          currentTime: currentTime,
           //toast alert
           toastShow: '',
           toastMsg: ''
@@ -676,6 +702,8 @@ app
 
     // generated rid
     const confirmRid = req.body.confirmRid;
+    const currentDate = req.body.currentDate;
+    const currentTime = req.body.currentTime;
 
     const currentUsername = req.session.user.username;
 
@@ -755,12 +783,27 @@ app
         location: location
       });
 
+      const newActivity = new Activity({
+        time: currentTime,
+        by: currentFullName,
+        username: currentUser,
+        type: 'Patrol Report',
+        title: 'Submitted a patrol report of' + reportType,
+        about: reportSummary
+      });
+
+      const newDateActivity = new DateActivity({
+        date: currentDate,
+        items: newActivity
+      });
+
       const existing = await PatrolReport.findOne({ reportId: confirmRid });
 
       if (!existing) {
         const result = PatrolReport.create(newReport);
+        const resultActivity = DateActivity.create(newDateActivity);
 
-        if (result) {
+        if (result && resultActivity) {
           console.log('Successfully added report.');
 
           const checkUser = await User.findOne({ username: currentUsername });
@@ -988,7 +1031,7 @@ app
         validationLocation: validationLocation,
         validationReportSummary: validationReportSummary,
         validationNotes: validationNotes,
-        //form 
+        //form
         reportId: confirmRid,
         reportType: reportType,
         startTime: startTime,
@@ -997,6 +1040,8 @@ app
         location: location,
         reportSummary: reportSummary,
         notes: notes,
+        currentDate : currentDate,
+        currentTime : currentTime,
         //toast alert
         toastShow: 'show',
         toastMsg: 'There is error in your input!'
@@ -1880,7 +1925,7 @@ app
         validationActionTaken: validationActionTaken,
         validationStaffOnDuty: validationStaffOnDuty,
         //form
-        reportId : confirmRid,
+        reportId: confirmRid,
         reportType: reportType,
         time: time,
         date: date,
@@ -2430,7 +2475,7 @@ app
         validationStatus: validationStatus,
         validationNotes: validationNotes,
         //form name
-        reportId : confirmRid,
+        reportId: confirmRid,
         scheduleTitle: scheduleTitle,
         startDate: startDate,
         endDate: endDate,
@@ -2834,7 +2879,6 @@ app.get('/social/profile', async function (req, res) {
         username: checkUser.username
       });
 
-      console.log(checkCaseReport.length);
       res.render('profile', {
         currentFullName: checkUser.fullname,
         currentUser: checkUser.username,
