@@ -14,7 +14,7 @@ const fs = require('fs');
 const path = require('path');
 const fileUpload = require('express-fileupload');
 // getdate
-const date = require('./public/assets/js/date');
+const dateLocal = require('./public/assets/js/date');
 const { string } = require('yargs');
 
 const mongoURI = 'mongodb://localhost:27017/sessions';
@@ -181,9 +181,9 @@ app.get('/reset-password', function (req, res) {
   res.render('reset-password');
 });
 
-// ACTIVITY
+// iTEM ACTIVITY
 
-const ActivitySchema = new mongoose.Schema({
+const itemActivitySchema = new mongoose.Schema({
   time: String,
   by: String,
   username: String,
@@ -192,15 +192,15 @@ const ActivitySchema = new mongoose.Schema({
   about: String
 });
 
-const Activity = mongoose.model('Activity', ActivitySchema);
+const ItemActivity = mongoose.model('ItemActivity', itemActivitySchema);
 
-// DATE-ACTIVITY
-const DateActivitySchema = new mongoose.Schema({
+// ACTIVITY
+const ActivitySchema = new mongoose.Schema({
   date: String,
-  items: [ActivitySchema]
+  items: [itemActivitySchema]
 });
 
-const DateActivity = mongoose.model('Date', DateActivitySchema);
+const Activity = mongoose.model('Activity', ActivitySchema);
 
 // FILES
 
@@ -246,6 +246,41 @@ app.post('/upload-patrol', async (req, res) => {
     // find rid
     const confirmRid = req.body.fileReportId;
 
+    // date for upload
+    var uploadDate = dateLocal.getDateYear();
+    var uploadTime = dateLocal.getCurrentTime();
+
+    // Activity
+    const newItemActivity = new ItemActivity({
+      time: uploadTime,
+      by: checkUser.fullname,
+      username: checkUser.username,
+      type: 'Upload Files',
+      title: 'Addes & uploaded ' + Object.keys(req.files).length + ' files',
+      about: 'Files added for attachment in patrol report'
+    });
+
+    const newActivity = new Activity({
+      date: uploadTime,
+      items: newItemActivity
+    });
+
+    const findDate = await Activity.findOne({ date: uploadDate });
+
+    if (findDate) {
+      findDate.items.push(newItemActivity);
+      await findDate.save();
+      console.log('Activity was added to existing date');
+    } else {
+      const resultActivity = Activity.create(newActivity);
+
+      if (resultActivity) {
+        console.log('Added new activity');
+      } else {
+        console.log('Something is wrong');
+      }
+    }
+
     // Check if the report ID exists in the database
     const existingFile = await File.findOne({ reportId: confirmRid });
 
@@ -254,7 +289,7 @@ app.post('/upload-patrol', async (req, res) => {
       for (const file of Object.values(req.files)) {
         const uploadPath = __dirname + '/public/uploads/' + file.name;
         const pathFile = 'uploads/' + file.name;
-        const todayDate = date.getDate();
+        const todayDate = dateLocal.getDate();
         const fileType = path.extname(file.name);
 
         file.mv(uploadPath, err => {
@@ -648,9 +683,6 @@ app
 
       const confirmRid = req.query.rid;
 
-      const currentTime = date.getCurrentTime();
-      const currentDate = date.getDateYear();
-
       if (checkUser) {
         res.render('patrol-report-submit', {
           currentFullName: checkUser.fullname,
@@ -672,8 +704,6 @@ app
           location: '',
           reportSummary: '',
           notes: '',
-          currentDate: currentDate,
-          currentTime: currentTime,
           //toast alert
           toastShow: '',
           toastMsg: ''
@@ -692,6 +722,10 @@ app
     var validationReportSummary = '';
     var validationNotes = '';
 
+    // current date time
+    var currentTime = dateLocal.getCurrentTime();
+    var currentDate = dateLocal.getDateYear();
+
     const reportType = req.body.reportType;
     const startTime = req.body.startTime;
     const endTime = req.body.endTime;
@@ -702,8 +736,6 @@ app
 
     // generated rid
     const confirmRid = req.body.confirmRid;
-    const currentDate = req.body.currentDate;
-    const currentTime = req.body.currentTime;
 
     const currentUsername = req.session.user.username;
 
@@ -770,6 +802,39 @@ app
       const currentFullName = checkUser.fullname;
       const currentUser = checkUser.username;
 
+      // Activity
+      const newItemActivity = new ItemActivity({
+        time: currentTime,
+        by: currentFullName,
+        username: currentUser,
+        type: 'Patrol Report',
+        title: 'Submitted a patrol report of ' + _.lowerCase(reportType),
+        about: reportSummary
+      });
+
+      const newActivity = new Activity({
+        date: currentDate,
+        items: newItemActivity
+      });
+
+      const findDate = await Activity.findOne({ date: currentDate });
+
+      if (findDate) {
+        findDate.items.push(newItemActivity);
+        await findDate.save();
+        console.log('Activity was added to existing date');
+      } else {
+        const resultActivity = Activity.create(newActivity);
+
+        if (resultActivity) {
+          console.log('Added new activity');
+        } else {
+          console.log('Something is wrong');
+        }
+      }
+
+      // Patrol Report
+
       const newReport = new PatrolReport({
         reportId: confirmRid,
         username: currentUser,
@@ -783,27 +848,12 @@ app
         location: location
       });
 
-      const newActivity = new Activity({
-        time: currentTime,
-        by: currentFullName,
-        username: currentUser,
-        type: 'Patrol Report',
-        title: 'Submitted a patrol report of' + reportType,
-        about: reportSummary
-      });
-
-      const newDateActivity = new DateActivity({
-        date: currentDate,
-        items: newActivity
-      });
-
       const existing = await PatrolReport.findOne({ reportId: confirmRid });
 
       if (!existing) {
         const result = PatrolReport.create(newReport);
-        const resultActivity = DateActivity.create(newDateActivity);
 
-        if (result && resultActivity) {
+        if (result) {
           console.log('Successfully added report.');
 
           const checkUser = await User.findOne({ username: currentUsername });
@@ -1040,8 +1090,6 @@ app
         location: location,
         reportSummary: reportSummary,
         notes: notes,
-        currentDate : currentDate,
-        currentTime : currentTime,
         //toast alert
         toastShow: 'show',
         toastMsg: 'There is error in your input!'
@@ -1146,6 +1194,41 @@ app.post('/upload-case', async (req, res) => {
 
     // find rid
     const confirmRid = req.body.fileReportId;
+
+    // date for upload
+    var uploadDate = dateLocal.getDateYear();
+    var uploadTime = dateLocal.getCurrentTime();
+
+    // Activity
+    const newItemActivity = new ItemActivity({
+      time: uploadTime,
+      by: checkUser.fullname,
+      username: checkUser.username,
+      type: 'Upload Files',
+      title: 'Addes & uploaded ' + Object.keys(req.files).length + ' files',
+      about: 'Files added for attachment in case report'
+    });
+
+    const newActivity = new Activity({
+      date: uploadTime,
+      items: newItemActivity
+    });
+
+    const findDate = await Activity.findOne({ date: uploadDate });
+
+    if (findDate) {
+      findDate.items.push(newItemActivity);
+      await findDate.save();
+      console.log('Activity was added to existing date');
+    } else {
+      const resultActivity = Activity.create(newActivity);
+
+      if (resultActivity) {
+        console.log('Added new activity');
+      } else {
+        console.log('Something is wrong');
+      }
+    }
 
     // Check if the report ID exists in the database
     const existingFile = await File.findOne({ reportId: confirmRid });
@@ -1591,6 +1674,10 @@ app
     var validationEventSummary = '';
     var validationStaffOnDuty = '';
 
+    // current date time
+    var currentTime = dateLocal.getCurrentTime();
+    var currentDate = dateLocal.getDateYear();
+
     const reportType = req.body.reportType;
     const time = req.body.time;
     const location = req.body.location;
@@ -1675,6 +1762,37 @@ app
     ) {
       const currentFullName = checkUser.fullname;
       const currentUser = checkUser.username;
+
+      // Activity
+      const newItemActivity = new ItemActivity({
+        time: currentTime,
+        by: currentFullName,
+        username: currentUser,
+        type: 'Case Report',
+        title: 'Submitted a case report of ' + _.lowerCase(reportType),
+        about: reportSummary
+      });
+
+      const newActivity = new Activity({
+        date: currentDate,
+        items: newItemActivity
+      });
+
+      const findDate = await Activity.findOne({ date: currentDate });
+
+      if (findDate) {
+        findDate.items.push(newItemActivity);
+        await findDate.save();
+        console.log('Activity was added to existing date');
+      } else {
+        const resultActivity = Activity.create(newActivity);
+
+        if (resultActivity) {
+          console.log('Added new activity');
+        } else {
+          console.log('Something is wrong');
+        }
+      }
 
       const newReport = new CaseReport({
         reportId: confirmRid,
@@ -2056,6 +2174,41 @@ app.post('/upload-schedule', async (req, res) => {
     // find current confirm report id
     const confirmRid = req.body.fileReportId;
 
+    // date for upload
+    var uploadDate = dateLocal.getDateYear();
+    var uploadTime = dateLocal.getCurrentTime();
+
+    // Activity
+    const newItemActivity = new ItemActivity({
+      time: uploadTime,
+      by: checkUser.fullname,
+      username: checkUser.username,
+      type: 'Upload Files',
+      title: 'Addes & uploaded ' + Object.keys(req.files).length + ' files',
+      about: 'Files added for attachment in schedule'
+    });
+
+    const newActivity = new Activity({
+      date: uploadTime,
+      items: newItemActivity
+    });
+
+    const findDate = await Activity.findOne({ date: uploadDate });
+
+    if (findDate) {
+      findDate.items.push(newItemActivity);
+      await findDate.save();
+      console.log('Activity was added to existing date');
+    } else {
+      const resultActivity = Activity.create(newActivity);
+
+      if (resultActivity) {
+        console.log('Added new activity');
+      } else {
+        console.log('Something is wrong');
+      }
+    }
+
     // Check if the report ID exists in the database
     const existingFile = await FileSchedule.findOne({ reportId: confirmRid });
 
@@ -2064,7 +2217,7 @@ app.post('/upload-schedule', async (req, res) => {
       for (const file of Object.values(req.files)) {
         const uploadPath = __dirname + '/public/uploads/' + file.name;
         const pathFile = 'uploads/' + file.name;
-        const todayDate = date.getDate();
+        const todayDate = dateLocal.getDate();
         const fileType = path.extname(file.name);
 
         file.mv(uploadPath, err => {
@@ -2142,6 +2295,10 @@ app
     var validationStatus = '';
     var validationNotes = '';
 
+    // current date time
+    var currentTime = dateLocal.getCurrentTime();
+    var currentDate = dateLocal.getDateYear();
+
     const scheduleTitle = req.body.scheduleTitle;
     const startDate = req.body.startDate;
     const endDate = req.body.endDate;
@@ -2214,6 +2371,37 @@ app
       validationNotes === 'is-valid'
     ) {
       const currentUser = checkUser.username;
+
+      // Activity
+      const newItemActivity = new ItemActivity({
+        time: currentTime,
+        by: checkUser.fullname,
+        username: currentUser,
+        type: 'Schedule',
+        title: 'Submitted a schedule of ' + month + ' ,from ' + startDate + ' towards ' + endDate,
+        about: notes + ' ,while currently the status is ' + status
+      });
+
+      const newActivity = new Activity({
+        date: currentDate,
+        items: newItemActivity
+      });
+
+      const findDate = await Activity.findOne({ date: currentDate });
+
+      if (findDate) {
+        findDate.items.push(newItemActivity);
+        await findDate.save();
+        console.log('Activity was added to existing date');
+      } else {
+        const resultActivity = Activity.create(newActivity);
+
+        if (resultActivity) {
+          console.log('Added new activity');
+        } else {
+          console.log('Something is wrong');
+        }
+      }
 
       const newSchedule = new Schedule({
         reportId: confirmRid,
