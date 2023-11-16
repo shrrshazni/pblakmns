@@ -15,7 +15,7 @@ const path = require('path');
 const fileUpload = require('express-fileupload');
 // getdate
 const dateLocal = require('./public/assets/js/date');
-const { string } = require('yargs');
+const { string, check } = require('yargs');
 
 const mongoURI = 'mongodb://localhost:27017/sessions';
 
@@ -2378,7 +2378,13 @@ app
         by: checkUser.fullname,
         username: currentUser,
         type: 'Schedule',
-        title: 'Submitted a schedule of ' + month + ' ,from ' + startDate + ' towards ' + endDate,
+        title:
+          'Submitted a schedule of ' +
+          month +
+          ' ,from ' +
+          startDate +
+          ' towards ' +
+          endDate,
         about: notes + ' ,while currently the status is ' + status
       });
 
@@ -3067,15 +3073,40 @@ app.get('/social/profile', async function (req, res) {
         username: checkUser.username
       });
 
-      res.render('profile', {
-        currentFullName: checkUser.fullname,
-        currentUser: checkUser.username,
-        email: checkUser.email,
-        phone: checkUser.phone,
-        amountPatrol: checkPatrolReport.length,
-        amountCase: checkCaseReport.length,
-        amountTotalReports: checkPatrolReport.length + checkCaseReport.length
-      });
+      const checkActivity = await Activity.find({});
+
+      var todayDate = dateLocal.getDateYear();
+
+      if (checkActivity.length > 0) {
+        const checkItemActivity = await Activity.Activity.find({
+          'items.username': username
+        });
+        res.render('profile', {
+          currentFullName: checkUser.fullname,
+          currentUser: checkUser.username,
+          email: checkUser.email,
+          phone: checkUser.phone,
+          amountPatrol: checkPatrolReport.length,
+          amountCase: checkCaseReport.length,
+          amountTotalReports: checkPatrolReport.length + checkCaseReport.length,
+          activity: checkActivity,
+          itemActivity: checkItemActivity,
+          todayDate: todayDate
+        });
+      } else {
+        res.render('profile', {
+          currentFullName: checkUser.fullname,
+          currentUser: checkUser.username,
+          email: checkUser.email,
+          phone: checkUser.phone,
+          amountPatrol: checkPatrolReport.length,
+          amountCase: checkCaseReport.length,
+          amountTotalReports: checkPatrolReport.length + checkCaseReport.length,
+          activity: '',
+          itemActivity: '',
+          todayDate: ''
+        });
+      }
     }
   } else {
     res.redirect('/sign-in');

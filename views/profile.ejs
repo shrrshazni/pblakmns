@@ -59,7 +59,10 @@
               <div class="col-auto">
                 <div class="d-flex flex-wrap mb-3 align-items-center">
                   <h3 class="me-2"><%= currentFullName %></h3>
-                  <span class="fw-semi-bold fs--1 text-1100 badge badge-phoenix badge-phoenix-primary">PB<%= currentUser %></span>
+                  <span
+                    class="fw-semi-bold fs--1 text-1100 badge badge-phoenix badge-phoenix-primary"
+                    >PB<%= currentUser %></span
+                  >
                 </div>
               </div>
               <div class="mb-4">
@@ -83,7 +86,7 @@
                   <div class="col-auto order-xxl-3">
                     <button class="btn btn-phoenix-primary lh-1">
                       <span class="fa-solid fa-suitcase me-2"></span>Case Report
-                      (<%= amountCase  %>)
+                      (<%= amountCase %>)
                     </button>
                   </div>
                 </div>
@@ -93,6 +96,7 @@
         </div>
       </div>
     </div>
+
     <!-- timeline -->
     <div class="col-12 col-xl-5">
       <div class="row gx-xl-8 gx-xxl-11">
@@ -101,8 +105,76 @@
           class="col-xl-12 overflow-auto scrollbar-overlay"
           style="height: 90vh"
         >
+          <% if (Array.isArray(activity) && activity.length > 0) { %> <%
+          activity.forEach(function (item1) { %>
           <div>
+            <% if(todayDate === item1.date) {%>
             <h4 class="py-3 border-y border-300 mb-5 ms-8">Today</h4>
+            <%} else { %>
+            <h4 class="py-3 border-y border-300 mb-5 ms-8">
+              <%= item1.date %>
+            </h4>
+            <% } %> <% if (Array.isArray(itemActivity) && itemActivity.length >
+            0) { %> <% itemActivity.forEach(function (item2) { %>
+            <div class="timeline-basic mb-9">
+              <div class="timeline-item">
+                <div class="row g-3">
+                  <div class="col-auto">
+                    <div class="timeline-item-bar position-relative">
+                      <% if(item2.type === 'Patrol Report'){ %>
+                      <div class="icon-item icon-item-md rounded-7 border">
+                        <span
+                          class="fa-solid fa-clipboard text-success-500 fs--1"
+                        ></span>
+                      </div>
+                      <% } else if(item2.type === 'Case Report'){ %>
+                      <div class="icon-item icon-item-md rounded-7 border">
+                        <span
+                          class="fa-solid fa-flag text-danger-500 fs--1"
+                        ></span>
+                      </div>
+                      <% } else if(item2.type === 'Schedule') {%>
+                      <div class="icon-item icon-item-md rounded-7 border">
+                        <span
+                          class="fa-solid fa-calendar text-info-500 fs--1"
+                        ></span>
+                      </div>
+                      <% }else { %>
+                      <div class="icon-item icon-item-md rounded-7 border">
+                        <span
+                          class="fa-regular fa-snowflake text-primary-500 fs--1"
+                        ></span>
+                      </div>
+                      <% } %>
+                      <span
+                        class="timeline-bar border-end border-dashed border-300"
+                      ></span>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="d-flex justify-content-between">
+                      <div class="d-flex mb-2">
+                        <h6
+                          class="lh-sm mb-0 me-2 text-800 timeline-item-title"
+                        >
+                          <%= item2.title %>
+                        </h6>
+                      </div>
+                      <p class="text-500 fs--1 mb-0 text-nowrap timeline-time">
+                        <span class="fa-regular fa-clock me-1"></span><%= item2.time %>
+                      </p>
+                    </div>
+                    <h6 class="fs--2 fw-normal mb-3">
+                      by <a class="fw-semi-bold" href="#!"><%= item2.by %></a>
+                    </h6>
+                    <p class="fs--1 text-800 w-sm-60 mb-5">
+                      <%= item2.about %>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <% }) %> <% } else { %>
             <div class="timeline-basic mb-9">
               <div class="timeline-item">
                 <div class="row g-3">
@@ -124,367 +196,24 @@
                         <h6
                           class="lh-sm mb-0 me-2 text-800 timeline-item-title"
                         >
-                          Assigned to serve as the <br class="d-sm-none" />
-                          project's director
+                          No activity on this date <br class="d-sm-none" />
+                          this date
                         </h6>
                       </div>
-                      <p class="text-500 fs--1 mb-0 text-nowrap timeline-time">
-                        <span class="fa-regular fa-clock me-1"></span>4:33pm
-                      </p>
                     </div>
-                    <h6 class="fs--2 fw-normal mb-3">
-                      by <a class="fw-semi-bold" href="#!">John N. Ward</a>
-                    </h6>
-                    <p class="fs--1 text-800 w-sm-60 mb-5">
-                      Utilizing best practices to better leverage our assets, we
-                      must engage in black sky leadership thinking, not the
-                      usual band-aid solution.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="row g-3">
-                  <div class="col-auto">
-                    <div class="timeline-item-bar position-relative">
-                      <div class="icon-item icon-item-md rounded-7 border">
-                        <span
-                          class="fa-solid fa-envelope text-danger fs--1"
-                        ></span>
-                      </div>
-                      <span
-                        class="timeline-bar border-end border-dashed border-300"
-                      ></span>
-                    </div>
-                  </div>
-                  <div class="col">
-                    <div class="d-flex justify-content-between">
-                      <div class="d-flex mb-2">
-                        <h6
-                          class="lh-sm mb-0 me-2 text-800 timeline-item-title"
-                        >
-                          Quary about purchased <br class="d-sm-none" />
-                          soccer socks
-                        </h6>
-                      </div>
-                      <p class="text-500 fs--1 mb-0 text-nowrap timeline-time">
-                        <span class="fa-regular fa-clock me-1"></span>6:30pm
-                      </p>
-                    </div>
-                    <h6 class="fs--2 fw-normal mb-3">
-                      by <a class="fw-semi-bold" href="#!">Edward Hopper</a>
-                    </h6>
-                    <p class="fs--1 text-800 w-sm-60 mb-5">
-                      I’ve come across your posts and found some favorable deals
-                      on your page. I’ve added a load of products to the cart
-                      and I don’t know the payment options you avail. Also, can
-                      you enlighten me about any discount.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="row g-3">
-                  <div class="col-auto">
-                    <div class="timeline-item-bar position-relative">
-                      <div class="icon-item icon-item-md rounded-7 border">
-                        <span class="fa-solid fa-video text-info fs--1"></span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col">
-                    <div class="d-flex justify-content-between">
-                      <div class="d-flex mb-2">
-                        <h6
-                          class="lh-sm mb-0 me-2 text-800 timeline-item-title"
-                        >
-                          Onboarding Meeting
-                        </h6>
-                      </div>
-                      <p class="text-500 fs--1 mb-0 text-nowrap timeline-time">
-                        <span class="fa-regular fa-clock me-1"></span>9:33pm
-                      </p>
-                    </div>
-                    <h6 class="fs--2 fw-normal false">
-                      by <a class="fw-semi-bold" href="#!">John N. Ward</a>
-                    </h6>
-                    <p class="fs--1 text-800 w-sm-60 mb-0"></p>
                   </div>
                 </div>
               </div>
             </div>
-            <h4 class="py-3 border-y border-300 mb-5 ms-8">15 October, 2022</h4>
-            <div class="timeline-basic mb-9">
-              <div class="timeline-item">
-                <div class="row g-3">
-                  <div class="col-auto">
-                    <div class="timeline-item-bar position-relative">
-                      <div class="icon-item icon-item-md rounded-7 border">
-                        <span
-                          class="fa-solid fa-swatchbook text-primary fs--1"
-                        ></span>
-                      </div>
-                      <span
-                        class="timeline-bar border-end border-dashed border-300"
-                      ></span>
-                    </div>
-                  </div>
-                  <div class="col">
-                    <div class="d-flex justify-content-between">
-                      <div class="d-flex mb-2">
-                        <h6
-                          class="lh-sm mb-0 me-2 text-800 timeline-item-title"
-                        >
-                          Designing the dungeon
-                        </h6>
-                      </div>
-                      <p class="text-500 fs--1 mb-0 text-nowrap timeline-time">
-                        <span class="fa-regular fa-clock me-1"></span>1:30pm
-                      </p>
-                    </div>
-                    <h6 class="fs--2 fw-normal mb-3">
-                      by <a class="fw-semi-bold" href="#!">John N. Ward</a>
-                    </h6>
-                    <p class="fs--1 text-800 w-sm-60 mb-5">
-                      To get off the runway and paradigm shift, we should take
-                      brass tacks with above-the-board actionable analytics,
-                      ramp up with viral partnering, not the usual goat rodeo
-                      putting socks on an octopus.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="row g-3">
-                  <div class="col-auto">
-                    <div class="timeline-item-bar position-relative">
-                      <div class="icon-item icon-item-md rounded-7 border">
-                        <span
-                          class="fa-solid fa-skull-crossbones text-danger fs--1"
-                        ></span>
-                      </div>
-                      <span
-                        class="timeline-bar border-end border-dashed border-300"
-                      ></span>
-                    </div>
-                  </div>
-                  <div class="col">
-                    <div class="d-flex justify-content-between">
-                      <div class="d-flex mb-2">
-                        <h6
-                          class="lh-sm mb-0 me-2 text-800 timeline-item-title"
-                        >
-                          How to take the headache <br class="d-sm-none" />
-                          out of Order
-                        </h6>
-                      </div>
-                      <p class="text-500 fs--1 mb-0 text-nowrap timeline-time">
-                        <span class="fa-regular fa-clock me-1"></span>8:32pm
-                      </p>
-                    </div>
-                    <h6 class="fs--2 fw-normal mb-3">
-                      by <a class="fw-semi-bold" href="#!">Edward Hopper</a>
-                    </h6>
-                    <p class="fs--1 text-800 w-sm-60 mb-5">
-                      It is a long established fact that a reader will be
-                      distracted by the readable content of a page when looking
-                      at its layout. The point of using Lorem Ipsum is that it
-                      has a more-or-less normal distribution of letters.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="row g-3">
-                  <div class="col-auto">
-                    <div class="timeline-item-bar position-relative">
-                      <div class="icon-item icon-item-md rounded-7 border">
-                        <span
-                          class="fa-solid fa-stethoscope text-primary fs--1"
-                        ></span>
-                      </div>
-                      <span
-                        class="timeline-bar border-end border-dashed border-300"
-                      ></span>
-                    </div>
-                  </div>
-                  <div class="col">
-                    <div class="d-flex justify-content-between">
-                      <div class="d-flex mb-2">
-                        <h6
-                          class="lh-sm mb-0 me-2 text-800 timeline-item-title"
-                        >
-                          Mandatory routine checkup
-                        </h6>
-                      </div>
-                      <p class="text-500 fs--1 mb-0 text-nowrap timeline-time">
-                        <span class="fa-regular fa-clock me-1"></span>9:30pm
-                      </p>
-                    </div>
-                    <h6 class="fs--2 fw-normal mb-3">
-                      by
-                      <a class="fw-semi-bold" href="#!"
-                        >Eye before Thy Hospital</a
-                      >
-                    </h6>
-                    <p class="fs--1 text-800 w-sm-60 mb-5">
-                      To get the bitter butter out and take the better butter
-                      into the bitter dough to make a bitter bread and broad
-                      donut, not the usual yellow butter, but the white
-                      butterless butter.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="row g-3">
-                  <div class="col-auto">
-                    <div class="timeline-item-bar position-relative">
-                      <div class="icon-item icon-item-md rounded-7 border">
-                        <span
-                          class="fa-solid fa-utensils text-success fs--1"
-                        ></span>
-                      </div>
-                      <span
-                        class="timeline-bar border-end border-dashed border-300"
-                      ></span>
-                    </div>
-                  </div>
-                  <div class="col">
-                    <div class="d-flex justify-content-between">
-                      <div class="d-flex mb-2">
-                        <h6
-                          class="lh-sm mb-0 me-2 text-800 timeline-item-title"
-                        >
-                          Making bad butter better
-                        </h6>
-                      </div>
-                      <p class="text-500 fs--1 mb-0 text-nowrap timeline-time">
-                        <span class="fa-regular fa-clock me-1"></span>8:30pm
-                      </p>
-                    </div>
-                    <h6 class="fs--2 fw-normal mb-3">
-                      by <a class="fw-semi-bold" href="#!">Edward Hopper</a>
-                    </h6>
-                    <p class="fs--1 text-800 w-sm-60 mb-5">
-                      Check how long a fish might live out of water and if you
-                      can check the pulse to see if it's alive or not though
-                      it's okay to eat fish cause they don't have any feelings.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="row g-3">
-                  <div class="col-auto">
-                    <div class="timeline-item-bar position-relative">
-                      <div class="icon-item icon-item-md rounded-7 border">
-                        <span class="fa-solid fa-rocket text-info fs--1"></span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col">
-                    <div class="d-flex justify-content-between">
-                      <div class="d-flex mb-2">
-                        <h6
-                          class="lh-sm mb-0 me-2 text-800 timeline-item-title"
-                        >
-                          Launching Phoenix
-                        </h6>
-                      </div>
-                      <p class="text-500 fs--1 mb-0 text-nowrap timeline-time">
-                        <span class="fa-regular fa-clock me-1"></span>10:33pm
-                      </p>
-                    </div>
-                    <h6 class="fs--2 fw-normal false">
-                      by <a class="fw-semi-bold" href="#!">John N. Ward</a>
-                    </h6>
-                    <p class="fs--1 text-800 w-sm-60 mb-0"></p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <h4 class="py-3 border-y border-300 mb-5 ms-8">20 October, 2022</h4>
-            <div class="timeline-basic mb-9">
-              <div class="timeline-item">
-                <div class="row g-3">
-                  <div class="col-auto">
-                    <div class="timeline-item-bar position-relative">
-                      <div class="icon-item icon-item-md rounded-7 border">
-                        <span
-                          class="fa-solid fa-screwdriver-wrench text-warning fs--1"
-                        ></span>
-                      </div>
-                      <span
-                        class="timeline-bar border-end border-dashed border-300"
-                      ></span>
-                    </div>
-                  </div>
-                  <div class="col">
-                    <div class="d-flex justify-content-between">
-                      <div class="d-flex mb-2">
-                        <h6
-                          class="lh-sm mb-0 me-2 text-800 timeline-item-title"
-                        >
-                          To take the ants out
-                        </h6>
-                      </div>
-                      <p class="text-500 fs--1 mb-0 text-nowrap timeline-time">
-                        <span class="fa-regular fa-clock me-1"></span>8:32pm
-                      </p>
-                    </div>
-                    <h6 class="fs--2 fw-normal mb-3">
-                      by <a class="fw-semi-bold" href="#!">Edward Hopper</a>
-                    </h6>
-                    <p class="fs--1 text-800 w-sm-60 mb-5">
-                      Many ants are crawling into my PC and now they live in
-                      there to get highly skilled in web development and
-                      programming language that will make them earn better than
-                      the humans so that they’ll be able to buy off all the
-                      sugar out of the market.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="row g-3">
-                  <div class="col-auto">
-                    <div class="timeline-item-bar position-relative">
-                      <div class="icon-item icon-item-md rounded-7 border">
-                        <span
-                          class="fa-solid fa-paperclip text-info fs--1"
-                        ></span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col">
-                    <div class="d-flex justify-content-between">
-                      <div class="d-flex mb-2">
-                        <h6
-                          class="lh-sm mb-0 me-2 text-800 timeline-item-title"
-                        >
-                          Added file
-                        </h6>
-                        <h6 class="mb-0 fs--1">
-                          <span
-                            class="fa-solid fa-file-pdf me-1 text-700"
-                          ></span
-                          ><a href="#!">Readme.pdf</a>
-                        </h6>
-                      </div>
-                      <p class="text-500 fs--1 mb-0 text-nowrap timeline-time">
-                        <span class="fa-regular fa-clock me-1"></span>10:33pm
-                      </p>
-                    </div>
-                    <h6 class="fs--2 fw-normal false">
-                      by <a class="fw-semi-bold" href="#!">John N. Ward</a>
-                    </h6>
-                    <p class="fs--1 text-800 w-sm-60 mb-0"></p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <% } %>
           </div>
+          <% }) %> <% } else { %>
+          <div>
+            <h4 class="py-3 border-y border-300 mb-5 ms-8">
+              There is no activity yet
+            </h4>
+          </div>
+          <% } %>
         </div>
       </div>
     </div>
