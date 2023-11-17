@@ -97,7 +97,6 @@
       </div>
     </div>
 
-    <!-- timeline -->
     <div class="col-12 col-xl-5">
       <div class="row gx-xl-8 gx-xxl-11">
         <h3 class="mb-4 text-center">Activity Timeline</h3>
@@ -105,119 +104,31 @@
           class="col-xl-12 overflow-auto scrollbar-overlay"
           style="height: 90vh"
         >
-          <% if (Array.isArray(activity) && activity.length > 0) { %> <%
-          activity.forEach(function (item1) { %>
-          <div>
-            <% if(todayDate === item1.date) {%>
-            <h4 class="py-3 border-y border-300 mb-5 ms-8">Today</h4>
-            <%} else { %>
-            <h4 class="py-3 border-y border-300 mb-5 ms-8">
-              <%= item1.date %>
-            </h4>
-            <% } %> <% if (Array.isArray(itemActivity) && itemActivity.length >
-            0) { %> <% itemActivity.forEach(function (item2) { %>
-            <div class="timeline-basic mb-9">
-              <div class="timeline-item">
-                <div class="row g-3">
-                  <div class="col-auto">
-                    <div class="timeline-item-bar position-relative">
-                      <% if(item2.type === 'Patrol Report'){ %>
-                      <div class="icon-item icon-item-md rounded-7 border">
-                        <span
-                          class="fa-solid fa-clipboard text-success-500 fs--1"
-                        ></span>
-                      </div>
-                      <% } else if(item2.type === 'Case Report'){ %>
-                      <div class="icon-item icon-item-md rounded-7 border">
-                        <span
-                          class="fa-solid fa-flag text-danger-500 fs--1"
-                        ></span>
-                      </div>
-                      <% } else if(item2.type === 'Schedule') {%>
-                      <div class="icon-item icon-item-md rounded-7 border">
-                        <span
-                          class="fa-solid fa-calendar text-info-500 fs--1"
-                        ></span>
-                      </div>
-                      <% }else { %>
-                      <div class="icon-item icon-item-md rounded-7 border">
-                        <span
-                          class="fa-regular fa-snowflake text-primary-500 fs--1"
-                        ></span>
-                      </div>
-                      <% } %>
-                      <span
-                        class="timeline-bar border-end border-dashed border-300"
-                      ></span>
-                    </div>
-                  </div>
-                  <div class="col">
-                    <div class="d-flex justify-content-between">
-                      <div class="d-flex mb-2">
-                        <h6
-                          class="lh-sm mb-0 me-2 text-800 timeline-item-title"
-                        >
-                          <%= item2.title %>
-                        </h6>
-                      </div>
-                      <p class="text-500 fs--1 mb-0 text-nowrap timeline-time">
-                        <span class="fa-regular fa-clock me-1"></span><%= item2.time %>
-                      </p>
-                    </div>
-                    <h6 class="fs--2 fw-normal mb-3">
-                      by <a class="fw-semi-bold" href="#!"><%= item2.by %></a>
-                    </h6>
-                    <p class="fs--1 text-800 w-sm-60 mb-5">
-                      <%= item2.about %>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <% }) %> <% } else { %>
-            <div class="timeline-basic mb-9">
-              <div class="timeline-item">
-                <div class="row g-3">
-                  <div class="col-auto">
-                    <div class="timeline-item-bar position-relative">
-                      <div class="icon-item icon-item-md rounded-7 border">
-                        <span
-                          class="fa-solid fa-clipboard text-success fs--1"
-                        ></span>
-                      </div>
-                      <span
-                        class="timeline-bar border-end border-dashed border-300"
-                      ></span>
-                    </div>
-                  </div>
-                  <div class="col">
-                    <div class="d-flex justify-content-between">
-                      <div class="d-flex mb-2">
-                        <h6
-                          class="lh-sm mb-0 me-2 text-800 timeline-item-title"
-                        >
-                          No activity on this date <br class="d-sm-none" />
-                          this date
-                        </h6>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <% } %>
-          </div>
-          <% }) %> <% } else { %>
-          <div>
-            <h4 class="py-3 border-y border-300 mb-5 ms-8">
-              There is no activity yet
-            </h4>
-          </div>
-          <% } %>
+
+        <% if (Array.isArray(activity) && activity.length > 0) { %> <%
+        activity.forEach(activity => { %>
+        <h2>Date: <%= activity.date %></h2>
+
+        <% if (Array.isArray(activity.items) && activity.items.length > 0) { %>
+        <ul>
+              <% activity.items.forEach(itemArray => { %>
+                <% if(itemArray.username === currentUser) {%>
+                  <h4><%= itemArray.type %></h4>
+                <% } %>
+              <% }); %>
+        </ul>
+        <% } else { %>
+        <p>No items for this activity.</p>
+        <% } %> <% }); %> <% } else { %>
+        <p>No activities found for <%= currentUser %>.</p>
+        <% } %>
+
         </div>
       </div>
     </div>
+
   </div>
+
 </div>
 
 <%-include("partials/navbar-script.ejs") %> <%-include("partials/footer") %>

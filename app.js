@@ -3073,14 +3073,17 @@ app.get('/social/profile', async function (req, res) {
         username: checkUser.username
       });
 
-      const checkActivity = await Activity.find({});
+      const checkActivity = await Activity.find({ 'items.username': currentUsername });
+      console.log(checkActivity);
 
       var todayDate = dateLocal.getDateYear();
 
       if (checkActivity.length > 0) {
-        const checkItemActivity = await Activity.Activity.find({
-          'items.username': username
-        });
+        // const checkItemActivity = await Activity.find({
+        //   'items.username': currentUsername
+        // });
+        // console.log(checkItemActivity);
+
         res.render('profile', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
@@ -3090,7 +3093,7 @@ app.get('/social/profile', async function (req, res) {
           amountCase: checkCaseReport.length,
           amountTotalReports: checkPatrolReport.length + checkCaseReport.length,
           activity: checkActivity,
-          itemActivity: checkItemActivity,
+          // itemActivity: checkItemActivity,
           todayDate: todayDate
         });
       } else {
@@ -3103,7 +3106,7 @@ app.get('/social/profile', async function (req, res) {
           amountCase: checkCaseReport.length,
           amountTotalReports: checkPatrolReport.length + checkCaseReport.length,
           activity: '',
-          itemActivity: '',
+          // itemActivity: '',
           todayDate: ''
         });
       }
