@@ -66,7 +66,8 @@ const userSchema = new mongoose.Schema({
   password: String,
   username: String,
   email: String,
-  phone: String
+  phone: String,
+  profile: String
 });
 
 //mongoose passport-local
@@ -3073,17 +3074,15 @@ app.get('/social/profile', async function (req, res) {
         username: checkUser.username
       });
 
-      const checkActivity = await Activity.find({ 'items.username': currentUsername });
-      console.log(checkActivity);
+      const checkActivity = await Activity.find({
+        'items.username': currentUsername
+      })
+        .limit(7)
+        .sort({ timestamp: -1 });
 
       var todayDate = dateLocal.getDateYear();
 
       if (checkActivity.length > 0) {
-        // const checkItemActivity = await Activity.find({
-        //   'items.username': currentUsername
-        // });
-        // console.log(checkItemActivity);
-
         res.render('profile', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
@@ -3093,8 +3092,8 @@ app.get('/social/profile', async function (req, res) {
           amountCase: checkCaseReport.length,
           amountTotalReports: checkPatrolReport.length + checkCaseReport.length,
           activity: checkActivity,
-          // itemActivity: checkItemActivity,
           todayDate: todayDate
+          // totalItemCount: totalItemCount
         });
       } else {
         res.render('profile', {
@@ -3106,8 +3105,8 @@ app.get('/social/profile', async function (req, res) {
           amountCase: checkCaseReport.length,
           amountTotalReports: checkPatrolReport.length + checkCaseReport.length,
           activity: '',
-          // itemActivity: '',
           todayDate: ''
+          // totalItemCount: ''
         });
       }
     }
@@ -3124,15 +3123,275 @@ app.get('/social/settings', async function (req, res) {
 
     const checkUser = await User.findOne({ username: currentUsername });
 
-    // generate random id
-    const rid = crypto.randomBytes(6).toString('hex').toUpperCase();
-    console.log('Settings rid:' + rid);
-
     if (checkUser) {
       res.render('settings', {
         currentFullName: checkUser.fullname,
-        currentUser: checkUser.username
+        currentUser: checkUser.username,
+        currentEmail: checkUser.email,
+        currentPhone: checkUser.phone,
+        // validation
+        validationFullName: '',
+        validationEmail: '',
+        validationPhone: '',
+        validationOldPassword: '',
+        validationNewPassword: '',
+        validationConfirmPassword: '',
+        // input
+        fullName: '',
+        email: '',
+        phone: '',
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: ''
       });
+    }
+  } else {
+    res.redirect('/sign-in');
+  }
+});
+
+app.post('/social/settings/:customListName', async function (req, res) {
+  if (req.isAuthenticated()) {
+    var currentUsername = req.session.user.username;
+
+    const checkUser = await User.findOne({ username: currentUsername });
+
+    // request customName
+    const customListName = req.params.customListName;
+
+    if (checkUser) {
+      if (customListName === 'submit-information') {
+        const fullName = req.body.fullname;
+        const email = req.body.email;
+        const phone = req.body.phone;
+
+        const fullNameRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const phoneNumberRegex = /^(\+?6?01)[0-9]-*\d{7,8}$/;
+
+        var validationFullName = '';
+        var validationEmail = '';
+        var validationPhone = '';
+
+        // Full Name
+        if (fullNameRegex.test(fullName) === 'false' || fullName === '') {
+          validationFullName = 'is-invalid';
+        } else {
+          validationFullName = 'is-valid';
+        }
+
+        // Email
+        if (emailRegex.test(email) === 'false' || email === '') {
+          validationEmail = 'is-invalid';
+        } else {
+          validationEmail = 'is-valid';
+        }
+
+        // Phone
+        if (phoneNumberRegex.test(phone) === 'false' || phone === '') {
+          validationPhone = 'is-invalid';
+        } else {
+          validationPhone = 'is-valid';
+        }
+
+        if (
+          validationFullName === 'is-valid' &&
+          validationEmail === 'is-valid' &&
+          validationPhone === 'is-valid'
+        ) {
+          const filter = { username: currentUsername };
+
+          const update = {
+            $set: {
+              fullname: fullName,
+              email: email,
+              phone: phone
+            }
+          };
+
+          const options = { new: true };
+
+          const updatedUser = await User.findOneAndUpdate(
+            filter,
+            update,
+            options
+          );
+
+          if (updatedUser) {
+            console.log('Successful update user data');
+            res.render('settings', {
+              currentFullName: checkUser.fullname,
+              currentUser: checkUser.username,
+              currentEmail: checkUser.email,
+              currentPhone: checkUser.phone,
+              // validation
+              validationFullName: '',
+              validationEmail: '',
+              validationPhone: '',
+              validationOldPassword: '',
+              validationNewPassword: '',
+              validationConfirmPassword: '',
+              // input
+              fullName: '',
+              email: '',
+              phone: '',
+              oldPassword: '',
+              newPassword: '',
+              confirmPassword: ''
+            });
+          } else {
+            console.log('Unsuccessful update user data');
+            res.render('settings', {
+              currentFullName: checkUser.fullname,
+              currentUser: checkUser.username,
+              currentEmail: checkUser.email,
+              currentPhone: checkUser.phone,
+              // validation
+              validationFullName: '',
+              validationEmail: '',
+              validationPhone: '',
+              validationOldPassword: '',
+              validationNewPassword: '',
+              validationConfirmPassword: '',
+              // input
+              fullName: '',
+              email: '',
+              phone: '',
+              oldPassword: '',
+              newPassword: '',
+              confirmPassword: ''
+            });
+          }
+        } else {
+          res.render('settings', {
+            currentFullName: checkUser.fullname,
+            currentUser: checkUser.username,
+            currentEmail: checkUser.email,
+            currentPhone: checkUser.phone,
+            // validation
+            validationFullName: validationFullName,
+            validationEmail: validationEmail,
+            validationPhone: validationPhone,
+            validationOldPassword: '',
+            validationNewPassword: '',
+            validationConfirmPassword: '',
+            // input
+            fullName: fullName,
+            email: email,
+            phone: phone,
+            oldPassword: '',
+            newPassword: '',
+            confirmPassword: ''
+          });
+        }
+      } else if (customListName === 'submit-password') {
+        const oldPassword = req.body.oldPassword;
+        const newPassword = req.body.newPassword;
+        const confirmPassword = req.body.confirmPassword;
+
+        const passwordRegex = /^(?:\d+|[a-zA-Z0-9]{4,})/;
+
+        var validationOldPassword = '';
+        var validationNewPassword = '';
+        var validationConfirmPassword = '';
+
+        const user = await User.findByUsername(currentUsername);
+
+        var checkOldPassword = '';
+
+        user.authenticate(oldPassword, function (err, result) {
+          if (result) {
+            checkOldPassword = 'correct';
+          } else {
+            checkOldPassword = 'incorrect';
+          }
+          console.log(checkOldPassword);
+
+          // Old Password
+          if (
+            passwordRegex.test(oldPassword) === 'false' ||
+            oldPassword === '' ||
+            checkOldPassword === 'incorrect'
+          ) {
+            validationOldPassword = 'is-invalid';
+          } else {
+            validationOldPassword = 'is-valid';
+          }
+
+          // New Password
+          if (
+            passwordRegex.test(newPassword) === 'false' ||
+            newPassword === ''
+          ) {
+            validationNewPassword = 'is-invalid';
+          } else {
+            validationNewPassword = 'is-valid';
+          }
+
+          // Phone
+          if (newPassword !== confirmPassword) {
+            validationConfirmPassword = 'is-invalid';
+          } else {
+            validationConfirmPassword = 'is-valid';
+          }
+
+          if (
+            validationOldPassword === 'is-valid' &&
+            validationNewPassword === 'is-valid' &&
+            validationConfirmPassword === 'is-valid'
+          ) {
+            user.changePassword(oldPassword, newPassword, err => {
+              if (err) {
+                console.error(err);
+              } else {
+                console.log('Successfully change password');
+                res.render('settings', {
+                  currentFullName: checkUser.fullname,
+                  currentUser: checkUser.username,
+                  currentEmail: checkUser.email,
+                  currentPhone: checkUser.phone,
+                  // validation
+                  validationFullName: '',
+                  validationEmail: '',
+                  validationPhone: '',
+                  validationOldPassword: '',
+                  validationNewPassword: '',
+                  validationConfirmPassword: '',
+                  // input
+                  fullName: '',
+                  email: '',
+                  phone: '',
+                  oldPassword: '',
+                  newPassword: '',
+                  confirmPassword: ''
+                });
+              }
+            });
+          } else {
+            console.log('Unsuccessful');
+            res.render('settings', {
+              currentFullName: checkUser.fullname,
+              currentUser: checkUser.username,
+              currentEmail: checkUser.email,
+              currentPhone: checkUser.phone,
+              // validation
+              validationFullName: '',
+              validationEmail: '',
+              validationPhone: '',
+              validationOldPassword: validationOldPassword,
+              validationNewPassword: validationNewPassword,
+              validationConfirmPassword: validationConfirmPassword,
+              // input
+              fullName: '',
+              email: '',
+              phone: '',
+              oldPassword: oldPassword,
+              newPassword: newPassword,
+              confirmPassword: confirmPassword
+            });
+          }
+        });
+      }
     }
   } else {
     res.redirect('/sign-in');

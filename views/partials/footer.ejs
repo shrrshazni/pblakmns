@@ -48,8 +48,30 @@
 
 <script>
   $(document).ready(function () {
-    // PATROL REPORT SUBMIT
+    $(document).on('click', function () {
+      $('#upload-profile-picture').click();
+    });
 
+    $('#upload-profile-picture').on('change', function () {
+      previewImage(this);
+    });
+
+    function previewImage(input) {
+      const previewImage = $('#preview-image')[0];
+
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          previewImage.src = e.target.result;
+        };
+
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+  });
+
+  $(document).ready(function () {
     // Function to show the toast
     function showDropzoneFilesToast(content) {
       $('#dropzoneAlertContent').text(content);
@@ -85,8 +107,6 @@
       }, 2000);
     });
   });
-
- 
 </script>
 
 <!-- to be added later close tag for body and html -->
