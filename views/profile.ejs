@@ -18,6 +18,9 @@
             ></div>
             <!--/.bg-holder-->
 
+            <% if(currentProfile === ''){ currentProfile =
+            'assets/img/team/avatar.webp'; } %>
+
             <div class="feed-profile" style="width: 150px; height: 150px">
               <div
                 class="position-relative bg-400 rounded-circle cursor-pointer d-flex flex-center mb-xxl-7"
@@ -25,8 +28,7 @@
                 <div class="avatar avatar-5xl">
                   <img
                     class="rounded-circle rounded-circle bg-white img-thumbnail shadow-sm"
-                    src="../../assets/img/team/9.webp"
-                    alt=""
+                    src="<%= currentProfile %>"
                   />
                 </div>
                 <label
@@ -126,11 +128,13 @@
                       <span
                         class="fa-solid fa-file-arrow-up text-primary fs--1"
                       ></span>
-                      <%} %>
+                      <%}else %> <% if(itemArray.type === 'Upload Profile') {%>
+                      <span class="fa-solid fa-user text-primary fs--1"></span>
+                      <% } %>
                     </div>
                     <% if ( lastItemIndex >= 0 &&
-                    activity.items[lastItemIndex].username === currentUser )
-                    { %> <% if (itemIndex === lastItemIndex-1) { %>
+                    activity.items[lastItemIndex].username === currentUser ) {
+                    %> <% if (itemIndex === lastItemIndex) { %>
                     <span class=""></span>
                     <% } else { %>
                     <span
@@ -143,7 +147,7 @@
                   <div class="d-flex justify-content-between">
                     <div class="d-flex mb-2">
                       <h6 class="lh-sm mb-0 me-2 text-800 timeline-item-title">
-                        <%= itemArray.title %>
+                        <%= itemArray.title %> & last item index <%= lastItemIndex %> & item index <%= itemIndex %>
                       </h6>
                     </div>
                     <p class="text-500 fs--1 mb-0 text-nowrap timeline-time">

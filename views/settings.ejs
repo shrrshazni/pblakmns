@@ -18,40 +18,55 @@
             ></div>
             <!--/.bg-holder-->
 
-            <input
-              class="d-none"
-              id="upload-profile-picture"
-              type="file"
-              accept="image/*"
-              onchange="previewImage()"
-            />
-            <div
-              class="hoverbox feed-profile mb-15"
-              style="width: 150px; height: 150px"
+            <% if(currentProfile === ''){ currentProfile =
+            'assets/img/team/avatar.webp'; } %>
+            <form
+              action="/social/settings/upload-profile"
+              method="post"
+              enctype="multipart/form-data"
             >
+              <input
+                class="d-none"
+                id="upload-profile-picture"
+                type="file"
+                name="file"
+                accept="image/*"
+                onchange="previewImage()"
+              />
               <div
-                class="hoverbox-content bg-black rounded-circle d-flex flex-center z-index-1"
-                style="--phoenix-bg-opacity: 0.56"
+                class="hoverbox feed-profile mb-15"
+                style="width: 150px; height: 150px"
               >
-                <span class="fa-solid fa-camera fs-7 text-300 light"></span>
-              </div>
-              <div
-                class="position-relative bg-400 rounded-circle cursor-pointer d-flex flex-center mb-xxl-7"
-              >
-                <div class="avatar avatar-5xl">
-                  <img
-                    class="rounded-circle rounded-circle bg-white img-thumbnail shadow-sm"
-                    src=""
-                    alt="User profile image"
-                    id="preview-image"
-                  />
+                <div
+                  class="hoverbox-content bg-black rounded-circle d-flex flex-center z-index-1"
+                  style="--phoenix-bg-opacity: 0.56"
+                >
+                  <span class="fa-solid fa-camera fs-7 text-300 light"></span>
                 </div>
-                <label
-                  class="w-100 h-100 position-absolute z-index-1"
-                  for="upload-profile-picture"
-                ></label>
+                <div
+                  class="position-relative bg-400 rounded-circle cursor-pointer d-flex flex-center mb-xxl-7"
+                >
+                  <div class="avatar avatar-5xl">
+                    <img
+                      class="rounded-circle rounded-circle bg-white img-thumbnail shadow-sm"
+                      src="<%= currentProfile %>"
+                      id="preview-image"
+                    />
+                  </div>
+                  <label
+                    class="w-100 h-100 position-absolute z-index-1"
+                    for="upload-profile-picture"
+                  ></label>
+                </div>
               </div>
-            </div>
+              <button
+                class="btn btn-primary z-index-1 position-absolute bottom-0 end-0 m-2"
+                type="submit"
+                id="uploadProfile"
+              >
+                Upload Profile
+              </button>
+            </form>
           </div>
         </div>
 
@@ -271,6 +286,64 @@
             </div>
           </form>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- alert toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+  <div class="d-flex">
+    <div
+      class="toast <%= toastShow %> align-items-center text-white bg-primary border-0 light"
+      role="alert"
+      data-bs-autohide="false"
+      aria-live="assertive"
+      aria-atomic="true"
+      id="alertToast"
+    >
+      <div class="d-flex justify-content-between">
+        <div class="toast-body px-0 py-3">
+          <code class="text-white"><%= toastMsg %></code>
+        </div>
+
+        <button
+          class="btn ms-2 p-0 btn-close-white"
+          type="button"
+          data-bs-dismiss="toast"
+          aria-label="Close"
+        >
+          <span class="uil uil-times fs-1"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- alert toast upload -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+  <div class="d-flex">
+    <div
+      class="toast align-items-center text-white bg-primary border-0 light"
+      role="alert"
+      data-bs-autohide="false"
+      aria-live="assertive"
+      aria-atomic="true"
+      id="alertUploadProfileToast"
+    >
+      <div class="d-flex justify-content-between">
+        <div class="toast-body px-0 py-3">
+          <code id="profileAlertContent" class="text-white"></code>
+        </div>
+
+        <button
+          class="btn ms-2 p-0 btn-close-white"
+          type="button"
+          data-bs-dismiss="toast"
+          aria-label="Close"
+        >
+          <span class="uil uil-times fs-1"></span>
+        </button>
       </div>
     </div>
   </div>

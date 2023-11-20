@@ -32,27 +32,3 @@
     transform: translate(-50%, -50%) rotate(360deg);
   }
 }
-
-/* scrollbar-overlay */
-/* 
-body {
-  overflow: auto;
-}
-
-body::-webkit-scrollbar {
-  visibility: hidden;
-  -webkit-appearance: none;
-  width: 6px;
-  height: 6px;
-  background-color: transparent;
-}
-
-body::-webkit-scrollbar-thumb {
-  visibility: visible;
-  border-radius: 3px;
-  background-color: rgba(159, 166, 188, 0.55);
-}
-
-body:focus::-webkit-scrollbar-thumb {
-  visibility: visible;
-} */

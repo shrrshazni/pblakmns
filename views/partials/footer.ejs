@@ -107,6 +107,39 @@
       }, 2000);
     });
   });
+
+  $(document).ready(function () {
+    function showProfileToast(content) {
+      $('#profileAlertContent').text(content);
+
+      var toast = new bootstrap.Toast(
+        document.getElementById('alertUploadProfileToast')
+      );
+      toast.show();
+    }
+
+    var fileInput = document.getElementById('upload-profile-picture');
+
+    // Access the files property to get an array of File objects
+    var files = fileInput.files;
+
+    $('#uploadProfile').on('click', function () {
+      var button = $(this);
+      button.addClass('loading').prop('disabled', true);
+
+      // Check if there are files selected
+      if (files.length > 0) {
+        // Log or process the first file in the array
+        showProfileToast('Queued file:', files[0].name);
+      } else {
+        showProfileToast('No file selected.');
+      }
+
+      setTimeout(function () {
+        button.removeClass('loading').prop('disabled', false);
+      }, 2000);
+    });
+  });
 </script>
 
 <!-- to be added later close tag for body and html -->

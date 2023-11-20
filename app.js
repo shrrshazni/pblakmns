@@ -42,7 +42,6 @@ app.use(
     secret: 'Our little secret.',
     resave: true,
     saveUninitialized: false,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 },
     store: store
   })
 );
@@ -106,6 +105,7 @@ app.get('/', async function (req, res) {
       res.render('home', {
         currentFullName: checkUser.fullname,
         currentUser: checkUser.username,
+        currentProfile: checkUser.profile,
         rid: crypto.randomBytes(6).toString('hex').toUpperCase()
       });
     }
@@ -118,28 +118,102 @@ app.get('/', async function (req, res) {
 
 app
   .get('/sign-in', function (req, res) {
-    res.render('sign-in');
+    res.render('sign-in', {
+      // validation
+      validationUsername: '',
+      validationPassword: '',
+      // input value
+      username: '',
+      password: '',
+      // toast
+      toastShow: '',
+      toastMsg: ''
+    });
   })
   .post('/sign-in', async function (req, res) {
     const username = req.body.username;
     const password = req.body.password;
+    const rememberMe = req.body.rememberMe;
 
-    const user = new User({
-      username: username,
-      password: password
-    });
+    // Set the session duration based on the 'rememberMe' checkbox
+    const sessionDuration = rememberMe
+      ? 7 * 24 * 60 * 60 * 1000
+      : 1 * 60 * 60 * 1000;
 
-    req.login(user, function (err) {
-      if (err) {
-        console.log('Login error');
-        res.redirect('/sign-in');
-      } else {
-        passport.authenticate('local')(req, res, function () {
-          req.session.user = user;
-          res.redirect('/');
-        });
-      }
-    });
+    req.session.cookie.maxAge = sessionDuration;
+
+    var validationUsername = '';
+    var validationPassword = '';
+
+    const passwordRegex = /^(?:\d+|[a-zA-Z0-9]{4,})/;
+
+    const user = await User.findByUsername(username);
+    var checkUser = '';
+
+    if (!user) {
+      checkUser = 'Not found';
+    } else {
+      checkUser = 'Found';
+    }
+
+    // validation username
+    if (username === '' || checkUser === 'Not found') {
+      validationUsername = 'is-invalid';
+    } else {
+      validationUsername = 'is-valid';
+    }
+
+    // validation username
+    if (password === '' || passwordRegex.test(password) === 'false') {
+      validationPassword = 'is-invalid';
+    } else {
+      validationPassword = 'is-valid';
+    }
+
+    if (
+      validationUsername === 'is-valid' &&
+      validationPassword === 'is-valid'
+    ) {
+      const user = new User({
+        username: username,
+        password: password
+      });
+
+      req.login(user, function (err) {
+        console.log(err);
+        if (err) {
+          console.log('Login error');
+          validationPassword = 'is-invalid';
+          res.render('sign-in', {
+            // validation
+            validationUsername: validationUsername,
+            validationPassword: validationPassword,
+            // input value
+            username: username,
+            password: password,
+            toastShow: 'show',
+            toastMsg:
+              'You have entered wrong password for this username'
+          });
+        } else {
+          passport.authenticate('local')(req, res, function () {
+            req.session.user = user;
+            res.redirect('/');
+          });
+        }
+      });
+    } else {
+      res.render('sign-in', {
+        // validation
+        validationUsername: validationUsername,
+        validationPassword: validationPassword,
+        // input value
+        username: username,
+        password: password,
+        toastShow: 'show',
+        toastMsg: 'There is an error, please do check your input'
+      });
+    }
   });
 
 //SIGN UP
@@ -340,6 +414,7 @@ app.get('/patrol-report/view', async function (req, res) {
         res.render('patrol-report-view', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
           itemReports: itemReports,
           totalReports: itemReports.length,
           amountBMI: itemBMI.length,
@@ -364,6 +439,7 @@ app.get('/patrol-report/view', async function (req, res) {
         res.render('patrol-report-view', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
           itemReports: 'There is no patrol report submitted yet.',
           totalReports: '0',
           amountBMI: '0',
@@ -416,6 +492,7 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
           res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: itemBMI,
             totalReports: itemReports.length,
             amountBMI: itemBMI.length,
@@ -440,6 +517,7 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
           res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: 'There is no patrol report submitted yet.',
             totalReports: '0',
             amountBMI: '0',
@@ -467,6 +545,7 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
           res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: itemBMII,
             totalReports: itemReports.length,
             amountBMI: itemBMI.length,
@@ -491,6 +570,7 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
           res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: 'There is no patrol report submitted yet.',
             totalReports: '0',
             amountBMI: '0',
@@ -518,6 +598,7 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
           res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: itemJM,
             totalReports: itemReports.length,
             amountBMI: itemBMI.length,
@@ -542,6 +623,7 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
           res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: 'There is no patrol report submitted yet.',
             totalReports: '0',
             amountBMI: '0',
@@ -569,6 +651,7 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
           res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: itemCM,
             totalReports: itemReports.length,
             amountBMI: itemBMI.length,
@@ -593,6 +676,7 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
           res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: 'There is no patrol report submitted yet.',
             totalReports: '0',
             amountBMI: '0',
@@ -620,6 +704,7 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
           res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: itemRS,
             totalReports: itemReports.length,
             amountBMI: itemBMI.length,
@@ -644,6 +729,7 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
           res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: 'There is no patrol report submitted yet.',
             totalReports: '0',
             amountBMI: '0',
@@ -688,6 +774,7 @@ app
         res.render('patrol-report-submit', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
           reportId: confirmRid,
           //validation
           validationReportType: '',
@@ -879,6 +966,7 @@ app
               res.render('patrol-report-view', {
                 currentFullName: checkUser.fullname,
                 currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
                 itemReports: itemReports,
                 totalReports: itemReports.length,
                 amountBMI: itemBMI.length,
@@ -903,6 +991,7 @@ app
               res.render('patrol-report-view', {
                 currentFullName: checkUser.fullname,
                 currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
                 itemReports: 'There is no patrol report submitted yet.',
                 totalReports: '0',
                 amountBMI: '0',
@@ -950,6 +1039,7 @@ app
               res.render('patrol-report-view', {
                 currentFullName: checkUser.fullname,
                 currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
                 itemReports: itemReports,
                 totalReports: itemReports.length,
                 amountBMI: itemBMI.length,
@@ -974,6 +1064,7 @@ app
               res.render('patrol-report-view', {
                 currentFullName: checkUser.fullname,
                 currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
                 itemReports: 'There is no patrol report submitted yet.',
                 totalReports: '0',
                 amountBMI: '0',
@@ -1022,6 +1113,7 @@ app
             res.render('patrol-report-view', {
               currentFullName: checkUser.fullname,
               currentUser: checkUser.username,
+              currentProfile: checkUser.profile,
               itemReports: itemReports,
               totalReports: itemReports.length,
               amountBMI: itemBMI.length,
@@ -1046,6 +1138,7 @@ app
             res.render('patrol-report-view', {
               currentFullName: checkUser.fullname,
               currentUser: checkUser.username,
+              currentProfile: checkUser.profile,
               itemReports: 'There is no patrol report submitted yet.',
               totalReports: '0',
               amountBMI: '0',
@@ -1074,6 +1167,7 @@ app
       res.render('patrol-report-submit', {
         currentFullName: checkUser.fullname,
         currentUser: checkUser.username,
+        currentProfile: checkUser.profile,
         //validation
         validationReportType: validationReportType,
         validationDate: validationDate,
@@ -1118,6 +1212,7 @@ app.get('/patrol-report/details', async function (req, res) {
           res.render('patrol-report-details', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             // patrol report
             reportType: checkReport.type,
             madeBy: checkReport.madeBy,
@@ -1133,6 +1228,7 @@ app.get('/patrol-report/details', async function (req, res) {
           res.render('patrol-report-details', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             // patrol report
             reportType: checkReport.type,
             madeBy: checkReport.madeBy,
@@ -1149,6 +1245,7 @@ app.get('/patrol-report/details', async function (req, res) {
         res.render('patrol-report-details', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
           reportType: '',
           madeBy: '',
           pbNumber: '',
@@ -1289,6 +1386,7 @@ app.get('/case-report/view', async function (req, res) {
         res.render('case-report-view', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
           itemReports: itemReports,
           totalReports: itemReports.length,
           amountBMI: itemBMI.length,
@@ -1313,6 +1411,7 @@ app.get('/case-report/view', async function (req, res) {
         res.render('case-report-view', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
           itemReports: 'There is no case report submitted yet.',
           totalReports: '0',
           amountBMI: '0',
@@ -1365,6 +1464,7 @@ app.get('/case-report/view/:customListName', async function (req, res) {
           res.render('case-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: itemBMI,
             totalReports: itemReports.length,
             amountBMI: itemBMI.length,
@@ -1389,6 +1489,7 @@ app.get('/case-report/view/:customListName', async function (req, res) {
           res.render('case-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: 'There is no case report submitted yet.',
             totalReports: '0',
             amountBMI: '0',
@@ -1416,6 +1517,7 @@ app.get('/case-report/view/:customListName', async function (req, res) {
           res.render('case-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: itemBMII,
             totalReports: itemReports.length,
             amountBMI: itemBMI.length,
@@ -1440,6 +1542,7 @@ app.get('/case-report/view/:customListName', async function (req, res) {
           res.render('case-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: 'There is no case report submitted yet.',
             totalReports: '0',
             amountBMI: '0',
@@ -1467,6 +1570,7 @@ app.get('/case-report/view/:customListName', async function (req, res) {
           res.render('case-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: itemJM,
             totalReports: itemReports.length,
             amountBMI: itemBMI.length,
@@ -1491,6 +1595,7 @@ app.get('/case-report/view/:customListName', async function (req, res) {
           res.render('case-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: 'There is no case report submitted yet.',
             totalReports: '0',
             amountBMI: '0',
@@ -1518,6 +1623,7 @@ app.get('/case-report/view/:customListName', async function (req, res) {
           res.render('case-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: itemCM,
             totalReports: itemReports.length,
             amountBMI: itemBMI.length,
@@ -1542,6 +1648,7 @@ app.get('/case-report/view/:customListName', async function (req, res) {
           res.render('case-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: 'There is no case report submitted yet.',
             totalReports: '0',
             amountBMI: '0',
@@ -1569,6 +1676,7 @@ app.get('/case-report/view/:customListName', async function (req, res) {
           res.render('case-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: itemRS,
             totalReports: itemReports.length,
             amountBMI: itemBMI.length,
@@ -1593,6 +1701,7 @@ app.get('/case-report/view/:customListName', async function (req, res) {
           res.render('case-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemReports: 'There is no case report submitted yet.',
             totalReports: '0',
             amountBMI: '0',
@@ -1637,6 +1746,7 @@ app
         res.render('case-report-submit', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
           reportId: confirmRid,
           //validation
           validationReportType: '',
@@ -1839,6 +1949,7 @@ app
               res.render('case-report-view', {
                 currentFullName: checkUser.fullname,
                 currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
                 itemReports: itemReports,
                 totalReports: itemReports.length,
                 amountBMI: itemBMI.length,
@@ -1863,6 +1974,7 @@ app
               res.render('case-report-view', {
                 currentFullName: checkUser.fullname,
                 currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
                 itemReports: 'There is no case report submitted yet.',
                 totalReports: '0',
                 amountBMI: '0',
@@ -1910,6 +2022,7 @@ app
               res.render('case-report-view', {
                 currentFullName: checkUser.fullname,
                 currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
                 itemReports: itemReports,
                 totalReports: itemReports.length,
                 amountBMI: itemBMI.length,
@@ -1934,6 +2047,7 @@ app
               res.render('case-report-view', {
                 currentFullName: checkUser.fullname,
                 currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
                 itemReports: 'There is no case report submitted yet.',
                 totalReports: '0',
                 amountBMI: '0',
@@ -1982,6 +2096,7 @@ app
             res.render('case-report-view', {
               currentFullName: checkUser.fullname,
               currentUser: checkUser.username,
+              currentProfile: checkUser.profile,
               itemReports: itemReports,
               totalReports: itemReports.length,
               amountBMI: itemBMI.length,
@@ -2006,6 +2121,7 @@ app
             res.render('case-report-view', {
               currentFullName: checkUser.fullname,
               currentUser: checkUser.username,
+              currentProfile: checkUser.profile,
               itemReports: 'There is no case report submitted yet.',
               totalReports: '0',
               amountBMI: '0',
@@ -2034,6 +2150,7 @@ app
       res.render('case-report-submit', {
         currentFullName: checkUser.fullname,
         currentUser: checkUser.username,
+        currentProfile: checkUser.profile,
         //validation
         validationReportType: validationReportType,
         validationDate: validationDate,
@@ -2080,6 +2197,7 @@ app.get('/case-report/details', async function (req, res) {
           res.render('case-report-details', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             // patrol report
             reportType: checkReport.type,
             madeBy: checkReport.madeBy,
@@ -2097,6 +2215,7 @@ app.get('/case-report/details', async function (req, res) {
           res.render('case-report-details', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             // patrol report
             reportType: checkReport.type,
             madeBy: checkReport.madeBy,
@@ -2115,6 +2234,7 @@ app.get('/case-report/details', async function (req, res) {
         res.render('case-report-details', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
           reportType: '',
           madeBy: '',
           pbNumber: '',
@@ -2261,6 +2381,7 @@ app
         res.render('schedule-submit', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
           reportId: confirmRid,
           //validation
           validationScheduleTitle: '',
@@ -2455,6 +2576,7 @@ app
               res.render('schedule', {
                 currentFullName: checkUser.fullname,
                 currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
                 itemFiles: itemFiles,
                 itemSchedules: itemSchedules,
                 totalSchedules: itemSchedules.length,
@@ -2480,6 +2602,7 @@ app
               res.render('schedule', {
                 currentFullName: checkUser.fullname,
                 currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
                 itemFiles: '',
                 itemSchedules: '',
                 totalSchedules: '0',
@@ -2531,6 +2654,7 @@ app
               res.render('schedule', {
                 currentFullName: checkUser.fullname,
                 currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
                 itemFiles: itemFiles,
                 itemSchedules: itemSchedules,
                 totalSchedules: itemSchedules.length,
@@ -2556,6 +2680,7 @@ app
               res.render('schedule', {
                 currentFullName: checkUser.fullname,
                 currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
                 itemFiles: '',
                 itemSchedules: '',
                 totalSchedules: '0',
@@ -2607,6 +2732,7 @@ app
             res.render('schedule', {
               currentFullName: checkUser.fullname,
               currentUser: checkUser.username,
+              currentProfile: checkUser.profile,
               itemFiles: itemFiles,
               itemSchedules: itemSchedules,
               totalSchedules: itemSchedules.length,
@@ -2632,6 +2758,7 @@ app
             res.render('schedule', {
               currentFullName: checkUser.fullname,
               currentUser: checkUser.username,
+              currentProfile: checkUser.profile,
               itemFiles: '',
               itemSchedules: '',
               totalSchedules: '0',
@@ -2660,6 +2787,7 @@ app
       res.render('schedule-submit', {
         currentFullName: checkUser.fullname,
         currentUser: checkUser.username,
+        currentProfile: checkUser.profile,
         reportId: confirmRid,
         //validation
         validationScheduleTitle: validationScheduleTitle,
@@ -2709,6 +2837,7 @@ app.get('/schedule', async function (req, res) {
         res.render('schedule', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
           itemFiles: itemFiles,
           itemSchedules: itemSchedules,
           totalSchedules: itemSchedules.length,
@@ -2734,6 +2863,7 @@ app.get('/schedule', async function (req, res) {
         res.render('schedule', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
           itemFiles: '',
           itemSchedules: '',
           totalSchedules: '0',
@@ -2790,6 +2920,7 @@ app.get('/schedule/:customListName', async function (req, res) {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemFiles: itemFiles,
             itemSchedules: itemBMI,
             totalSchedules: itemSchedules.length,
@@ -2815,6 +2946,7 @@ app.get('/schedule/:customListName', async function (req, res) {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemFiles: '',
             itemSchedules: '',
             totalSchedules: '0',
@@ -2843,6 +2975,7 @@ app.get('/schedule/:customListName', async function (req, res) {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemFiles: itemFiles,
             itemSchedules: itemBMII,
             totalSchedules: itemSchedules.length,
@@ -2868,6 +3001,7 @@ app.get('/schedule/:customListName', async function (req, res) {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemFiles: '',
             itemSchedules: '',
             totalSchedules: '0',
@@ -2896,6 +3030,7 @@ app.get('/schedule/:customListName', async function (req, res) {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemFiles: itemFiles,
             itemSchedules: itemJM,
             totalSchedules: itemSchedules.length,
@@ -2921,6 +3056,7 @@ app.get('/schedule/:customListName', async function (req, res) {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemFiles: '',
             itemSchedules: '',
             totalSchedules: '0',
@@ -2949,6 +3085,7 @@ app.get('/schedule/:customListName', async function (req, res) {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemFiles: itemFiles,
             itemSchedules: itemCM,
             totalSchedules: itemSchedules.length,
@@ -2974,6 +3111,7 @@ app.get('/schedule/:customListName', async function (req, res) {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemFiles: '',
             itemSchedules: '',
             totalSchedules: '0',
@@ -3002,6 +3140,7 @@ app.get('/schedule/:customListName', async function (req, res) {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemFiles: itemFiles,
             itemSchedules: itemRS,
             totalSchedules: itemSchedules.length,
@@ -3027,6 +3166,7 @@ app.get('/schedule/:customListName', async function (req, res) {
           res.render('schedule', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             itemFiles: '',
             itemSchedules: '',
             totalSchedules: '0',
@@ -3086,6 +3226,7 @@ app.get('/social/profile', async function (req, res) {
         res.render('profile', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
           email: checkUser.email,
           phone: checkUser.phone,
           amountPatrol: checkPatrolReport.length,
@@ -3099,6 +3240,7 @@ app.get('/social/profile', async function (req, res) {
         res.render('profile', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
           email: checkUser.email,
           phone: checkUser.phone,
           amountPatrol: checkPatrolReport.length,
@@ -3127,6 +3269,7 @@ app.get('/social/settings', async function (req, res) {
       res.render('settings', {
         currentFullName: checkUser.fullname,
         currentUser: checkUser.username,
+        currentProfile: checkUser.profile,
         currentEmail: checkUser.email,
         currentPhone: checkUser.phone,
         // validation
@@ -3142,7 +3285,9 @@ app.get('/social/settings', async function (req, res) {
         phone: '',
         oldPassword: '',
         newPassword: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        toastShow: '',
+        toastMsg: ''
       });
     }
   } else {
@@ -3222,6 +3367,7 @@ app.post('/social/settings/:customListName', async function (req, res) {
             res.render('settings', {
               currentFullName: checkUser.fullname,
               currentUser: checkUser.username,
+              currentProfile: checkUser.profile,
               currentEmail: checkUser.email,
               currentPhone: checkUser.phone,
               // validation
@@ -3237,13 +3383,16 @@ app.post('/social/settings/:customListName', async function (req, res) {
               phone: '',
               oldPassword: '',
               newPassword: '',
-              confirmPassword: ''
+              confirmPassword: '',
+              toastShow: 'show',
+              toastMsg: 'Update information succesful'
             });
           } else {
             console.log('Unsuccessful update user data');
             res.render('settings', {
               currentFullName: checkUser.fullname,
               currentUser: checkUser.username,
+              currentProfile: checkUser.profile,
               currentEmail: checkUser.email,
               currentPhone: checkUser.phone,
               // validation
@@ -3259,13 +3408,16 @@ app.post('/social/settings/:customListName', async function (req, res) {
               phone: '',
               oldPassword: '',
               newPassword: '',
-              confirmPassword: ''
+              confirmPassword: '',
+              toastShow: 'show',
+              toastMsg: 'Update information error'
             });
           }
         } else {
           res.render('settings', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
             currentEmail: checkUser.email,
             currentPhone: checkUser.phone,
             // validation
@@ -3281,7 +3433,9 @@ app.post('/social/settings/:customListName', async function (req, res) {
             phone: phone,
             oldPassword: '',
             newPassword: '',
-            confirmPassword: ''
+            confirmPassword: '',
+            toastShow: 'show',
+            toastMsg: 'There is error in information input'
           });
         }
       } else if (customListName === 'submit-password') {
@@ -3348,6 +3502,7 @@ app.post('/social/settings/:customListName', async function (req, res) {
                 res.render('settings', {
                   currentFullName: checkUser.fullname,
                   currentUser: checkUser.username,
+                  currentProfile: checkUser.profile,
                   currentEmail: checkUser.email,
                   currentPhone: checkUser.phone,
                   // validation
@@ -3363,7 +3518,9 @@ app.post('/social/settings/:customListName', async function (req, res) {
                   phone: '',
                   oldPassword: '',
                   newPassword: '',
-                  confirmPassword: ''
+                  confirmPassword: '',
+                  toastShow: 'show',
+                  toastMsg: 'Change password successful'
                 });
               }
             });
@@ -3372,6 +3529,7 @@ app.post('/social/settings/:customListName', async function (req, res) {
             res.render('settings', {
               currentFullName: checkUser.fullname,
               currentUser: checkUser.username,
+              currentProfile: checkUser.profile,
               currentEmail: checkUser.email,
               currentPhone: checkUser.phone,
               // validation
@@ -3387,10 +3545,80 @@ app.post('/social/settings/:customListName', async function (req, res) {
               phone: '',
               oldPassword: oldPassword,
               newPassword: newPassword,
-              confirmPassword: confirmPassword
+              confirmPassword: confirmPassword,
+              toastShow: 'show',
+              toastMsg: 'There is error in password input'
             });
           }
         });
+      } else if (customListName === 'upload-profile') {
+        if (!req.files || Object.keys(req.files).length === 0) {
+          console.log('There is no files selected');
+        } else {
+          // find user full name
+          const currentUsername = req.session.user.username;
+          const checkUser = await User.findOne({ username: currentUsername });
+
+          // date for upload
+          var uploadDate = dateLocal.getDateYear();
+          var uploadTime = dateLocal.getCurrentTime();
+
+          // Activity
+          const newItemActivity = new ItemActivity({
+            time: uploadTime,
+            by: checkUser.fullname,
+            username: checkUser.username,
+            type: 'Upload Profile',
+            title: 'Update & uploaded profiles',
+            about: 'Image added for profile image displayed'
+          });
+
+          const newActivity = new Activity({
+            date: uploadDate,
+            items: newItemActivity
+          });
+
+          const findDate = await Activity.findOne({ date: uploadDate });
+
+          if (findDate) {
+            findDate.items.push(newItemActivity);
+            await findDate.save();
+            console.log('Activity was added to existing date');
+          } else {
+            const resultActivity = Activity.create(newActivity);
+
+            if (resultActivity) {
+              console.log('Added new activity');
+            } else {
+              console.log('Something is wrong');
+            }
+          }
+          // No file with the report ID found, proceed with file upload
+          for (const file of Object.values(req.files)) {
+            const uploadPath = __dirname + '/public/uploads/' + file.name;
+            const filepath = '/uploads/' + file.name;
+
+            file.mv(uploadPath, err => {
+              if (err) {
+                console.log(err);
+              }
+            });
+
+            const updatedProfile = await User.findOneAndUpdate(
+              { username: checkUser.username },
+              { $set: { profile: filepath } },
+              { new: true }
+            );
+
+            if (updatedProfile) {
+              console.log('Profile image updated');
+              res.redirect('/social/settings');
+            } else {
+              console.log('Profile image cannot be updated');
+              res.redirect('/social/settings');
+            }
+          }
+        }
       }
     }
   } else {
