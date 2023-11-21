@@ -13,6 +13,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const fileUpload = require('express-fileupload');
+const nodemailer = require('nodemailer');
 // getdate
 const dateLocal = require('./public/assets/js/date');
 const { string, check } = require('yargs');
@@ -88,6 +89,15 @@ passport.deserializeUser(function (id, done) {
     done(null, false);
   } else {
     done(null, user);
+  }
+});
+
+// Create a transporter using SMTP transport
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'shrrshazni@gmail.com',
+    pass: 'hzjlhfyspfyynndw'
   }
 });
 
@@ -192,11 +202,10 @@ app
             username: username,
             password: password,
             toastShow: 'show',
-            toastMsg:
-              'You have entered wrong password for this username'
+            toastMsg: 'You have entered wrong password for this username'
           });
         } else {
-          passport.authenticate('local')(req, res, function () {
+          passport.authenticate('local')(req, res, function (err) {
             req.session.user = user;
             res.redirect('/');
           });
@@ -246,15 +255,187 @@ app
 
 //FORGOT PASSWORD
 
-app.get('/forgot-password', function (req, res) {
-  res.render('forgot-password');
-});
+app
+  .get('/forgot-password', function (req, res) {
+    res.render('forgot-password', {
+      validationEmail: '',
+      email: '',
+      // toast alert
+      toastShow: '',
+      toastMsg: ''
+    });
+  })
+  .post('/forgot-password', async function (req, res) {
+    const email = req.body.email;
+
+    var validationEmail = '';
+    var checkEmail = '';
+    var userId = '';
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    const user = await User.findOne({ email: email });
+
+    console.log();
+
+    if (user) {
+      checkEmail = 'found';
+      userId = user._id;
+    } else {
+      checkEmail = 'not found';
+    }
+
+    // email validation
+    if (
+      email === '' ||
+      emailRegex.test(email) === 'incorrect' ||
+      checkEmail === 'not found'
+    ) {
+      validationEmail = 'is-invalid';
+    } else {
+      validationEmail = 'is-valid';
+    }
+
+    if (validationEmail === 'is-valid') {
+      const resetPasswordUrl = 'localhost:3000/reset-password/' + userId;
+
+      let mailOptions = {
+        from: 'shrrshazni@gmail.com',
+        to: email,
+        subject: 'Forgot Password - Reset Your Password',
+        html: `
+          <html>
+            <head>
+              <style>
+                body {
+                  font-family: 'Arial', sans-serif;
+                  background-color: #f4f4f4;
+                  color: #333;
+                }
+                h1 {
+                  color: #009688;
+                }
+                p {
+                  margin-bottom: 20px;
+                }
+                a {
+                  color: #3498db;
+                }
+              </style>
+            </head>
+            <body>
+              <h1>Forgot Your Password?</h1>
+              <p>No worries! Click the link below to reset your password:</p>
+              <p><a href="${resetPasswordUrl}">${resetPasswordUrl}</a></p>
+              <p>If you didn't request a password reset, you can ignore this email.</p>
+            </body>
+          </html>
+        `
+      };
+
+      // Send mail with defined transport object
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          return console.log(error);
+        }
+        console.log('Message %s sent: %s', info.messageId, info.response);
+      });
+
+      res.render('forgot-password', {
+        validationEmail: '',
+        email: '',
+        // toast alert
+        toastShow: 'show',
+        toastMsg: 'Reset password has been send to your registered email'
+      });
+    } else {
+      res.render('forgot-password', {
+        validationEmail: validationEmail,
+        email: email,
+        // toast alert
+        toastShow: 'show',
+        toastMsg: 'Your email was not registered, please check your email again'
+      });
+    }
+  });
 
 //RESET PASSWORD
 
-app.get('/reset-password', function (req, res) {
-  res.render('reset-password');
-});
+app
+  .get('/reset-password/:customNameList', async function (req, res) {
+    const userId = req.params.customNameList;
+    res.render('reset-password', {
+      userId: userId,
+      validationNewPassword: '',
+      validationConfirmPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+      // alert toast
+      toastShow: '',
+      toastMsg: ''
+    });
+  })
+  .post('/reset-password/:customNameList', async function (req, res) {
+    const userId = req.params.customNameList;
+    const newPassword = req.body.newPassword;
+    const confirmPassword = req.body.confirmPassword;
+
+    const passwordRegex = /^(?:\d+|[a-zA-Z0-9]{4,})/;
+    var validationNewPassword = '';
+    var validationConfirmPassword = '';
+
+    const user = await User.findOne({ _id: userId });
+
+    // New Password
+    if (passwordRegex.test(newPassword) === 'false' || newPassword === '') {
+      validationNewPassword = 'is-invalid';
+    } else {
+      validationNewPassword = 'is-valid';
+    }
+
+    // Phone
+    if (newPassword != confirmPassword) {
+      validationConfirmPassword = 'is-invalid';
+    } else {
+      validationConfirmPassword = 'is-valid';
+    }
+
+    if (
+      validationNewPassword === 'is-valid' &&
+      validationConfirmPassword === 'is-valid'
+    ) {
+      user.setPassword(newPassword, err => {
+        if (err) {
+          return res.redirect('/reset-password/' + userId);
+        }
+        user.save();
+        console.log('Set password succesful');
+      });
+
+      res.render('sign-in', {
+        // validation
+        validationUsername: '',
+        validationPassword: '',
+        // input value
+        username: '',
+        password: '',
+        toastShow: 'show',
+        toastMsg: 'You have succesfully set new password'
+      });
+    } else {
+      console.log('There are some error in the input');
+      res.render('reset-password', {
+        userId: userId,
+        validationNewPassword: validationNewPassword,
+        validationConfirmPassword: validationConfirmPassword,
+        newPassword: newPassword,
+        confirmPassword: confirmPassword,
+        // alert toast
+        toastShow: 'show',
+        toastMsg: 'There are some error in your input'
+      });
+    }
+  });
 
 // iTEM ACTIVITY
 
@@ -3625,6 +3806,451 @@ app.post('/social/settings/:customListName', async function (req, res) {
     res.redirect('/sign-in');
   }
 });
+
+// Duty Acknowledgement
+app
+  .get('/duty-acknowledgement', async function (req, res) {
+    if (req.isAuthenticated()) {
+      const currentUsername = req.session.user.username;
+
+      const checkUser = await User.findOne({ username: currentUsername });
+
+      const confirmRid = req.query.rid;
+
+      if (checkUser) {
+        res.render('duty-acknowledgement', {
+          currentFullName: checkUser.fullname,
+          currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
+          reportId: confirmRid,
+          //validation
+          validationReportType: '',
+          validationTime: '',
+          validationDate: '',
+          validationLocation: '',
+          validationReportSummary: '',
+          validationActionTaken: '',
+          validationEventSummary: '',
+          validationStaffOnDuty: '',
+          //form name
+          reportType: '',
+          time: '',
+          date: '',
+          location: '',
+          reportSummary: '',
+          actionTaken: '',
+          eventSummary: '',
+          staffOnDuty: '',
+          //toast alert
+          toastShow: '',
+          toastMsg: ''
+        });
+      }
+    } else {
+      res.redirect('/sign-in');
+    }
+  })
+  .post('/duty-acknowledgement', async function (req, res) {
+    var validationReportType = '';
+    var validationTime = '';
+    var validationDate = '';
+    var validationLocation = '';
+    var validationReportSummary = '';
+    var validationActionTaken = '';
+    var validationEventSummary = '';
+    var validationStaffOnDuty = '';
+
+    // current date time
+    var currentTime = dateLocal.getCurrentTime();
+    var currentDate = dateLocal.getDateYear();
+
+    const reportType = req.body.reportType;
+    const time = req.body.time;
+    const location = req.body.location;
+    const date = req.body.date;
+    const reportSummary = req.body.reportSummary;
+    const actionTaken = req.body.actionTaken;
+    const eventSummary = req.body.eventSummary;
+    const staffOnDuty = req.body.staffs;
+
+    // generated rid
+    const confirmRid = req.body.confirmRid;
+
+    const currentUsername = req.session.user.username;
+
+    const checkUser = await User.findOne({ username: currentUsername });
+
+    // Validate the reportType
+    if (!reportType || reportType === '') {
+      validationReportType = 'is-invalid';
+    } else {
+      validationReportType = 'is-valid';
+    }
+
+    // Validate the startTime
+    if (!time || time === '') {
+      validationTime = 'is-invalid';
+    } else {
+      validationTime = 'is-valid';
+    }
+
+    // Validate the date
+    if (!date || date === '') {
+      validationDate = 'is-invalid';
+    } else {
+      validationDate = 'is-valid';
+    }
+
+    // Validate the location
+    if (!location || location === '') {
+      validationLocation = 'is-invalid';
+    } else {
+      validationLocation = 'is-valid';
+    }
+
+    // Validate the reportSummary
+    if (!reportSummary || reportSummary === '') {
+      validationReportSummary = 'is-invalid';
+    } else {
+      validationReportSummary = 'is-valid';
+    }
+
+    // Validate the actionTaken
+    if (!actionTaken || actionTaken === '') {
+      validationActionTaken = 'is-invalid';
+    } else {
+      validationActionTaken = 'is-valid';
+    }
+
+    // Validate the eventSummary
+    if (!eventSummary || eventSummary === '') {
+      validationEventSummary = 'is-invalid';
+    } else {
+      validationEventSummary = 'is-valid';
+    }
+
+    // Validate the eventSummary
+    if (!staffOnDuty || staffOnDuty === '') {
+      validationStaffOnDuty = 'is-invalid';
+    } else {
+      validationStaffOnDuty = 'is-valid';
+    }
+
+    if (
+      validationReportType === 'is-valid' &&
+      validationTime === 'is-valid' &&
+      validationDate === 'is-valid' &&
+      validationLocation === 'is-valid' &&
+      validationReportSummary === 'is-valid' &&
+      validationActionTaken === 'is-valid' &&
+      validationEventSummary === 'is-valid' &&
+      validationStaffOnDuty === 'is-valid'
+    ) {
+      const currentFullName = checkUser.fullname;
+      const currentUser = checkUser.username;
+
+      // Activity
+      const newItemActivity = new ItemActivity({
+        time: currentTime,
+        by: currentFullName,
+        username: currentUser,
+        type: 'Case Report',
+        title: 'Submitted a case report of ' + _.lowerCase(reportType),
+        about: reportSummary
+      });
+
+      const newActivity = new Activity({
+        date: currentDate,
+        items: newItemActivity
+      });
+
+      const findDate = await Activity.findOne({ date: currentDate });
+
+      if (findDate) {
+        findDate.items.push(newItemActivity);
+        await findDate.save();
+        console.log('Activity was added to existing date');
+      } else {
+        const resultActivity = Activity.create(newActivity);
+
+        if (resultActivity) {
+          console.log('Added new activity');
+        } else {
+          console.log('Something is wrong');
+        }
+      }
+
+      const newReport = new CaseReport({
+        reportId: confirmRid,
+        username: currentUser,
+        madeBy: currentFullName,
+        type: reportType,
+        time: time,
+        date: date,
+        summary: reportSummary,
+        actionTaken: actionTaken,
+        eventSummary: eventSummary,
+        staffOnDuty: staffOnDuty,
+        location: location
+      });
+
+      const existing = await CaseReport.findOne({ reportId: confirmRid });
+
+      if (!existing) {
+        const result = CaseReport.create(newReport);
+
+        if (result) {
+          console.log('Successfully added report.');
+
+          const checkUser = await User.findOne({ username: currentUsername });
+
+          if (checkUser) {
+            const itemReports = await CaseReport.find({});
+            const itemBMI = await CaseReport.find({
+              location: 'Baitul Makmur I'
+            });
+            const itemBMII = await CaseReport.find({
+              location: 'Baitul Makmur II'
+            });
+            const itemJM = await CaseReport.find({
+              location: 'Jamek Mosque'
+            });
+            const itemCM = await CaseReport.find({ location: 'City Mosque' });
+            const itemRS = await CaseReport.find({
+              location: 'Raudhatul Sakinah'
+            });
+
+            if (itemReports.length > 0) {
+              res.render('case-report-view', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
+                itemReports: itemReports,
+                totalReports: itemReports.length,
+                amountBMI: itemBMI.length,
+                amountBMII: itemBMII.length,
+                amountJM: itemJM.length,
+                amountCM: itemCM.length,
+                amountRS: itemRS.length,
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated random id
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Submit report successful!'
+              });
+            } else {
+              res.render('case-report-view', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
+                itemReports: 'There is no case report submitted yet.',
+                totalReports: '0',
+                amountBMI: '0',
+                amountBMII: '0',
+                amountJM: '0',
+                amountCM: '0',
+                amountRS: '0',
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated random id
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Submit report successful!'
+              });
+            }
+          }
+        } else {
+          console.log('Add report failed');
+
+          const checkUser = await User.findOne({ username: currentUsername });
+
+          if (checkUser) {
+            const itemReports = await CaseReport.find({});
+            const itemBMI = await CaseReport.find({
+              location: 'Baitul Makmur I'
+            });
+            const itemBMII = await CaseReport.find({
+              location: 'Baitul Makmur II'
+            });
+            const itemJM = await CaseReport.find({
+              location: 'Jamek Mosque'
+            });
+            const itemCM = await CaseReport.find({ location: 'City Mosque' });
+            const itemRS = await CaseReport.find({
+              location: 'Raudhatul Sakinah'
+            });
+
+            if (itemReports.length > 0) {
+              res.render('case-report-view', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
+                itemReports: itemReports,
+                totalReports: itemReports.length,
+                amountBMI: itemBMI.length,
+                amountBMII: itemBMII.length,
+                amountJM: itemJM.length,
+                amountCM: itemCM.length,
+                amountRS: itemRS.length,
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated random id
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Add report failed!'
+              });
+            } else {
+              res.render('case-report-view', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
+                itemReports: 'There is no case report submitted yet.',
+                totalReports: '0',
+                amountBMI: '0',
+                amountBMII: '0',
+                amountJM: '0',
+                amountCM: '0',
+                amountRS: '0',
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated random id
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Add report failed!'
+              });
+            }
+          }
+        }
+      } else {
+        console.log('There is existing report!');
+
+        const checkUser = await User.findOne({ username: currentUsername });
+
+        if (checkUser) {
+          const itemReports = await CaseReport.find({});
+          const itemBMI = await CaseReport.find({
+            location: 'Baitul Makmur I'
+          });
+          const itemBMII = await CaseReport.find({
+            location: 'Baitul Makmur II'
+          });
+          const itemJM = await CaseReport.find({
+            location: 'Jamek Mosque'
+          });
+          const itemCM = await CaseReport.find({ location: 'City Mosque' });
+          const itemRS = await CaseReport.find({
+            location: 'Raudhatul Sakinah'
+          });
+
+          if (itemReports.length > 0) {
+            res.render('case-report-view', {
+              currentFullName: checkUser.fullname,
+              currentUser: checkUser.username,
+              currentProfile: checkUser.profile,
+              itemReports: itemReports,
+              totalReports: itemReports.length,
+              amountBMI: itemBMI.length,
+              amountBMII: itemBMII.length,
+              amountJM: itemJM.length,
+              amountCM: itemCM.length,
+              amountRS: itemRS.length,
+              topNav: 'All',
+              classActive1: 'active',
+              classActive2: '',
+              classActive3: '',
+              classActive4: '',
+              classActive5: '',
+              classActive6: '',
+              // generated random id
+              rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+              // toast alert
+              toastShow: 'show',
+              toastMsg: 'There is an exisitng report!'
+            });
+          } else {
+            res.render('case-report-view', {
+              currentFullName: checkUser.fullname,
+              currentUser: checkUser.username,
+              currentProfile: checkUser.profile,
+              itemReports: 'There is no case report submitted yet.',
+              totalReports: '0',
+              amountBMI: '0',
+              amountBMII: '0',
+              amountJM: '0',
+              amountCM: '0',
+              amountRS: '0',
+              topNav: 'All',
+              classActive1: 'active',
+              classActive2: '',
+              classActive3: '',
+              classActive4: '',
+              classActive5: '',
+              classActive6: '',
+              // generated random id
+              rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+              // toast alert
+              toastShow: 'show',
+              toastMsg: 'There is an existing report!'
+            });
+          }
+        }
+      }
+    } else {
+      // Render the response after the delay
+      res.render('case-report-submit', {
+        currentFullName: checkUser.fullname,
+        currentUser: checkUser.username,
+        currentProfile: checkUser.profile,
+        //validation
+        validationReportType: validationReportType,
+        validationDate: validationDate,
+        validationTime: validationTime,
+        validationLocation: validationLocation,
+        validationReportSummary: validationReportSummary,
+        validationEventSummary: validationEventSummary,
+        validationActionTaken: validationActionTaken,
+        validationStaffOnDuty: validationStaffOnDuty,
+        //form
+        reportId: confirmRid,
+        reportType: reportType,
+        time: time,
+        date: date,
+        location: location,
+        reportSummary: reportSummary,
+        eventSummary: eventSummary,
+        actionTaken: actionTaken,
+        staffOnDuty: staffOnDuty,
+        //toast alert
+        toastShow: 'show',
+        toastMsg: 'There is error in your input!'
+      });
+    }
+  });
 
 // SIGN OUT
 app.get('/sign-out', function (req, res) {
