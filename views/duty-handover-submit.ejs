@@ -7,13 +7,13 @@
   <nav class="mb-2" aria-label="breadcrumb">
     <ol class="breadcrumb mb-0">
       <li class="breadcrumb-item active">Reports</li>
-      <li class="breadcrumb-item active">Duty Acknowledgement</li>
+      <li class="breadcrumb-item active">Duty Handover</li>
     </ol>
   </nav>
   <h2 class="mb-2 lh-sm">Submit Report</h2>
   <p class="text-700 lead mb-2">
-    A duty report summarizes tasks, achievements, challenges during a period,
-    informing superiors of work progress and outcomes.
+    A handover duty report summarizes tasks, achievements, challenges during a
+    period, informing superiors of work progress and outcomes.
   </p>
 
   <div class="mt-4">
@@ -29,7 +29,7 @@
               <div class="row g-3 justify-content-between align-items-center">
                 <div class="col-12 col-md">
                   <h4 class="text-900 mb-0" data-anchor="data-anchor">
-                    Duty Acknowledgement
+                    Duty Handover
                   </h4>
                 </div>
               </div>
@@ -38,7 +38,7 @@
               <div class="p-4">
                 <!-- form >form tag will be merge with file uploader form tag -->
                 <form
-                  action="/case-report/submit"
+                  action="/duty-handover/submit"
                   method="post"
                   class="row g-3 has-validation"
                   id="reportForm"
@@ -50,12 +50,11 @@
                     >
 
                     <select
-                      class="form-select <%= validationReportType %>"
+                      class="form-select <%= validationShift %>"
                       id="validationCustom04"
-                      required=""
-                      name="reportType"
+                      name="shift"
                     >
-                      <option selected="" value="<%= reportType %>">
+                      <option selected="" value="<%= shift %>">
                         Choose Shift
                       </option>
                       <option value="Shift A">Shift A</option>
@@ -63,9 +62,7 @@
                       <option value="Shift C">Shift C</option>
                     </select>
                     <div class="valid-feedback">Looks good!</div>
-                    <div class="invalid-feedback">
-                      Please select a title report.
-                    </div>
+                    <div class="invalid-feedback">Please select a shift.</div>
                   </div>
 
                   <div class="col-md-4">
@@ -77,7 +74,6 @@
                       type="text"
                       placeholder="day/month/year"
                       data-options='{"dateFormat":"d/m/y","disableMobile":true,"allowInput":true}'
-                      required="required"
                       name="date"
                       value="<%= date %>"
                     />
@@ -95,7 +91,6 @@
                     <select
                       class="form-select <%= validationLocation %>"
                       id="validationCustom05"
-                      required=""
                       name="location"
                     >
                       <option selected="" value="<%= location %>">
@@ -121,12 +116,11 @@
                     >
 
                     <input
-                      class="form-control <%= validationStaffOnDuty %>"
+                      class="form-control <%= validationHeadShift %>"
                       id="validationCustom03"
                       type="text"
-                      required=""
-                      name="staffs"
-                      value="<%= staffOnDuty %>"
+                      name="headShift"
+                      value="<%= headShift %>"
                     />
                     <div class="invalid-feedback">
                       Please provide head shift assigned.
@@ -142,8 +136,7 @@
                       class="form-control <%= validationStaffOnDuty %>"
                       id="validationCustom03"
                       type="text"
-                      required=""
-                      name="staffs"
+                      name="staffOnDuty"
                       value="<%= staffOnDuty %>"
                     />
                     <div class="invalid-feedback">
@@ -157,12 +150,11 @@
                     >
 
                     <input
-                      class="form-control <%= validationStaffOnDuty %>"
+                      class="form-control <%= validationStaffSickLeave %>"
                       id="validationCustom03"
                       type="text"
-                      required=""
-                      name="staffs"
-                      value="<%= staffOnDuty %>"
+                      name="staffSickLeave"
+                      value="<%= staffSickLeave %>"
                     />
                     <div class="invalid-feedback">
                       Please provide a staff on sick leave.
@@ -171,39 +163,37 @@
 
                   <div class="col-md-6">
                     <label class="form-label" for="validationCustom03"
-                      >Staff absence</label
+                      >Staff absent</label
                     >
 
                     <input
-                      class="form-control <%= validationStaffOnDuty %>"
+                      class="form-control <%= validationStaffAbsent %>"
                       id="validationCustom03"
                       type="text"
-                      required=""
-                      name="staffs"
-                      value="<%= staffOnDuty %>"
+                      name="staffAbsent"
+                      value="<%= staffAbsent %>"
                     />
                     <div class="invalid-feedback">
-                      Please provide a staff absence.
+                      Please provide a staff absent.
                     </div>
                   </div>
 
-                  <div class="col-12 gy-4">
-                    <label class="form-label" for="floatingProjectDescription1"
+                  <div class="col-12 gy-4 mb-3">
+                    <label class="form-label" for="floatingProjectDescription2"
                       >Notes</label
                     >
                     <textarea
-                      class="form-control <%= validationEventSummary %> scrollbar-overlay"
-                      id="floatingProjectDescription1"
-                      placeholder="Leave notes here"
+                      class="form-control <%= validationNotes %> scrollbar-overlay"
+                      id="floatingProjectDescription2"
+                      placeholder="Leave a note here"
                       style="height: 64px"
-                      required="required"
-                      name="eventSummary"
+                      name="notes"
                     >
-<%= eventSummary %></textarea
+<%= notes %></textarea
                     >
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">
-                      Please enter notes here.
+                      Please enter a note here.
                     </div>
                   </div>
 
@@ -305,152 +295,6 @@
         >
           <span class="uil uil-times fs-1"></span>
         </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL -->
-
-<!-- modal for upload files -->
-<div
-  class="modal fade scrollbar-overlay"
-  id="verticallyCentered"
-  tabindex="-1"
-  aria-labelledby="verticallyCenteredModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-dialog-centered modal-md">
-    <div class="modal-content">
-      <div class="modal-header border border-0">
-        <h5 class="modal-title" id="verticallyCenteredModalLabel">
-          Upload Files
-        </h5>
-        <button
-          class="btn p-1"
-          type="button"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        >
-          <span class="fas fa-times fs--1"></span>
-        </button>
-      </div>
-
-      <div class="modal-body p-3">
-        <!-- file uploader -->
-        <!-- data-options are the setting for dropzone can find the settings also inside -->
-        <form
-          class="dropzone dropzone-multiple p-0 mb-4"
-          id="myDropzone"
-          data-dropzone="data-dropzone"
-          action="/upload-case"
-          data-options='{"url":"/upload-case","paramName": "file"}'
-        >
-          <div class="dz-message" data-dz-message="data-dz-message">
-            <img
-              class="me-2"
-              src="../../../assets/img/icons/cloud-upload.svg"
-              width="25"
-              alt=""
-            />Drop your files here
-          </div>
-          <div class="dz-preview dz-preview-multiple m-0 d-flex flex-column">
-            <div class="d-flex mb-3 pb-3 border-bottom media">
-              <div class="border border-300 p-2 rounded-2 me-2">
-                <img
-                  class="rounded-2 dz-image"
-                  src="../../../assets/img/icons/file.png"
-                  alt="..."
-                  data-dz-thumbnail="data-dz-thumbnail"
-                />
-              </div>
-              <div class="flex-1 d-flex flex-between-center">
-                <div>
-                  <h6 data-dz-name="data-dz-name"></h6>
-                  <div class="d-flex align-items-center">
-                    <p
-                      class="mb-0 fs--1 text-400 lh-1"
-                      data-dz-size="data-dz-size"
-                    ></p>
-                    <div class="dz-progress">
-                      <span class="dz-upload" data-dz-uploadprogress=""></span>
-                    </div>
-                  </div>
-                  <span
-                    class="fs--2 text-danger"
-                    data-dz-errormessage="data-dz-errormessage"
-                  ></span>
-                </div>
-                <div class="dropdown font-sans-serif">
-                  <button
-                    class="btn btn-link text-600 btn-sm dropdown-toggle btn-reveal dropdown-caret-none"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    <span class="fas fa-ellipsis-h"></span>
-                  </button>
-                  <div class="dropdown-menu dropdown-menu-end border py-2">
-                    <a
-                      class="dropdown-item"
-                      href="#!"
-                      data-dz-remove="data-dz-remove"
-                      >Remove File</a
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <input
-            type="text"
-            style="display: none"
-            value="<%= reportId %>"
-            name="fileReportId"
-          />
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary" type="submit" id="uploadButton">
-          <i class="fa fa-upload" aria-hidden="true"></i>&nbsp;&nbsp;Upload
-        </button>
-        <button
-          class="btn btn-outline-primary"
-          type="button"
-          data-bs-dismiss="modal"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- alert toast upload -->
-  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
-    <div class="d-flex">
-      <div
-        class="toast align-items-center text-white bg-primary border-0 light"
-        role="alert"
-        data-bs-autohide="false"
-        aria-live="assertive"
-        aria-atomic="true"
-        id="alertUploadToast"
-      >
-        <div class="d-flex justify-content-between">
-          <div class="toast-body px-0 py-3">
-            <code id="dropzoneAlertContent" class="text-white"></code>
-          </div>
-
-          <button
-            class="btn ms-2 p-0 btn-close-white"
-            type="button"
-            data-bs-dismiss="toast"
-            aria-label="Close"
-          >
-            <span class="uil uil-times fs-1"></span>
-          </button>
-        </div>
       </div>
     </div>
   </div>

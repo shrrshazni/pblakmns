@@ -3807,9 +3807,31 @@ app.post('/social/settings/:customListName', async function (req, res) {
   }
 });
 
+const dutyHandoverSchema = new mongoose.Schema({
+  reportId: String,
+  giveShift: String,
+  giveDate: String,
+  giveLocation: String,
+  giveHeadShift: String,
+  giveStaffOnDuty: String,
+  giveStaffSickLeave: String,
+  giveStaffAbsent: String,
+  receiveShift: String,
+  receiveDate: String,
+  receiveLocation: String,
+  receiveHeadShift: String,
+  receiveStaffOnDuty: String,
+  receiveStaffSickLeave: String,
+  receiveStaffAbsent: String,
+  notes: String,
+  status: String
+});
+
+const DutyHandover = mongoose.model('DutyHandover', dutyHandoverSchema);
+
 // Duty Acknowledgement
 app
-  .get('/duty-acknowledgement', async function (req, res) {
+  .get('/duty-handover/submit', async function (req, res) {
     if (req.isAuthenticated()) {
       const currentUsername = req.session.user.username;
 
@@ -3818,29 +3840,29 @@ app
       const confirmRid = req.query.rid;
 
       if (checkUser) {
-        res.render('duty-acknowledgement', {
+        res.render('duty-handover-submit', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
           currentProfile: checkUser.profile,
           reportId: confirmRid,
           //validation
-          validationReportType: '',
-          validationTime: '',
+          validationShift: '',
           validationDate: '',
           validationLocation: '',
-          validationReportSummary: '',
-          validationActionTaken: '',
-          validationEventSummary: '',
+          validationHeadShift: '',
           validationStaffOnDuty: '',
+          validationStaffSickLeave: '',
+          validationStaffAbsent: '',
+          validationNotes: '',
           //form name
-          reportType: '',
-          time: '',
+          shift: '',
           date: '',
           location: '',
-          reportSummary: '',
-          actionTaken: '',
-          eventSummary: '',
+          headShift: '',
           staffOnDuty: '',
+          staffSickLeave: '',
+          staffAbsent: '',
+          notes: '',
           //toast alert
           toastShow: '',
           toastMsg: ''
@@ -3850,28 +3872,28 @@ app
       res.redirect('/sign-in');
     }
   })
-  .post('/duty-acknowledgement', async function (req, res) {
-    var validationReportType = '';
-    var validationTime = '';
+  .post('/duty-handover/submit', async function (req, res) {
+    var validationShift = '';
     var validationDate = '';
     var validationLocation = '';
-    var validationReportSummary = '';
-    var validationActionTaken = '';
-    var validationEventSummary = '';
+    var validationHeadShift = '';
     var validationStaffOnDuty = '';
+    var validationStaffSickLeave = '';
+    var validationStaffAbsent = '';
+    var validationNotes = '';
 
     // current date time
     var currentTime = dateLocal.getCurrentTime();
     var currentDate = dateLocal.getDateYear();
 
-    const reportType = req.body.reportType;
-    const time = req.body.time;
+    const shift = req.body.shift;
     const location = req.body.location;
     const date = req.body.date;
-    const reportSummary = req.body.reportSummary;
-    const actionTaken = req.body.actionTaken;
-    const eventSummary = req.body.eventSummary;
-    const staffOnDuty = req.body.staffs;
+    const headShift = req.body.headShift;
+    const staffOnDuty = req.body.staffOnDuty;
+    const staffSickLeave = req.body.staffSickLeave;
+    const staffAbsent = req.body.staffAbsent;
+    const notes = req.body.notes;
 
     // generated rid
     const confirmRid = req.body.confirmRid;
@@ -3881,17 +3903,10 @@ app
     const checkUser = await User.findOne({ username: currentUsername });
 
     // Validate the reportType
-    if (!reportType || reportType === '') {
-      validationReportType = 'is-invalid';
+    if (!shift || shift === '') {
+      validationShift = 'is-invalid';
     } else {
-      validationReportType = 'is-valid';
-    }
-
-    // Validate the startTime
-    if (!time || time === '') {
-      validationTime = 'is-invalid';
-    } else {
-      validationTime = 'is-valid';
+      validationShift = 'is-valid';
     }
 
     // Validate the date
@@ -3908,55 +3923,64 @@ app
       validationLocation = 'is-valid';
     }
 
-    // Validate the reportSummary
-    if (!reportSummary || reportSummary === '') {
-      validationReportSummary = 'is-invalid';
+    // Validate the headShift
+    if (!headShift || headShift === '') {
+      validationHeadShift = 'is-invalid';
     } else {
-      validationReportSummary = 'is-valid';
+      validationHeadShift = 'is-valid';
     }
 
-    // Validate the actionTaken
-    if (!actionTaken || actionTaken === '') {
-      validationActionTaken = 'is-invalid';
-    } else {
-      validationActionTaken = 'is-valid';
-    }
-
-    // Validate the eventSummary
-    if (!eventSummary || eventSummary === '') {
-      validationEventSummary = 'is-invalid';
-    } else {
-      validationEventSummary = 'is-valid';
-    }
-
-    // Validate the eventSummary
+    // Validate the staffOnDuty
     if (!staffOnDuty || staffOnDuty === '') {
       validationStaffOnDuty = 'is-invalid';
     } else {
       validationStaffOnDuty = 'is-valid';
     }
 
+    // Validate the staffSickLeave
+    if (!staffSickLeave || staffSickLeave === '') {
+      validationStaffSickLeave = 'is-invalid';
+    } else {
+      validationStaffSickLeave = 'is-valid';
+    }
+
+    // Validate the staffAbsent
+    if (!staffAbsent || staffAbsent === '') {
+      validationStaffAbsent = 'is-invalid';
+    } else {
+      validationStaffAbsent = 'is-valid';
+    }
+
+    // Validate the notes
+    if (!notes || notes === '') {
+      validationNotes = 'is-invalid';
+    } else {
+      validationNotes = 'is-valid';
+    }
+
     if (
-      validationReportType === 'is-valid' &&
-      validationTime === 'is-valid' &&
+      validationShift === 'is-valid' &&
       validationDate === 'is-valid' &&
       validationLocation === 'is-valid' &&
-      validationReportSummary === 'is-valid' &&
-      validationActionTaken === 'is-valid' &&
-      validationEventSummary === 'is-valid' &&
-      validationStaffOnDuty === 'is-valid'
+      validationHeadShift === 'is-valid' &&
+      validationStaffOnDuty === 'is-valid' &&
+      validationStaffSickLeave === 'is-valid' &&
+      validationStaffAbsent === 'is-valid' &&
+      validationNotes === 'is-valid'
     ) {
       const currentFullName = checkUser.fullname;
       const currentUser = checkUser.username;
+
+      const status = 'Incompleted';
 
       // Activity
       const newItemActivity = new ItemActivity({
         time: currentTime,
         by: currentFullName,
         username: currentUser,
-        type: 'Case Report',
-        title: 'Submitted a case report of ' + _.lowerCase(reportType),
-        about: reportSummary
+        type: 'Duty Handover',
+        title: 'Submitted a duty handover report of ' + _.lowerCase(shift)+ '& status is' + status,
+        about: notes
       });
 
       const newActivity = new Activity({
@@ -3969,7 +3993,7 @@ app
       if (findDate) {
         findDate.items.push(newItemActivity);
         await findDate.save();
-        console.log('Activity was added to existing date');
+        console.log('Activity added to existing date');
       } else {
         const resultActivity = Activity.create(newActivity);
 
@@ -3980,24 +4004,23 @@ app
         }
       }
 
-      const newReport = new CaseReport({
-        reportId: confirmRid,
-        username: currentUser,
-        madeBy: currentFullName,
-        type: reportType,
-        time: time,
-        date: date,
-        summary: reportSummary,
-        actionTaken: actionTaken,
-        eventSummary: eventSummary,
-        staffOnDuty: staffOnDuty,
-        location: location
+      const newHandover = new DutyHandover({
+        reportId : confirmRid,
+        giveShift : shift,
+        giveDate : date,
+        giveLocation : location,
+        giveHeadShift : headShift,
+        giveStaffOnDuty : staffOnDuty,
+        giveStaffSickLeave : staffSickLeave,
+        giveStaffAbsent : staffAbsent,
+        status : status,
+        notes : notes
       });
 
-      const existing = await CaseReport.findOne({ reportId: confirmRid });
+      const existing = await DutyHandover.findOne({ reportId: confirmRid });
 
       if (!existing) {
-        const result = CaseReport.create(newReport);
+        const result = DutyHandover.create(newHandover);
 
         if (result) {
           console.log('Successfully added report.');
@@ -4221,33 +4244,32 @@ app
         }
       }
     } else {
-      // Render the response after the delay
-      res.render('case-report-submit', {
+      res.render('duty-handover-submit', {
         currentFullName: checkUser.fullname,
         currentUser: checkUser.username,
         currentProfile: checkUser.profile,
-        //validation
-        validationReportType: validationReportType,
-        validationDate: validationDate,
-        validationTime: validationTime,
-        validationLocation: validationLocation,
-        validationReportSummary: validationReportSummary,
-        validationEventSummary: validationEventSummary,
-        validationActionTaken: validationActionTaken,
-        validationStaffOnDuty: validationStaffOnDuty,
-        //form
         reportId: confirmRid,
-        reportType: reportType,
-        time: time,
+        //validation
+        validationShift: validationShift,
+        validationDate: validationDate,
+        validationLocation: validationLocation,
+        validationHeadShift: validationHeadShift,
+        validationStaffOnDuty: validationStaffOnDuty,
+        validationStaffSickLeave: validationStaffSickLeave,
+        validationStaffAbsent: validationStaffAbsent,
+        validationNotes: validationNotes,
+        //form name
+        shift: shift,
         date: date,
         location: location,
-        reportSummary: reportSummary,
-        eventSummary: eventSummary,
-        actionTaken: actionTaken,
+        headShift: headShift,
         staffOnDuty: staffOnDuty,
+        staffSickLeave: staffSickLeave,
+        staffAbsent: staffAbsent,
+        notes: notes,
         //toast alert
         toastShow: 'show',
-        toastMsg: 'There is error in your input!'
+        toastMsg: 'There is an error at your input, please do check it again'
       });
     }
   });
