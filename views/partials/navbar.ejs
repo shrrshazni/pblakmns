@@ -62,6 +62,13 @@
         >
       </li>
 
+      <!-- Duty Handover -->
+      <li class="nav-item dropdown">
+        <a class="nav-link lh-1" href="/duty-handover/view" role="button"
+          ><span class="uil fs-0 me-2 uil-file-export"></span>Duty Handover</a
+        >
+      </li>
+
       <!-- Reports -->
       <li class="nav-item dropdown">
         <a
@@ -165,10 +172,6 @@
       </div>
     </li>
 
-    <% if(currentProfile === ''){
-      currentProfile = 'assets/img/team/avatar.webp';
-    } %>
-
     <!-- User -->
     <li class="nav-item dropdown">
       <a
@@ -181,6 +184,8 @@
         aria-haspopup="true"
         aria-expanded="false"
       >
+        <% if(currentProfile === ''){ currentProfile =
+        'assets/img/team/avatar.webp'; } %>
         <div class="avatar avatar-l">
           <img
             class="rounded-circle bg-white border border-primary"

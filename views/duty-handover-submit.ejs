@@ -128,6 +128,27 @@
                   </div>
 
                   <div class="col-md-6">
+                    <label class="form-label" for="validationCustom04"
+                      >Handover shift to be received</label
+                    >
+
+                    <select
+                      class="form-select <%= validationHandoverShift %>"
+                      id="validationCustom04"
+                      name="handoverShift"
+                    >
+                      <option selected="" value="<%= handoverShift %>">
+                        Choose Shift
+                      </option>
+                      <option value="Shift A">Shift A</option>
+                      <option value="Shift B">Shift B</option>
+                      <option value="Shift C">Shift C</option>
+                    </select>
+                    <div class="valid-feedback">Looks good!</div>
+                    <div class="invalid-feedback">Please select a shift.</div>
+                  </div>
+
+                  <div class="col-md-12">
                     <label class="form-label" for="validationCustom03"
                       >Staff on duty</label
                     >
