@@ -3823,7 +3823,8 @@ const dutyHandoverSchema = new mongoose.Schema({
   notes: String,
   status: String,
   handoverShift: String,
-  giveLog: String
+  giveLog: String,
+  receiveLog: String
 });
 
 const DutyHandover = mongoose.model('DutyHandover', dutyHandoverSchema);
@@ -4358,7 +4359,7 @@ app
         ' telah menyerahkan tugas kepada ' +
         handoverShift +
         ' selaku ketua syif dalam keadaan baik dan senarai peralatan tugas mencukupi di ' +
-        location;
+        location + ' pada tarikh ' + date;
 
       // Activity
       const newItemActivity = new ItemActivity({
@@ -4683,11 +4684,12 @@ app
         });
 
         if (checkReport) {
+          console.log(checkReport.handoverShift);
           res.render('duty-handover-details', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
-            reportId : checkReport.reportId,
+            reportId: checkReport.reportId,
             giveHeadShift: checkReport.giveHeadShift,
             giveShift: checkReport.giveShift,
             giveDate: checkReport.giveDate,
@@ -4700,28 +4702,32 @@ app
             date: checkReport.giveDate,
             handoverShift: checkReport.handoverShift,
             shift: checkReport.giveShift,
+            receivedLog : checkReport.receiveLog,
             // validation
-            validationShift: '',
-            validationDate: '',
-            validationLocation: '',
             validationHeadShift: '',
             validationStaffOnDuty: '',
             validationStaffSickLeave: '',
             validationStaffAbsent: '',
             validationNotes: '',
-            validationHandoverShift: '',
             //form name
             headShift: '',
             staffOnDuty: '',
             staffSickLeave: '',
             staffAbsent: '',
+            // tab-pane
+            showTabPane1: 'active',
+            showTabPane2: '',
+            showTabPane3: '',
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         } else {
           res.render('duty-handover-details', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
-            reportId : checkReport.reportId,
+            reportId: checkReport.reportId,
             giveHeadShift: '',
             giveShift: '',
             giveDate: '',
@@ -4732,15 +4738,11 @@ app
             notes: '',
             giveLog: '',
             // validation
-            validationShift: '',
-            validationDate: '',
-            validationLocation: '',
             validationHeadShift: '',
             validationStaffOnDuty: '',
             validationStaffSickLeave: '',
             validationStaffAbsent: '',
             validationNotes: '',
-            validationHandoverShift: '',
             //form name
             shift: '',
             date: '',
@@ -4748,7 +4750,14 @@ app
             staffOnDuty: '',
             staffSickLeave: '',
             staffAbsent: '',
-            handoverShift: ''
+            handoverShift: '',
+            // tab-pane
+            showTabPane1: 'active',
+            showTabPane2: '',
+            showTabPane3: '',
+            // toast alert
+            toastShow: '',
+            toastMsg: ''
           });
         }
       }
@@ -4756,7 +4765,199 @@ app
       res.redirect('/sign-in');
     }
   })
-  .post('/duty-handover/details', async function (req, res) {});
+  .post('/duty-handover/details', async function (req, res) {
+    // find current user using
+    var currentUsername = req.session.user.username;
+    const checkUser = await User.findOne({ username: currentUsername });
+
+    const reportId = req.body.confirmRid;
+
+    // find current handover report
+    const checkReport = await DutyHandover.findOne({
+      reportId: reportId
+    });
+
+    // current date time
+    var currentTime = dateLocal.getCurrentTime();
+    var currentDate = dateLocal.getDateYear();
+
+    const shift = req.body.shift;
+    const date = req.body.date;
+    const location = req.body.location;
+    const headShift = req.body.headShift;
+    const handoverShift = req.body.handoverShift;
+    const staffOnDuty = req.body.staffOnDuty;
+    const staffSickLeave = req.body.staffSickLeave;
+    const staffAbsent = req.body.staffAbsent;
+    const notes = req.body.notes;
+
+    var validationHeadShift = '';
+    var validationStaffOnDuty = '';
+    var validationStaffSickLeave = '';
+    var validationStaffAbsent = '';
+    var validationNotes = '';
+
+    // validation head shift
+    if (headShift === '') {
+      validationHeadShift = 'is-invalid';
+    } else {
+      validationHeadShift = 'is-valid';
+    }
+
+    // validation staff on duty
+    if (staffOnDuty === '') {
+      validationStaffOnDuty = 'is-invalid';
+    } else {
+      validationStaffOnDuty = 'is-valid';
+    }
+
+    // validation staff sick leave
+    if (staffSickLeave === '') {
+      validationStaffSickLeave = 'is-invalid';
+    } else {
+      validationStaffSickLeave = 'is-valid';
+    }
+
+    // validation absent
+    if (staffAbsent === '') {
+      validationStaffAbsent = 'is-invalid';
+    } else {
+      validationStaffAbsent = 'is-valid';
+    }
+
+    // validation notes
+    if (notes === '') {
+      validationNotes = 'is-invalid';
+    } else {
+      validationNotes = 'is-valid';
+    }
+
+    if (
+      validationHeadShift === 'is-valid' &&
+      validationStaffOnDuty === 'is-valid' &&
+      validationStaffSickLeave === 'is-valid' &&
+      validationStaffAbsent === 'is-valid' &&
+      validationNotes === 'is-valid'
+    ) {
+      console.log('Succesful!');
+
+      const currentFullName = checkUser.fullname;
+      const currentUser = checkUser.username;
+
+      const status = 'Completed';
+
+      const receiveLog =
+        'Saya ' +
+        headShift +
+        ' selaku ketua syif ' +
+        shift +
+        ' telah menerima tugas daripada ' +
+        handoverShift +
+        ' selaku ketua syif dalam keadaan baik dan senarai peralatan tugas mencukupi di ' +
+        location + ' pada tarikh ' + date;
+
+      // Activity
+      const newItemActivity = new ItemActivity({
+        time: currentTime,
+        by: currentFullName,
+        username: currentUser,
+        type: 'Duty Handover',
+        title:
+          'Submitted a received duty report of ' +
+          shift +
+          ' & status is ' +
+          status,
+        about: notes
+      });
+
+      const newActivity = new Activity({
+        date: currentDate,
+        items: newItemActivity
+      });
+
+      const findDate = await Activity.findOne({ date: currentDate });
+
+      if (findDate) {
+        findDate.items.push(newItemActivity);
+        await findDate.save();
+        console.log('Activity added to existing date');
+      } else {
+        const resultActivity = Activity.create(newActivity);
+
+        if (resultActivity) {
+          console.log('Added new activity');
+        } else {
+          console.log('Something is wrong');
+        }
+      }
+
+      const updatedData = {
+        reportId: reportId,
+        receiveShift: shift,
+        receiveDate: date,
+        receiveHeadShift: headShift,
+        receiveStaffOnDuty: staffOnDuty,
+        receiveStaffSickLeave: staffSickLeave,
+        receiveStaffAbsent: staffAbsent,
+        status: status,
+        notes: notes,
+        location: location,
+        handoverShift: handoverShift,
+        receiveLog: receiveLog
+      };
+
+      const updatedHandover = await DutyHandover.findOneAndUpdate(
+        { reportId: reportId },
+        { $set: updatedData },
+        { new: true }
+      );
+
+      if (updatedHandover) {
+        console.log('Updated handover:', updatedHandover);
+      } else {
+        console.log('No handover found with reportId:', confirmRid);
+      }
+    } else {
+      console.log('Unsuccessful!');
+      res.render('duty-handover-details', {
+        currentFullName: checkUser.fullname,
+        currentUser: checkUser.username,
+        currentProfile: checkUser.profile,
+        reportId: checkReport.reportId,
+        giveHeadShift: checkReport.giveHeadShift,
+        giveShift: checkReport.giveShift,
+        giveDate: checkReport.giveDate,
+        location: checkReport.location,
+        giveStaffSickLeave: checkReport.giveStaffSickLeave,
+        giveStaffAbsent: checkReport.giveStaffAbsent,
+        status: checkReport.status,
+        notes: checkReport.notes,
+        giveLog: checkReport.giveLog,
+        date: checkReport.giveDate,
+        handoverShift: checkReport.handoverShift,
+        shift: checkReport.giveShift,
+        // validation
+        validationHeadShift: validationHeadShift,
+        validationStaffOnDuty: validationStaffOnDuty,
+        validationStaffSickLeave: validationStaffSickLeave,
+        validationStaffAbsent: validationStaffAbsent,
+        validationNotes: validationNotes,
+        //form name
+        headShift: headShift,
+        staffOnDuty: staffOnDuty,
+        staffSickLeave: staffSickLeave,
+        staffAbsent: staffAbsent,
+        // tab-pane
+        showTabPane1: '',
+        showTabPane2: 'active',
+        showTabPane3: '',
+        // toast alert
+        toastShow: 'show',
+        toastMsg:
+          'There is an error, please do check your input form at received section'
+      });
+    }
+  });
 
 // SIGN OUT
 app.get('/sign-out', function (req, res) {
