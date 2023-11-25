@@ -237,7 +237,8 @@ app
       {
         username: req.body.username,
         fullname: req.body.fullname,
-        email: req.body.email
+        email: req.body.email,
+        profile: ''
       },
       req.body.password,
       function (err, user) {
@@ -582,14 +583,14 @@ app.get('/patrol-report/view', async function (req, res) {
     const checkUser = await User.findOne({ username: currentUsername });
 
     if (checkUser) {
-      const itemReports = await PatrolReport.find({});
-      const itemBMI = await PatrolReport.find({ location: 'Baitul Makmur I' });
+      const itemReports = await PatrolReport.find({}).sort({ date: -1 });
+      const itemBMI = await PatrolReport.find({ location: 'Baitul Makmur I' }).sort({ date: -1 });
       const itemBMII = await PatrolReport.find({
         location: 'Baitul Makmur II'
-      });
-      const itemJM = await PatrolReport.find({ location: 'Jamek Mosque' });
-      const itemCM = await PatrolReport.find({ location: 'City Mosque' });
-      const itemRS = await PatrolReport.find({ location: 'Raudhatul Sakinah' });
+      }).sort({ date: -1 });
+      const itemJM = await PatrolReport.find({ location: 'Jamek Mosque' }).sort({ date: -1 });
+      const itemCM = await PatrolReport.find({ location: 'City Mosque' }).sort({ date: -1 });
+      const itemRS = await PatrolReport.find({ location: 'Raudhatul Sakinah' }).sort({ date: -1 });
 
       if (itemReports.length > 0) {
         res.render('patrol-report-view', {
@@ -657,14 +658,14 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
     const customListName = _.upperCase(req.params.customListName);
 
     if (checkUser) {
-      const itemReports = await PatrolReport.find({});
-      const itemBMI = await PatrolReport.find({ location: 'Baitul Makmur I' });
+      const itemReports = await PatrolReport.find({}).sort({ date: -1});
+      const itemBMI = await PatrolReport.find({ location: 'Baitul Makmur I' }).sort({ date: -1 });
       const itemBMII = await PatrolReport.find({
         location: 'Baitul Makmur II'
-      });
-      const itemJM = await PatrolReport.find({ location: 'Jamek Mosque' });
-      const itemCM = await PatrolReport.find({ location: 'City Mosque' });
-      const itemRS = await PatrolReport.find({ location: 'Raudhatul Sakinah' });
+      }).sort({ date: -1 });
+      const itemJM = await PatrolReport.find({ location: 'Jamek Mosque' }).sort({ date: -1 });
+      const itemCM = await PatrolReport.find({ location: 'City Mosque' }).sort({ date: -1 });
+      const itemRS = await PatrolReport.find({ location: 'Raudhatul Sakinah' }).sort({ date: -1 });
 
       // check customlistname
       if (customListName === 'BMI') {
@@ -1128,20 +1129,20 @@ app
           const checkUser = await User.findOne({ username: currentUsername });
 
           if (checkUser) {
-            const itemReports = await PatrolReport.find({});
+            const itemReports = await PatrolReport.find({}).sort({ date: -1 });
             const itemBMI = await PatrolReport.find({
               location: 'Baitul Makmur I'
-            });
+            }).sort({ date: -1 });
             const itemBMII = await PatrolReport.find({
               location: 'Baitul Makmur II'
-            });
+            }).sort({ date: -1 });
             const itemJM = await PatrolReport.find({
               location: 'Jamek Mosque'
-            });
-            const itemCM = await PatrolReport.find({ location: 'City Mosque' });
+            }).sort({ date: -1 });
+            const itemCM = await PatrolReport.find({ location: 'City Mosque' }).sort({ date: -1 });
             const itemRS = await PatrolReport.find({
               location: 'Raudhatul Sakinah'
-            });
+            }).sort({ date: -1 });
 
             if (itemReports.length > 0) {
               res.render('patrol-report-view', {
@@ -1201,20 +1202,20 @@ app
           const checkUser = await User.findOne({ username: currentUsername });
 
           if (checkUser) {
-            const itemReports = await PatrolReport.find({});
+            const itemReports = await PatrolReport.find({}).sort({ date: -1 });
             const itemBMI = await PatrolReport.find({
               location: 'Baitul Makmur I'
-            });
+            }).sort({ date: -1 });
             const itemBMII = await PatrolReport.find({
               location: 'Baitul Makmur II'
-            });
+            }).sort({ date: -1 });
             const itemJM = await PatrolReport.find({
               location: 'Jamek Mosque'
-            });
-            const itemCM = await PatrolReport.find({ location: 'City Mosque' });
+            }).sort({ date: -1 });
+            const itemCM = await PatrolReport.find({ location: 'City Mosque' }).sort({ date: -1 });
             const itemRS = await PatrolReport.find({
               location: 'Raudhatul Sakinah'
-            });
+            }).sort({ date: -1 });
 
             if (itemReports.length > 0) {
               res.render('patrol-report-view', {
@@ -1554,14 +1555,14 @@ app.get('/case-report/view', async function (req, res) {
     const checkUser = await User.findOne({ username: currentUsername });
 
     if (checkUser) {
-      const itemReports = await CaseReport.find({});
-      const itemBMI = await CaseReport.find({ location: 'Baitul Makmur I' });
+      const itemReports = await CaseReport.find({username:checkUser.username}).sort({ date: -1 });
+      const itemBMI = await CaseReport.find({ location: 'Baitul Makmur I',username:checkUser.username }).sort({ date: -1 });
       const itemBMII = await CaseReport.find({
         location: 'Baitul Makmur II'
-      });
-      const itemJM = await CaseReport.find({ location: 'Jamek Mosque' });
-      const itemCM = await CaseReport.find({ location: 'City Mosque' });
-      const itemRS = await CaseReport.find({ location: 'Raudhatul Sakinah' });
+      }).sort({ date: -1 });
+      const itemJM = await CaseReport.find({ location: 'Jamek Mosque',username:checkUser.username }).sort({ date: -1 });
+      const itemCM = await CaseReport.find({ location: 'City Mosque',username:checkUser.username }).sort({ date: -1 });
+      const itemRS = await CaseReport.find({ location: 'Raudhatul Sakinah',username:checkUser.username }).sort({ date: -1 });
 
       if (itemReports.length > 0) {
         res.render('case-report-view', {
@@ -1629,14 +1630,14 @@ app.get('/case-report/view/:customListName', async function (req, res) {
     const customListName = _.upperCase(req.params.customListName);
 
     if (checkUser) {
-      const itemReports = await CaseReport.find({});
-      const itemBMI = await CaseReport.find({ location: 'Baitul Makmur I' });
+      const itemReports = await CaseReport.find({username:checkUser.username});
+      const itemBMI = await CaseReport.find({ location: 'Baitul Makmur I',username:checkUser.username });
       const itemBMII = await CaseReport.find({
-        location: 'Baitul Makmur II'
+        location: 'Baitul Makmur II',username:checkUser.username
       });
-      const itemJM = await CaseReport.find({ location: 'Jamek Mosque' });
-      const itemCM = await CaseReport.find({ location: 'City Mosque' });
-      const itemRS = await CaseReport.find({ location: 'Raudhatul Sakinah' });
+      const itemJM = await CaseReport.find({ location: 'Jamek Mosque',username:checkUser.username });
+      const itemCM = await CaseReport.find({ location: 'City Mosque',username:checkUser.username });
+      const itemRS = await CaseReport.find({ location: 'Raudhatul Sakinah',username:checkUser.username });
 
       // check customlistname
       if (customListName === 'BMI') {
@@ -2111,20 +2112,20 @@ app
           const checkUser = await User.findOne({ username: currentUsername });
 
           if (checkUser) {
-            const itemReports = await CaseReport.find({});
+            const itemReports = await CaseReport.find({username:checkUser.username}).sort({ date: -1 });
             const itemBMI = await CaseReport.find({
-              location: 'Baitul Makmur I'
-            });
+              location: 'Baitul Makmur I',username:checkUser.username
+            }).sort({ date: -1 });
             const itemBMII = await CaseReport.find({
-              location: 'Baitul Makmur II'
-            });
+              location: 'Baitul Makmur II',username:checkUser.username
+            }).sort({ date: -1 });
             const itemJM = await CaseReport.find({
-              location: 'Jamek Mosque'
-            });
-            const itemCM = await CaseReport.find({ location: 'City Mosque' });
+              location: 'Jamek Mosque',username:checkUser.username
+            }).sort({ date: -1 });
+            const itemCM = await CaseReport.find({ location: 'City Mosque',username:checkUser.username }).sort({ date: -1 });
             const itemRS = await CaseReport.find({
-              location: 'Raudhatul Sakinah'
-            });
+              location: 'Raudhatul Sakinah',username:checkUser.username
+            }).sort({ date: -1 });
 
             if (itemReports.length > 0) {
               res.render('case-report-view', {
@@ -2184,20 +2185,20 @@ app
           const checkUser = await User.findOne({ username: currentUsername });
 
           if (checkUser) {
-            const itemReports = await CaseReport.find({});
+            const itemReports = await CaseReport.find({username:checkUser.username}).sort({ date: -1 });
             const itemBMI = await CaseReport.find({
-              location: 'Baitul Makmur I'
-            });
+              location: 'Baitul Makmur I',username:checkUser.username
+            }).sort({ date: -1 });
             const itemBMII = await CaseReport.find({
-              location: 'Baitul Makmur II'
-            });
+              location: 'Baitul Makmur II',username:checkUser.username
+            }).sort({ date: -1 });
             const itemJM = await CaseReport.find({
-              location: 'Jamek Mosque'
-            });
-            const itemCM = await CaseReport.find({ location: 'City Mosque' });
+              location: 'Jamek Mosque',username:checkUser.username
+            }).sort({ date: -1 });
+            const itemCM = await CaseReport.find({ location: 'City Mosque',username:checkUser.username });
             const itemRS = await CaseReport.find({
-              location: 'Raudhatul Sakinah'
-            });
+              location: 'Raudhatul Sakinah',username:checkUser.username
+            }).sort({ date: -1 });
 
             if (itemReports.length > 0) {
               res.render('case-report-view', {
@@ -2258,20 +2259,20 @@ app
         const checkUser = await User.findOne({ username: currentUsername });
 
         if (checkUser) {
-          const itemReports = await CaseReport.find({});
+          const itemReports = await CaseReport.find({}).sort({ date: -1 });
           const itemBMI = await CaseReport.find({
-            location: 'Baitul Makmur I'
-          });
+            location: 'Baitul Makmur I',username:checkUser.username
+          }).sort({ date: -1 });
           const itemBMII = await CaseReport.find({
-            location: 'Baitul Makmur II'
-          });
+            location: 'Baitul Makmur II',username:checkUser.username
+          }).sort({ date: -1 });
           const itemJM = await CaseReport.find({
-            location: 'Jamek Mosque'
-          });
-          const itemCM = await CaseReport.find({ location: 'City Mosque' });
+            location: 'Jamek Mosque',username:checkUser.username
+          }).sort({ date: -1 });
+          const itemCM = await CaseReport.find({ location: 'City Mosque' }).sort({ date: -1 });
           const itemRS = await CaseReport.find({
-            location: 'Raudhatul Sakinah'
-          });
+            location: 'Raudhatul Sakinah',username:checkUser.username
+          }).sort({ date: -1 });
 
           if (itemReports.length > 0) {
             res.render('case-report-view', {
@@ -2737,18 +2738,18 @@ app
 
           if (checkUser) {
             // schedules
-            const itemSchedules = await Schedule.find({});
+            const itemSchedules = await Schedule.find({}).sort({ startDate: -1 });
             const itemBMI = await Schedule.find({
               location: 'Baitul Makmur I'
-            });
+            }).sort({ startDate: -1 });
             const itemBMII = await Schedule.find({
               location: 'Baitul Makmur II'
-            });
-            const itemJM = await Schedule.find({ location: 'Jamek Mosque' });
-            const itemCM = await Schedule.find({ location: 'City Mosque' });
+            }).sort({ startDate: -1 });
+            const itemJM = await Schedule.find({ location: 'Jamek Mosque' }).sort({ startDate: -1 });
+            const itemCM = await Schedule.find({ location: 'City Mosque' }).sort({ startDate: -1 });
             const itemRS = await Schedule.find({
               location: 'Raudhatul Sakinah'
-            });
+            }).sort({ startDate: -1 });
 
             // schedules file
             const itemFiles = await FileSchedule.find({});
@@ -2815,18 +2816,18 @@ app
 
           if (checkUser) {
             // schedules
-            const itemSchedules = await Schedule.find({});
+            const itemSchedules = await Schedule.find({}).sort({ startDate: -1 });
             const itemBMI = await Schedule.find({
               location: 'Baitul Makmur I'
-            });
+            }).sort({ startDate: -1 });
             const itemBMII = await Schedule.find({
               location: 'Baitul Makmur II'
-            });
-            const itemJM = await Schedule.find({ location: 'Jamek Mosque' });
-            const itemCM = await Schedule.find({ location: 'City Mosque' });
+            }).sort({ startDate: -1 });
+            const itemJM = await Schedule.find({ location: 'Jamek Mosque' }).sort({ startDate: -1 });
+            const itemCM = await Schedule.find({ location: 'City Mosque' }).sort({ startDate: -1 });
             const itemRS = await Schedule.find({
               location: 'Raudhatul Sakinah'
-            });
+            }).sort({ startDate: -1 });
 
             // schedules file
             const itemFiles = await FileSchedule.find({});
@@ -2893,18 +2894,18 @@ app
 
         if (checkUser) {
           // schedules
-          const itemSchedules = await Schedule.find({});
+          const itemSchedules = await Schedule.find({}).sort({ startDate: -1 });
           const itemBMI = await Schedule.find({
             location: 'Baitul Makmur I'
-          });
+          }).sort({ startDate: -1 });
           const itemBMII = await Schedule.find({
             location: 'Baitul Makmur II'
-          });
-          const itemJM = await Schedule.find({ location: 'Jamek Mosque' });
-          const itemCM = await Schedule.find({ location: 'City Mosque' });
+          }).sort({ startDate: -1 });
+          const itemJM = await Schedule.find({ location: 'Jamek Mosque' }).sort({ startDate: -1 });
+          const itemCM = await Schedule.find({ location: 'City Mosque' }).sort({ startDate: -1 });
           const itemRS = await Schedule.find({
             location: 'Raudhatul Sakinah'
-          });
+          }).sort({ startDate: -1 });
 
           // schedules file
           const itemFiles = await FileSchedule.find({});
@@ -3002,14 +3003,14 @@ app.get('/schedule', async function (req, res) {
 
     if (checkUser) {
       // schedules
-      const itemSchedules = await Schedule.find({});
-      const itemBMI = await Schedule.find({ location: 'Baitul Makmur I' });
+      const itemSchedules = await Schedule.find({}).sort({ startDate: -1 });
+      const itemBMI = await Schedule.find({ location: 'Baitul Makmur I' }).sort({ startDate: -1 });
       const itemBMII = await Schedule.find({
         location: 'Baitul Makmur II'
-      });
-      const itemJM = await Schedule.find({ location: 'Jamek Mosque' });
+      }).sort({ startDate: -1 });
+      const itemJM = await Schedule.find({ location: 'Jamek Mosque' }).sort({ startDate: -1 });
       const itemCM = await Schedule.find({ location: 'City Mosque' });
-      const itemRS = await Schedule.find({ location: 'Raudhatul Sakinah' });
+      const itemRS = await Schedule.find({ location: 'Raudhatul Sakinah' }).sort({ startDate: -1 });
 
       // schedules file
       const itemFiles = await FileSchedule.find({});
@@ -3082,14 +3083,14 @@ app.get('/schedule/:customListName', async function (req, res) {
 
     if (checkUser) {
       // schedules
-      const itemSchedules = await Schedule.find({});
-      const itemBMI = await Schedule.find({ location: 'Baitul Makmur I' });
+      const itemSchedules = await Schedule.find({}).sort({ startDate: -1 });
+      const itemBMI = await Schedule.find({ location: 'Baitul Makmur I' }).sort({ startDate: -1 });
       const itemBMII = await Schedule.find({
         location: 'Baitul Makmur II'
-      });
-      const itemJM = await Schedule.find({ location: 'Jamek Mosque' });
-      const itemCM = await Schedule.find({ location: 'City Mosque' });
-      const itemRS = await Schedule.find({ location: 'Raudhatul Sakinah' });
+      }).sort({ startDate: -1 });
+      const itemJM = await Schedule.find({ location: 'Jamek Mosque' }).sort({ startDate: -1 });
+      const itemCM = await Schedule.find({ location: 'City Mosque' }).sort({ startDate: -1 });
+      const itemRS = await Schedule.find({ location: 'Raudhatul Sakinah' }).sort({ startDate: -1 });
 
       // schedules file
       const itemFiles = await FileSchedule.find({});
@@ -3837,14 +3838,14 @@ app.get('/duty-handover/view', async function (req, res) {
     const checkUser = await User.findOne({ username: currentUsername });
 
     if (checkUser) {
-      const itemReports = await DutyHandover.find({});
-      const itemBMI = await DutyHandover.find({ location: 'Baitul Makmur I' });
+      const itemReports = await DutyHandover.find({}).sort({ date: -1 });
+      const itemBMI = await DutyHandover.find({ location: 'Baitul Makmur I' }).sort({ date: -1 });
       const itemBMII = await DutyHandover.find({
         location: 'Baitul Makmur II'
-      });
-      const itemJM = await DutyHandover.find({ location: 'Jamek Mosque' });
-      const itemCM = await DutyHandover.find({ location: 'City Mosque' });
-      const itemRS = await DutyHandover.find({ location: 'Raudhatul Sakinah' });
+      }).sort({ date: -1 });
+      const itemJM = await DutyHandover.find({ location: 'Jamek Mosque' }).sort({ date: -1 });
+      const itemCM = await DutyHandover.find({ location: 'City Mosque' }).sort({ date: -1 });
+      const itemRS = await DutyHandover.find({ location: 'Raudhatul Sakinah' }).sort({ date: -1 });
 
       if (itemReports.length > 0) {
         res.render('duty-handover-view', {
@@ -3912,14 +3913,14 @@ app.get('/duty-handover/view/:customListName', async function (req, res) {
     const customListName = _.upperCase(req.params.customListName);
 
     if (checkUser) {
-      const itemReports = await DutyHandover.find({});
-      const itemBMI = await DutyHandover.find({ location: 'Baitul Makmur I' });
+      const itemReports = await DutyHandover.find({}).sort({ date: -1 });
+      const itemBMI = await DutyHandover.find({ location: 'Baitul Makmur I' }).sort({ date: -1 });
       const itemBMII = await DutyHandover.find({
         location: 'Baitul Makmur II'
-      });
-      const itemJM = await DutyHandover.find({ location: 'Jamek Mosque' });
-      const itemCM = await DutyHandover.find({ location: 'City Mosque' });
-      const itemRS = await DutyHandover.find({ location: 'Raudhatul Sakinah' });
+      }).sort({ date: -1 });
+      const itemJM = await DutyHandover.find({ location: 'Jamek Mosque' }).sort({ date: -1 });
+      const itemCM = await DutyHandover.find({ location: 'City Mosque' }).sort({ date: -1 });
+      const itemRS = await DutyHandover.find({ location: 'Raudhatul Sakinah' }).sort({ date: -1 });
 
       // check customlistname
       if (customListName === 'BMI') {
@@ -4354,12 +4355,14 @@ app
       const giveLog =
         'Saya ' +
         headShift +
-        ' selaku Ketua Syif ' +
+        ' selaku ketua syif ' +
         shift +
-        ' telah menyerahkan tugas kepada ' +
+        ' telah menyerahkan tugas kepada selaku ketua syif' +
         handoverShift +
-        ' selaku ketua syif dalam keadaan baik dan senarai peralatan tugas mencukupi di ' +
-        location + ' pada tarikh ' + date;
+        ' dalam keadaan baik dan senarai peralatan tugas mencukupi di ' +
+        location +
+        ' pada tarikh ' +
+        date;
 
       // Activity
       const newItemActivity = new ItemActivity({
@@ -4422,20 +4425,20 @@ app
           const checkUser = await User.findOne({ username: currentUsername });
 
           if (checkUser) {
-            const itemReports = await DutyHandover.find({});
+            const itemReports = await DutyHandover.find({}).sort({ date: -1 });
             const itemBMI = await DutyHandover.find({
               location: 'Baitul Makmur I'
-            });
+            }).sort({ date: -1 });
             const itemBMII = await DutyHandover.find({
               location: 'Baitul Makmur II'
-            });
+            }).sort({ date: -1 });
             const itemJM = await DutyHandover.find({
               location: 'Jamek Mosque'
-            });
-            const itemCM = await DutyHandover.find({ location: 'City Mosque' });
+            }).sort({ date: -1 });
+            const itemCM = await DutyHandover.find({ location: 'City Mosque' }).sort({ date: -1 });
             const itemRS = await DutyHandover.find({
               location: 'Raudhatul Sakinah'
-            });
+            }).sort({ date: -1 });
 
             if (itemReports.length > 0) {
               res.render('duty-handover-view', {
@@ -4495,20 +4498,20 @@ app
           const checkUser = await User.findOne({ username: currentUsername });
 
           if (checkUser) {
-            const itemReports = await DutyHandover.find({});
+            const itemReports = await DutyHandover.find({}).sort({ date: -1 });
             const itemBMI = await DutyHandover.find({
               location: 'Baitul Makmur I'
-            });
+            }).sort({ date: -1 });
             const itemBMII = await DutyHandover.find({
               location: 'Baitul Makmur II'
-            });
+            }).sort({ date: -1 });
             const itemJM = await DutyHandover.find({
               location: 'Jamek Mosque'
-            });
-            const itemCM = await DutyHandover.find({ location: 'City Mosque' });
+            }).sort({ date: -1 });
+            const itemCM = await DutyHandover.find({ location: 'City Mosque' }).sort({ date: -1 });
             const itemRS = await DutyHandover.find({
               location: 'Raudhatul Sakinah'
-            });
+            }).sort({ date: -1 });
 
             if (itemReports.length > 0) {
               res.render('duty-handover-view', {
@@ -4569,20 +4572,20 @@ app
         const checkUser = await User.findOne({ username: currentUsername });
 
         if (checkUser) {
-          const itemReports = await DutyHandover.find({});
+          const itemReports = await DutyHandover.find({}).sort({ date: -1 });
           const itemBMI = await DutyHandover.find({
             location: 'Baitul Makmur I'
-          });
+          }).sort({ date: -1 });
           const itemBMII = await DutyHandover.find({
             location: 'Baitul Makmur II'
-          });
+          }).sort({ date: -1 });
           const itemJM = await DutyHandover.find({
             location: 'Jamek Mosque'
-          });
-          const itemCM = await DutyHandover.find({ location: 'City Mosque' });
+          }).sort({ date: -1 });
+          const itemCM = await DutyHandover.find({ location: 'City Mosque' }).sort({ date: -1 });
           const itemRS = await DutyHandover.find({
             location: 'Raudhatul Sakinah'
-          });
+          }).sort({ date: -1 });
 
           if (itemReports.length > 0) {
             res.render('duty-handover-view', {
@@ -4683,26 +4686,34 @@ app
           reportId: reportId
         });
 
-        if (checkReport) {
-          console.log(checkReport.handoverShift);
+        if (checkReport.status === 'Completed') {
+          console.log(checkReport.status);
           res.render('duty-handover-details', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
+            // duty handover details
             reportId: checkReport.reportId,
-            giveHeadShift: checkReport.giveHeadShift,
             giveShift: checkReport.giveShift,
             giveDate: checkReport.giveDate,
-            location: checkReport.location,
+            giveHeadShift: checkReport.giveHeadShift,
+            giveStaffOnDuty: checkReport.giveStaffOnDuty,
             giveStaffSickLeave: checkReport.giveStaffSickLeave,
             giveStaffAbsent: checkReport.giveStaffAbsent,
+            receiveShift: checkReport.receiveShift,
+            receiveDate: checkReport.receiveDate,
+            receiveHeadShift: checkReport.receiveHeadShift,
+            receiveStaffOnDuty: checkReport.receiveStaffOnDuty,
+            receiveStaffSickLeave: checkReport.receiveStaffSickLeave,
+            receiveStaffAbsent: checkReport.receiveStaffAbsent,
+            giveLog: checkReport.giveLog,
+            receiveLog: checkReport.receiveLog,
+            location: checkReport.location,
             status: checkReport.status,
             notes: checkReport.notes,
-            giveLog: checkReport.giveLog,
             date: checkReport.giveDate,
             handoverShift: checkReport.handoverShift,
             shift: checkReport.giveShift,
-            receivedLog : checkReport.receiveLog,
             // validation
             validationHeadShift: '',
             validationStaffOnDuty: '',
@@ -4715,9 +4726,9 @@ app
             staffSickLeave: '',
             staffAbsent: '',
             // tab-pane
-            showTabPane1: 'active',
+            showTabPane1: '',
             showTabPane2: '',
-            showTabPane3: '',
+            showTabPane3: 'active',
             // toast alert
             toastShow: '',
             toastMsg: ''
@@ -4727,16 +4738,28 @@ app
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
+            // duty handover details
             reportId: checkReport.reportId,
-            giveHeadShift: '',
-            giveShift: '',
-            giveDate: '',
-            location: '',
-            giveStaffSickLeave: '',
-            giveStaffAbsent: '',
-            status: '',
-            notes: '',
-            giveLog: '',
+            giveShift: checkReport.giveShift,
+            giveDate: checkReport.giveDate,
+            giveHeadShift: checkReport.giveHeadShift,
+            giveStaffOnDuty: checkReport.giveStaffOnDuty,
+            giveStaffSickLeave: checkReport.giveStaffSickLeave,
+            giveStaffAbsent: checkReport.giveStaffAbsent,
+            receiveShift: checkReport.receiveShift,
+            receiveDate: checkReport.receiveDate,
+            receiveHeadShift: checkReport.receiveHeadShift,
+            receiveStaffOnDuty: checkReport.receiveStaffOnDuty,
+            receiveStaffSickLeave: checkReport.receiveStaffSickLeave,
+            receiveStaffAbsent: checkReport.receiveStaffAbsent,
+            giveLog: checkReport.giveLog,
+            receiveLog: checkReport.receiveLog,
+            location: checkReport.location,
+            status: checkReport.status,
+            notes: checkReport.notes,
+            date: checkReport.giveDate,
+            handoverShift: checkReport.handoverShift,
+            shift: checkReport.giveShift,
             // validation
             validationHeadShift: '',
             validationStaffOnDuty: '',
@@ -4744,16 +4767,13 @@ app
             validationStaffAbsent: '',
             validationNotes: '',
             //form name
-            shift: '',
-            date: '',
             headShift: '',
             staffOnDuty: '',
             staffSickLeave: '',
             staffAbsent: '',
-            handoverShift: '',
             // tab-pane
-            showTabPane1: 'active',
-            showTabPane2: '',
+            showTabPane1: '',
+            showTabPane2: 'active',
             showTabPane3: '',
             // toast alert
             toastShow: '',
@@ -4851,10 +4871,12 @@ app
         headShift +
         ' selaku ketua syif ' +
         shift +
-        ' telah menerima tugas daripada ' +
+        ' telah menerima tugas daripada ketua syif' +
         handoverShift +
-        ' selaku ketua syif dalam keadaan baik dan senarai peralatan tugas mencukupi di ' +
-        location + ' pada tarikh ' + date;
+        ' dalam keadaan baik dan senarai peralatan tugas mencukupi di ' +
+        location +
+        ' pada tarikh ' +
+        date;
 
       // Activity
       const newItemActivity = new ItemActivity({
@@ -4913,9 +4935,54 @@ app
       );
 
       if (updatedHandover) {
-        console.log('Updated handover:', updatedHandover);
+        console.log('Update success');
+        res.render('duty-handover-details', {
+          currentFullName: checkUser.fullname,
+          currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
+          // duty handover details
+          reportId: checkReport.reportId,
+          giveShift: checkReport.giveShift,
+          giveDate: checkReport.giveDate,
+          giveHeadShift: checkReport.giveHeadShift,
+          giveStaffOnDuty: checkReport.giveStaffOnDuty,
+          giveStaffSickLeave: checkReport.giveStaffSickLeave,
+          giveStaffAbsent: checkReport.giveStaffAbsent,
+          receiveShift: checkReport.receiveShift,
+          receiveDate: checkReport.receiveDate,
+          receiveHeadShift: checkReport.receiveHeadShift,
+          receiveStaffOnDuty: checkReport.receiveStaffOnDuty,
+          receiveStaffSickLeave: checkReport.receiveStaffSickLeave,
+          receiveStaffAbsent: checkReport.receiveStaffAbsent,
+          giveLog: checkReport.giveLog,
+          receiveLog: checkReport.receiveLog,
+          location: checkReport.location,
+          status: checkReport.status,
+          notes: checkReport.notes,
+          date: checkReport.giveDate,
+          handoverShift: checkReport.handoverShift,
+          shift: checkReport.giveShift,
+          // input form for receive handover
+          headShift: '',
+          staffOnDuty: '',
+          staffSickLeave: '',
+          staffAbsent: '',
+          // validation
+          validationHeadShift: '',
+          validationStaffOnDuty: '',
+          validationStaffSickLeave: '',
+          validationStaffAbsent: '',
+          validationNotes: '',
+          // tab-pane
+          showTabPane1: '',
+          showTabPane2: '',
+          showTabPane3: 'active',
+          // toast alert
+          toastShow: 'show',
+          toastMsg: 'The handover duty have completed'
+        });
       } else {
-        console.log('No handover found with reportId:', confirmRid);
+        console.log('Report Id are not exist');
       }
     } else {
       console.log('Unsuccessful!');
@@ -4923,16 +4990,25 @@ app
         currentFullName: checkUser.fullname,
         currentUser: checkUser.username,
         currentProfile: checkUser.profile,
+        // duty handover details
         reportId: checkReport.reportId,
-        giveHeadShift: checkReport.giveHeadShift,
         giveShift: checkReport.giveShift,
         giveDate: checkReport.giveDate,
-        location: checkReport.location,
+        giveHeadShift: checkReport.giveHeadShift,
+        giveStaffOnDuty: checkReport.giveStaffOnDuty,
         giveStaffSickLeave: checkReport.giveStaffSickLeave,
         giveStaffAbsent: checkReport.giveStaffAbsent,
+        receiveShift: checkReport.receiveShift,
+        receiveDate: checkReport.receiveDate,
+        receiveHeadShift: checkReport.receiveHeadShift,
+        receiveStaffOnDuty: checkReport.receiveStaffOnDuty,
+        receiveStaffSickLeave: checkReport.receiveStaffSickLeave,
+        receiveStaffAbsent: checkReport.receiveStaffAbsent,
+        giveLog: checkReport.giveLog,
+        receiveLog: checkReport.receiveLog,
+        location: checkReport.location,
         status: checkReport.status,
         notes: checkReport.notes,
-        giveLog: checkReport.giveLog,
         date: checkReport.giveDate,
         handoverShift: checkReport.handoverShift,
         shift: checkReport.giveShift,
