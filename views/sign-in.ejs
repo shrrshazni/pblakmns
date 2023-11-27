@@ -77,11 +77,11 @@
           </div>
 
           <button
-            class="btn btn-primary w-100 mb-3"
+            class="btn btn-primary w-100 mb-3 myButton"
             type="submit"
             name="submit"
           >
-            Sign In
+            <div class="btn-content">Sign In</div>
           </button>
         </form>
 
@@ -134,7 +134,7 @@
     }
   </script>
   <div
-    class="btn btn-phoenix-primary position-absolute bottom-0 end-0 m-4 shadow-lg rounded-5 d-flex px-2 py-1"
+    class="btn btn-phoenix-primary position-absolute top-0 end-0 m-4 shadow-lg rounded-5 d-flex px-2 py-1"
   >
     <p class="my-auto mx-2">Theme</p>
     <div class="theme-control-toggle fa-icon-wait px-2">
@@ -164,8 +164,9 @@
     </div>
   </div>
 </main>
+
 <!-- ===============================================-->
 <!--    End of Main Content-->
 <!-- ===============================================-->
 
-<%- include("partials/footer-startup") %>
+<%- include("partials/footer") %>

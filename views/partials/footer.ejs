@@ -47,6 +47,64 @@
 <script src="/assets/js/flatpickr.js"></script>
 
 <script>
+  // button loading function
+  $(document).ready(function () {
+    $('.myButton').on('click', function () {
+      // Add the loading class
+      // $('.btn-status').addClass('spinner-border');
+      // $('.btn-status').addClass('spinner-border-sm');
+      // $('.btn-content').addClass('visually-hidden');
+      $('.myButton').addClass('loading');
+      $('.btn-content').addClass('noshow');
+      // $('.myButton').prop('disabled', true);
+
+      // Simulate a delay (replace this with your actual loading logic)
+      setTimeout(function () {
+        // Remove the loading class after the loading is complete
+        // $('.btn-status').removeClass('spinner-border');
+        // $('.btn-status').removeClass('spinner-border-sm');
+        // $('.btn-content').removeClass('visually-hidden');
+        $('.myButton').removeClass('loading');
+        $('.btn-content').removeClass('noshow');
+        // $('.myButton').prop('disabled', false);
+      }, 3000); // Replace 3000 with the duration of your loading process in milliseconds
+    });
+  });
+
+  // upload files for report
+  $(document).ready(function () {
+    // Function to show the toast
+    function showDropzoneFilesToast(content) {
+      $('#dropzoneAlertContent').text(content);
+
+      var toast = new bootstrap.Toast(
+        document.getElementById('alertUploadToast')
+      );
+      toast.show();
+    }
+
+    var myDropzone = Dropzone.forElement('#myDropzone');
+
+    $('#uploadButton').on('click', function () {
+      setTimeout(function () {
+        // files upload process queue
+
+        if (myDropzone.getQueuedFiles().length > 0) {
+          // If files are present, show the toast with appropriate content
+          showDropzoneFilesToast('Files has been uploaded');
+          // Process the Dropzone queue
+          myDropzone.processQueue();
+        } else {
+          // If no files are present, show the toast with different content
+          showDropzoneFilesToast('No files selected');
+        }
+
+        button.prop('type', 'submit');
+      }, 2000);
+    });
+  });
+
+  // profile image preview
   $(document).ready(function () {
     $(document).on('click', function () {
       $('#upload-profile-picture').click();
@@ -71,76 +129,40 @@
     }
   });
 
+  // profile upload submit
   $(document).ready(function () {
-    // Function to show the toast
-    function showDropzoneFilesToast(content) {
-      $('#dropzoneAlertContent').text(content);
+    function showProfileToast(content) {
+      $('#profileAlertContent').text(content);
 
       var toast = new bootstrap.Toast(
-        document.getElementById('alertUploadToast')
+        document.getElementById('alertUploadProfileToast')
       );
       toast.show();
     }
 
-    var myDropzone = Dropzone.forElement('#myDropzone');
-
-    $('#uploadButton').on('click', function () {
+    $('#uploadProfile').on('click', function () {
       var button = $(this);
-      button.addClass('loading').prop('disabled', true);
+
+      event.preventDefault();
+
+      var fileInput = document.getElementById('upload-profile-picture');
+      // Access the files property to get an array of File objects
+      var files = fileInput.files;
+
+      var form = $(this).closest('form');
+      // Check if there are files selected
+      if (files.length > 0) {
+        // Log or process the first file in the array
+        showProfileToast('Queued file:', files[0].name);
+      } else {
+        showProfileToast('No file selected.');
+      }
 
       setTimeout(function () {
-        // files upload process queue
-
-        if (myDropzone.getQueuedFiles().length > 0) {
-          // If files are present, show the toast with appropriate content
-          showDropzoneFilesToast('Files has been uploaded');
-          // Process the Dropzone queue
-          myDropzone.processQueue();
-        } else {
-          // If no files are present, show the toast with different content
-          showDropzoneFilesToast('No files selected');
-        }
-
-        // var toast = $('#alertToast');
-        button.prop('type', 'submit');
-        button.removeClass('loading').prop('disabled', false);
+        form.submit();
       }, 2000);
     });
   });
-
-  // $(document).ready(function () {
-  //   function showProfileToast(content) {
-  //     $('#profileAlertContent').text(content);
-
-  //     var toast = new bootstrap.Toast(
-  //       document.getElementById('alertUploadProfileToast')
-  //     );
-  //     toast.show();
-  //   }
-
-  //   var fileInput = document.getElementById('upload-profile-picture');
-
-  //   // Access the files property to get an array of File objects
-  //   var files = fileInput.files;
-
-  //   $('#uploadProfile').on('click', function () {
-  //     var button = $(this);
-  //     button.addClass('loading').prop('disabled', true);
-
-  //     // Check if there are files selected
-  //     if (files.length > 0) {
-  //       // Log or process the first file in the array
-  //       showProfileToast('Queued file:', files[0].name);
-  //     } else {
-  //       showProfileToast('No file selected.');
-  //     }
-
-  //     setTimeout(function () {
-  //       button.removeClass('loading').prop('disabled', false);
-  //       button.prop('type', 'submit');
-  //     }, 2000);
-  //   });
-  // });
 </script>
 
 <!-- to be added later close tag for body and html -->

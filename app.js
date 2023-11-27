@@ -55,7 +55,7 @@ app.use(passport.session());
 main().catch(err => console.log(err));
 
 async function main() {
-  await mongoose.connect('mongodb://localhost:27017/pblakmnsDB');
+  await mongoose.connect('mongodb+srv://shrrshazni:protechlakmns123@cluster0.rembern.mongodb.net/auxiliaryPolice');
 }
 
 //USER
@@ -449,8 +449,6 @@ const itemActivitySchema = new mongoose.Schema({
   about: String
 });
 
-const ItemActivity = mongoose.model('ItemActivity', itemActivitySchema);
-
 // ACTIVITY
 const ActivitySchema = new mongoose.Schema({
   date: String,
@@ -460,7 +458,6 @@ const ActivitySchema = new mongoose.Schema({
 const Activity = mongoose.model('Activity', ActivitySchema);
 
 // FILES
-
 // Define a schema for your model (e.g., for storing file metadata)
 const FileSchema = new mongoose.Schema({
   reportId: String,
@@ -508,14 +505,14 @@ app.post('/upload-patrol', async (req, res) => {
     var uploadTime = dateLocal.getCurrentTime();
 
     // Activity
-    const newItemActivity = new ItemActivity({
+    const newItemActivity = {
       time: uploadTime,
       by: checkUser.fullname,
       username: checkUser.username,
       type: 'Upload Files',
       title: 'Addes & uploaded ' + Object.keys(req.files).length + ' files',
       about: 'Files added for attachment in patrol report'
-    });
+    };
 
     const newActivity = new Activity({
       date: uploadTime,
@@ -1073,14 +1070,14 @@ app
       const currentUser = checkUser.username;
 
       // Activity
-      const newItemActivity = new ItemActivity({
+      const newItemActivity = {
         time: currentTime,
         by: currentFullName,
         username: currentUser,
         type: 'Patrol Report',
         title: 'Submitted a patrol report of ' + _.lowerCase(reportType),
         about: reportSummary
-      });
+      };
 
       const newActivity = new Activity({
         date: currentDate,
@@ -1480,14 +1477,14 @@ app.post('/upload-case', async (req, res) => {
     var uploadTime = dateLocal.getCurrentTime();
 
     // Activity
-    const newItemActivity = new ItemActivity({
+    const newItemActivity = {
       time: uploadTime,
       by: checkUser.fullname,
       username: checkUser.username,
       type: 'Upload Files',
       title: 'Addes & uploaded ' + Object.keys(req.files).length + ' files',
       about: 'Files added for attachment in case report'
-    });
+    };
 
     const newActivity = new Activity({
       date: uploadTime,
@@ -2057,14 +2054,14 @@ app
       const currentUser = checkUser.username;
 
       // Activity
-      const newItemActivity = new ItemActivity({
+      const newItemActivity = {
         time: currentTime,
         by: currentFullName,
         username: currentUser,
         type: 'Case Report',
         title: 'Submitted a case report of ' + _.lowerCase(reportType),
         about: reportSummary
-      });
+      };
 
       const newActivity = new Activity({
         date: currentDate,
@@ -2482,14 +2479,14 @@ app.post('/upload-schedule', async (req, res) => {
     var uploadTime = dateLocal.getCurrentTime();
 
     // Activity
-    const newItemActivity = new ItemActivity({
+    const newItemActivity = {
       time: uploadTime,
       by: checkUser.fullname,
       username: checkUser.username,
       type: 'Upload Files',
       title: 'Addes & uploaded ' + Object.keys(req.files).length + ' files',
       about: 'Files added for attachment in schedule'
-    });
+    };
 
     const newActivity = new Activity({
       date: uploadDate,
@@ -2677,7 +2674,7 @@ app
       const currentUser = checkUser.username;
 
       // Activity
-      const newItemActivity = new ItemActivity({
+      const newItemActivity = {
         time: currentTime,
         by: checkUser.fullname,
         username: currentUser,
@@ -2690,7 +2687,7 @@ app
           ' towards ' +
           endDate,
         about: notes + ' ,while currently the status is ' + status
-      });
+      };
 
       const newActivity = new Activity({
         date: currentDate,
@@ -3744,14 +3741,14 @@ app.post('/social/settings/:customListName', async function (req, res) {
           var uploadTime = dateLocal.getCurrentTime();
 
           // Activity
-          const newItemActivity = new ItemActivity({
+          const newItemActivity = {
             time: uploadTime,
             by: checkUser.fullname,
             username: checkUser.username,
             type: 'Upload Profile',
             title: 'Update & uploaded profiles',
             about: 'Image added for profile image displayed'
-          });
+          };
 
           const newActivity = new Activity({
             date: uploadDate,
@@ -4365,7 +4362,7 @@ app
         date;
 
       // Activity
-      const newItemActivity = new ItemActivity({
+      const newItemActivity = {
         time: currentTime,
         by: currentFullName,
         username: currentUser,
@@ -4376,7 +4373,7 @@ app
           ' & status is ' +
           status,
         about: notes
-      });
+      };
 
       const newActivity = new Activity({
         date: currentDate,
@@ -4879,7 +4876,7 @@ app
         date;
 
       // Activity
-      const newItemActivity = new ItemActivity({
+      const newItemActivity = {
         time: currentTime,
         by: currentFullName,
         username: currentUser,
@@ -4890,7 +4887,7 @@ app
           ' & status is ' +
           status,
         about: notes
-      });
+      };
 
       const newActivity = new Activity({
         date: currentDate,
