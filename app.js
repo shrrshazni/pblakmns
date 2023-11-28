@@ -19,7 +19,7 @@ const dateLocal = require('./public/assets/js/date');
 const { string, check } = require('yargs');
 const cool = require('cool-ascii-faces');
 
-const mongoURI = 'mongodb://localhost:27017/sessions';
+const mongoURI = 'mongodb+srv://shrrshazni:protechlakmns123@cluster0.rembern.mongodb.net/sessions';
 
 const app = express();
 
@@ -5170,7 +5170,7 @@ app.get('/sign-out', function (req, res) {
   });
 });
 
-const PORT = process.env.PORT || 5001
+const PORT = process.env.PORT || 5001;
 
 app.get('/cool', (req, res) => res.send(cool()));
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
