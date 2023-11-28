@@ -16,7 +16,7 @@ const fileUpload = require('express-fileupload');
 const nodemailer = require('nodemailer');
 // getdate
 const dateLocal = require('./public/assets/js/date');
-const { string, check } = require('yargs');
+// const { string, check } = require('yargs');
 const cool = require('cool-ascii-faces');
 
 const mongoURI = 'mongodb+srv://shrrshazni:protechlakmns123@cluster0.rembern.mongodb.net/sessions';
@@ -241,6 +241,7 @@ app
         username: req.body.username,
         fullname: req.body.fullname,
         email: req.body.email,
+        phone: req.body.phone,
         profile: ''
       },
       req.body.password,
@@ -301,7 +302,7 @@ app
     }
 
     if (validationEmail === 'is-valid') {
-      const resetPasswordUrl = 'localhost:3000/reset-password/' + userId;
+      const resetPasswordUrl = 'https://whispering-coast-01823-a731e7840e6b.herokuapp.com/reset-password/' + userId;
 
       let mailOptions = {
         from: 'shrrshazni@gmail.com',
@@ -4475,9 +4476,9 @@ app
         'Saya ' +
         headShift +
         ' selaku ketua syif ' +
-        shift +
+        _.lowerCase(shift) +
         ' telah menyerahkan tugas kepada selaku ketua syif' +
-        handoverShift +
+        _.lowerCase(handoverShift) +
         ' dalam keadaan baik dan senarai peralatan tugas mencukupi di ' +
         location +
         ' pada tarikh ' +
@@ -4897,8 +4898,8 @@ app
             staffSickLeave: '',
             staffAbsent: '',
             // tab-pane
-            showTabPane1: '',
-            showTabPane2: 'active',
+            showTabPane1: 'active',
+            showTabPane2: '',
             showTabPane3: '',
             // toast alert
             toastShow: '',
@@ -4995,9 +4996,9 @@ app
         'Saya ' +
         headShift +
         ' selaku ketua syif ' +
-        shift +
-        ' telah menerima tugas daripada ketua syif' +
-        handoverShift +
+        _.lowerCase(shift) +
+        ' telah menerima tugas daripada ketua syif ' +
+        _.lowerCase(handoverShift) +
         ' dalam keadaan baik dan senarai peralatan tugas mencukupi di ' +
         location +
         ' pada tarikh ' +
@@ -5061,51 +5062,52 @@ app
 
       if (updatedHandover) {
         console.log('Update success');
-        res.render('duty-handover-details', {
-          currentFullName: checkUser.fullname,
-          currentUser: checkUser.username,
-          currentProfile: checkUser.profile,
-          // duty handover details
-          reportId: checkReport.reportId,
-          giveShift: checkReport.giveShift,
-          giveDate: checkReport.giveDate,
-          giveHeadShift: checkReport.giveHeadShift,
-          giveStaffOnDuty: checkReport.giveStaffOnDuty,
-          giveStaffSickLeave: checkReport.giveStaffSickLeave,
-          giveStaffAbsent: checkReport.giveStaffAbsent,
-          receiveShift: checkReport.receiveShift,
-          receiveDate: checkReport.receiveDate,
-          receiveHeadShift: checkReport.receiveHeadShift,
-          receiveStaffOnDuty: checkReport.receiveStaffOnDuty,
-          receiveStaffSickLeave: checkReport.receiveStaffSickLeave,
-          receiveStaffAbsent: checkReport.receiveStaffAbsent,
-          giveLog: checkReport.giveLog,
-          receiveLog: checkReport.receiveLog,
-          location: checkReport.location,
-          status: checkReport.status,
-          notes: checkReport.notes,
-          date: checkReport.giveDate,
-          handoverShift: checkReport.handoverShift,
-          shift: checkReport.giveShift,
-          // input form for receive handover
-          headShift: '',
-          staffOnDuty: '',
-          staffSickLeave: '',
-          staffAbsent: '',
-          // validation
-          validationHeadShift: '',
-          validationStaffOnDuty: '',
-          validationStaffSickLeave: '',
-          validationStaffAbsent: '',
-          validationNotes: '',
-          // tab-pane
-          showTabPane1: '',
-          showTabPane2: '',
-          showTabPane3: 'active',
-          // toast alert
-          toastShow: 'show',
-          toastMsg: 'The handover duty have completed'
-        });
+        res.redirect('/duty-handover/details?id='+ reportId);
+        // res.render('duty-handover-details', {
+        //   currentFullName: checkUser.fullname,
+        //   currentUser: checkUser.username,
+        //   currentProfile: checkUser.profile,
+        //   // duty handover details
+        //   reportId: checkReport.reportId,
+        //   giveShift: checkReport.giveShift,
+        //   giveDate: checkReport.giveDate,
+        //   giveHeadShift: checkReport.giveHeadShift,
+        //   giveStaffOnDuty: checkReport.giveStaffOnDuty,
+        //   giveStaffSickLeave: checkReport.giveStaffSickLeave,
+        //   giveStaffAbsent: checkReport.giveStaffAbsent,
+        //   receiveShift: checkReport.receiveShift,
+        //   receiveDate: checkReport.receiveDate,
+        //   receiveHeadShift: checkReport.receiveHeadShift,
+        //   receiveStaffOnDuty: checkReport.receiveStaffOnDuty,
+        //   receiveStaffSickLeave: checkReport.receiveStaffSickLeave,
+        //   receiveStaffAbsent: checkReport.receiveStaffAbsent,
+        //   giveLog: checkReport.giveLog,
+        //   receiveLog: checkReport.receiveLog,
+        //   location: checkReport.location,
+        //   status: checkReport.status,
+        //   notes: checkReport.notes,
+        //   date: checkReport.giveDate,
+        //   handoverShift: checkReport.handoverShift,
+        //   shift: checkReport.giveShift,
+        //   // input form for receive handover
+        //   headShift: '',
+        //   staffOnDuty: '',
+        //   staffSickLeave: '',
+        //   staffAbsent: '',
+        //   // validation
+        //   validationHeadShift: '',
+        //   validationStaffOnDuty: '',
+        //   validationStaffSickLeave: '',
+        //   validationStaffAbsent: '',
+        //   validationNotes: '',
+        //   // tab-pane
+        //   showTabPane1: '',
+        //   showTabPane2: '',
+        //   showTabPane3: 'active',
+        //   // toast alert
+        //   toastShow: 'show',
+        //   toastMsg: 'The handover duty have completed'
+        // });
       } else {
         console.log('Report Id are not exist');
       }
