@@ -42,6 +42,7 @@
     "passport-local-mongoose": "^8.0.0",
     "path": "^0.12.7",
     "sortablejs": "^1.15.0",
-    "swiper": "^11.0.5"
+    "swiper": "^11.0.5",
+    "yargs": "^17.7.2"
   }
 }
