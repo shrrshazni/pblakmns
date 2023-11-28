@@ -17,6 +17,7 @@ const nodemailer = require('nodemailer');
 // getdate
 const dateLocal = require('./public/assets/js/date');
 const { string, check } = require('yargs');
+const cool = require('cool-ascii-faces');
 
 const mongoURI = 'mongodb://localhost:27017/sessions';
 
@@ -55,7 +56,9 @@ app.use(passport.session());
 main().catch(err => console.log(err));
 
 async function main() {
-  await mongoose.connect('mongodb+srv://shrrshazni:protechlakmns123@cluster0.rembern.mongodb.net/auxiliaryPolice');
+  await mongoose.connect(
+    'mongodb+srv://shrrshazni:protechlakmns123@cluster0.rembern.mongodb.net/auxiliaryPolice'
+  );
 }
 
 //USER
@@ -581,13 +584,21 @@ app.get('/patrol-report/view', async function (req, res) {
 
     if (checkUser) {
       const itemReports = await PatrolReport.find({}).sort({ date: -1 });
-      const itemBMI = await PatrolReport.find({ location: 'Baitul Makmur I' }).sort({ date: -1 });
+      const itemBMI = await PatrolReport.find({
+        location: 'Baitul Makmur I'
+      }).sort({ date: -1 });
       const itemBMII = await PatrolReport.find({
         location: 'Baitul Makmur II'
       }).sort({ date: -1 });
-      const itemJM = await PatrolReport.find({ location: 'Jamek Mosque' }).sort({ date: -1 });
-      const itemCM = await PatrolReport.find({ location: 'City Mosque' }).sort({ date: -1 });
-      const itemRS = await PatrolReport.find({ location: 'Raudhatul Sakinah' }).sort({ date: -1 });
+      const itemJM = await PatrolReport.find({ location: 'Jamek Mosque' }).sort(
+        { date: -1 }
+      );
+      const itemCM = await PatrolReport.find({ location: 'City Mosque' }).sort({
+        date: -1
+      });
+      const itemRS = await PatrolReport.find({
+        location: 'Raudhatul Sakinah'
+      }).sort({ date: -1 });
 
       if (itemReports.length > 0) {
         res.render('patrol-report-view', {
@@ -655,14 +666,22 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
     const customListName = _.upperCase(req.params.customListName);
 
     if (checkUser) {
-      const itemReports = await PatrolReport.find({}).sort({ date: -1});
-      const itemBMI = await PatrolReport.find({ location: 'Baitul Makmur I' }).sort({ date: -1 });
+      const itemReports = await PatrolReport.find({}).sort({ date: -1 });
+      const itemBMI = await PatrolReport.find({
+        location: 'Baitul Makmur I'
+      }).sort({ date: -1 });
       const itemBMII = await PatrolReport.find({
         location: 'Baitul Makmur II'
       }).sort({ date: -1 });
-      const itemJM = await PatrolReport.find({ location: 'Jamek Mosque' }).sort({ date: -1 });
-      const itemCM = await PatrolReport.find({ location: 'City Mosque' }).sort({ date: -1 });
-      const itemRS = await PatrolReport.find({ location: 'Raudhatul Sakinah' }).sort({ date: -1 });
+      const itemJM = await PatrolReport.find({ location: 'Jamek Mosque' }).sort(
+        { date: -1 }
+      );
+      const itemCM = await PatrolReport.find({ location: 'City Mosque' }).sort({
+        date: -1
+      });
+      const itemRS = await PatrolReport.find({
+        location: 'Raudhatul Sakinah'
+      }).sort({ date: -1 });
 
       // check customlistname
       if (customListName === 'BMI') {
@@ -1136,7 +1155,9 @@ app
             const itemJM = await PatrolReport.find({
               location: 'Jamek Mosque'
             }).sort({ date: -1 });
-            const itemCM = await PatrolReport.find({ location: 'City Mosque' }).sort({ date: -1 });
+            const itemCM = await PatrolReport.find({
+              location: 'City Mosque'
+            }).sort({ date: -1 });
             const itemRS = await PatrolReport.find({
               location: 'Raudhatul Sakinah'
             }).sort({ date: -1 });
@@ -1209,7 +1230,9 @@ app
             const itemJM = await PatrolReport.find({
               location: 'Jamek Mosque'
             }).sort({ date: -1 });
-            const itemCM = await PatrolReport.find({ location: 'City Mosque' }).sort({ date: -1 });
+            const itemCM = await PatrolReport.find({
+              location: 'City Mosque'
+            }).sort({ date: -1 });
             const itemRS = await PatrolReport.find({
               location: 'Raudhatul Sakinah'
             }).sort({ date: -1 });
@@ -1552,14 +1575,28 @@ app.get('/case-report/view', async function (req, res) {
     const checkUser = await User.findOne({ username: currentUsername });
 
     if (checkUser) {
-      const itemReports = await CaseReport.find({username:checkUser.username}).sort({ date: -1 });
-      const itemBMI = await CaseReport.find({ location: 'Baitul Makmur I',username:checkUser.username }).sort({ date: -1 });
+      const itemReports = await CaseReport.find({
+        username: checkUser.username
+      }).sort({ date: -1 });
+      const itemBMI = await CaseReport.find({
+        location: 'Baitul Makmur I',
+        username: checkUser.username
+      }).sort({ date: -1 });
       const itemBMII = await CaseReport.find({
         location: 'Baitul Makmur II'
       }).sort({ date: -1 });
-      const itemJM = await CaseReport.find({ location: 'Jamek Mosque',username:checkUser.username }).sort({ date: -1 });
-      const itemCM = await CaseReport.find({ location: 'City Mosque',username:checkUser.username }).sort({ date: -1 });
-      const itemRS = await CaseReport.find({ location: 'Raudhatul Sakinah',username:checkUser.username }).sort({ date: -1 });
+      const itemJM = await CaseReport.find({
+        location: 'Jamek Mosque',
+        username: checkUser.username
+      }).sort({ date: -1 });
+      const itemCM = await CaseReport.find({
+        location: 'City Mosque',
+        username: checkUser.username
+      }).sort({ date: -1 });
+      const itemRS = await CaseReport.find({
+        location: 'Raudhatul Sakinah',
+        username: checkUser.username
+      }).sort({ date: -1 });
 
       if (itemReports.length > 0) {
         res.render('case-report-view', {
@@ -1627,14 +1664,29 @@ app.get('/case-report/view/:customListName', async function (req, res) {
     const customListName = _.upperCase(req.params.customListName);
 
     if (checkUser) {
-      const itemReports = await CaseReport.find({username:checkUser.username});
-      const itemBMI = await CaseReport.find({ location: 'Baitul Makmur I',username:checkUser.username });
-      const itemBMII = await CaseReport.find({
-        location: 'Baitul Makmur II',username:checkUser.username
+      const itemReports = await CaseReport.find({
+        username: checkUser.username
       });
-      const itemJM = await CaseReport.find({ location: 'Jamek Mosque',username:checkUser.username });
-      const itemCM = await CaseReport.find({ location: 'City Mosque',username:checkUser.username });
-      const itemRS = await CaseReport.find({ location: 'Raudhatul Sakinah',username:checkUser.username });
+      const itemBMI = await CaseReport.find({
+        location: 'Baitul Makmur I',
+        username: checkUser.username
+      });
+      const itemBMII = await CaseReport.find({
+        location: 'Baitul Makmur II',
+        username: checkUser.username
+      });
+      const itemJM = await CaseReport.find({
+        location: 'Jamek Mosque',
+        username: checkUser.username
+      });
+      const itemCM = await CaseReport.find({
+        location: 'City Mosque',
+        username: checkUser.username
+      });
+      const itemRS = await CaseReport.find({
+        location: 'Raudhatul Sakinah',
+        username: checkUser.username
+      });
 
       // check customlistname
       if (customListName === 'BMI') {
@@ -2109,19 +2161,28 @@ app
           const checkUser = await User.findOne({ username: currentUsername });
 
           if (checkUser) {
-            const itemReports = await CaseReport.find({username:checkUser.username}).sort({ date: -1 });
+            const itemReports = await CaseReport.find({
+              username: checkUser.username
+            }).sort({ date: -1 });
             const itemBMI = await CaseReport.find({
-              location: 'Baitul Makmur I',username:checkUser.username
+              location: 'Baitul Makmur I',
+              username: checkUser.username
             }).sort({ date: -1 });
             const itemBMII = await CaseReport.find({
-              location: 'Baitul Makmur II',username:checkUser.username
+              location: 'Baitul Makmur II',
+              username: checkUser.username
             }).sort({ date: -1 });
             const itemJM = await CaseReport.find({
-              location: 'Jamek Mosque',username:checkUser.username
+              location: 'Jamek Mosque',
+              username: checkUser.username
             }).sort({ date: -1 });
-            const itemCM = await CaseReport.find({ location: 'City Mosque',username:checkUser.username }).sort({ date: -1 });
+            const itemCM = await CaseReport.find({
+              location: 'City Mosque',
+              username: checkUser.username
+            }).sort({ date: -1 });
             const itemRS = await CaseReport.find({
-              location: 'Raudhatul Sakinah',username:checkUser.username
+              location: 'Raudhatul Sakinah',
+              username: checkUser.username
             }).sort({ date: -1 });
 
             if (itemReports.length > 0) {
@@ -2182,19 +2243,28 @@ app
           const checkUser = await User.findOne({ username: currentUsername });
 
           if (checkUser) {
-            const itemReports = await CaseReport.find({username:checkUser.username}).sort({ date: -1 });
+            const itemReports = await CaseReport.find({
+              username: checkUser.username
+            }).sort({ date: -1 });
             const itemBMI = await CaseReport.find({
-              location: 'Baitul Makmur I',username:checkUser.username
+              location: 'Baitul Makmur I',
+              username: checkUser.username
             }).sort({ date: -1 });
             const itemBMII = await CaseReport.find({
-              location: 'Baitul Makmur II',username:checkUser.username
+              location: 'Baitul Makmur II',
+              username: checkUser.username
             }).sort({ date: -1 });
             const itemJM = await CaseReport.find({
-              location: 'Jamek Mosque',username:checkUser.username
+              location: 'Jamek Mosque',
+              username: checkUser.username
             }).sort({ date: -1 });
-            const itemCM = await CaseReport.find({ location: 'City Mosque',username:checkUser.username });
+            const itemCM = await CaseReport.find({
+              location: 'City Mosque',
+              username: checkUser.username
+            });
             const itemRS = await CaseReport.find({
-              location: 'Raudhatul Sakinah',username:checkUser.username
+              location: 'Raudhatul Sakinah',
+              username: checkUser.username
             }).sort({ date: -1 });
 
             if (itemReports.length > 0) {
@@ -2258,17 +2328,23 @@ app
         if (checkUser) {
           const itemReports = await CaseReport.find({}).sort({ date: -1 });
           const itemBMI = await CaseReport.find({
-            location: 'Baitul Makmur I',username:checkUser.username
+            location: 'Baitul Makmur I',
+            username: checkUser.username
           }).sort({ date: -1 });
           const itemBMII = await CaseReport.find({
-            location: 'Baitul Makmur II',username:checkUser.username
+            location: 'Baitul Makmur II',
+            username: checkUser.username
           }).sort({ date: -1 });
           const itemJM = await CaseReport.find({
-            location: 'Jamek Mosque',username:checkUser.username
+            location: 'Jamek Mosque',
+            username: checkUser.username
           }).sort({ date: -1 });
-          const itemCM = await CaseReport.find({ location: 'City Mosque' }).sort({ date: -1 });
+          const itemCM = await CaseReport.find({
+            location: 'City Mosque'
+          }).sort({ date: -1 });
           const itemRS = await CaseReport.find({
-            location: 'Raudhatul Sakinah',username:checkUser.username
+            location: 'Raudhatul Sakinah',
+            username: checkUser.username
           }).sort({ date: -1 });
 
           if (itemReports.length > 0) {
@@ -2735,15 +2811,21 @@ app
 
           if (checkUser) {
             // schedules
-            const itemSchedules = await Schedule.find({}).sort({ startDate: -1 });
+            const itemSchedules = await Schedule.find({}).sort({
+              startDate: -1
+            });
             const itemBMI = await Schedule.find({
               location: 'Baitul Makmur I'
             }).sort({ startDate: -1 });
             const itemBMII = await Schedule.find({
               location: 'Baitul Makmur II'
             }).sort({ startDate: -1 });
-            const itemJM = await Schedule.find({ location: 'Jamek Mosque' }).sort({ startDate: -1 });
-            const itemCM = await Schedule.find({ location: 'City Mosque' }).sort({ startDate: -1 });
+            const itemJM = await Schedule.find({
+              location: 'Jamek Mosque'
+            }).sort({ startDate: -1 });
+            const itemCM = await Schedule.find({
+              location: 'City Mosque'
+            }).sort({ startDate: -1 });
             const itemRS = await Schedule.find({
               location: 'Raudhatul Sakinah'
             }).sort({ startDate: -1 });
@@ -2813,15 +2895,21 @@ app
 
           if (checkUser) {
             // schedules
-            const itemSchedules = await Schedule.find({}).sort({ startDate: -1 });
+            const itemSchedules = await Schedule.find({}).sort({
+              startDate: -1
+            });
             const itemBMI = await Schedule.find({
               location: 'Baitul Makmur I'
             }).sort({ startDate: -1 });
             const itemBMII = await Schedule.find({
               location: 'Baitul Makmur II'
             }).sort({ startDate: -1 });
-            const itemJM = await Schedule.find({ location: 'Jamek Mosque' }).sort({ startDate: -1 });
-            const itemCM = await Schedule.find({ location: 'City Mosque' }).sort({ startDate: -1 });
+            const itemJM = await Schedule.find({
+              location: 'Jamek Mosque'
+            }).sort({ startDate: -1 });
+            const itemCM = await Schedule.find({
+              location: 'City Mosque'
+            }).sort({ startDate: -1 });
             const itemRS = await Schedule.find({
               location: 'Raudhatul Sakinah'
             }).sort({ startDate: -1 });
@@ -2898,8 +2986,12 @@ app
           const itemBMII = await Schedule.find({
             location: 'Baitul Makmur II'
           }).sort({ startDate: -1 });
-          const itemJM = await Schedule.find({ location: 'Jamek Mosque' }).sort({ startDate: -1 });
-          const itemCM = await Schedule.find({ location: 'City Mosque' }).sort({ startDate: -1 });
+          const itemJM = await Schedule.find({ location: 'Jamek Mosque' }).sort(
+            { startDate: -1 }
+          );
+          const itemCM = await Schedule.find({ location: 'City Mosque' }).sort({
+            startDate: -1
+          });
           const itemRS = await Schedule.find({
             location: 'Raudhatul Sakinah'
           }).sort({ startDate: -1 });
@@ -3001,13 +3093,19 @@ app.get('/schedule', async function (req, res) {
     if (checkUser) {
       // schedules
       const itemSchedules = await Schedule.find({}).sort({ startDate: -1 });
-      const itemBMI = await Schedule.find({ location: 'Baitul Makmur I' }).sort({ startDate: -1 });
+      const itemBMI = await Schedule.find({ location: 'Baitul Makmur I' }).sort(
+        { startDate: -1 }
+      );
       const itemBMII = await Schedule.find({
         location: 'Baitul Makmur II'
       }).sort({ startDate: -1 });
-      const itemJM = await Schedule.find({ location: 'Jamek Mosque' }).sort({ startDate: -1 });
+      const itemJM = await Schedule.find({ location: 'Jamek Mosque' }).sort({
+        startDate: -1
+      });
       const itemCM = await Schedule.find({ location: 'City Mosque' });
-      const itemRS = await Schedule.find({ location: 'Raudhatul Sakinah' }).sort({ startDate: -1 });
+      const itemRS = await Schedule.find({
+        location: 'Raudhatul Sakinah'
+      }).sort({ startDate: -1 });
 
       // schedules file
       const itemFiles = await FileSchedule.find({});
@@ -3081,13 +3179,21 @@ app.get('/schedule/:customListName', async function (req, res) {
     if (checkUser) {
       // schedules
       const itemSchedules = await Schedule.find({}).sort({ startDate: -1 });
-      const itemBMI = await Schedule.find({ location: 'Baitul Makmur I' }).sort({ startDate: -1 });
+      const itemBMI = await Schedule.find({ location: 'Baitul Makmur I' }).sort(
+        { startDate: -1 }
+      );
       const itemBMII = await Schedule.find({
         location: 'Baitul Makmur II'
       }).sort({ startDate: -1 });
-      const itemJM = await Schedule.find({ location: 'Jamek Mosque' }).sort({ startDate: -1 });
-      const itemCM = await Schedule.find({ location: 'City Mosque' }).sort({ startDate: -1 });
-      const itemRS = await Schedule.find({ location: 'Raudhatul Sakinah' }).sort({ startDate: -1 });
+      const itemJM = await Schedule.find({ location: 'Jamek Mosque' }).sort({
+        startDate: -1
+      });
+      const itemCM = await Schedule.find({ location: 'City Mosque' }).sort({
+        startDate: -1
+      });
+      const itemRS = await Schedule.find({
+        location: 'Raudhatul Sakinah'
+      }).sort({ startDate: -1 });
 
       // schedules file
       const itemFiles = await FileSchedule.find({});
@@ -3836,13 +3942,21 @@ app.get('/duty-handover/view', async function (req, res) {
 
     if (checkUser) {
       const itemReports = await DutyHandover.find({}).sort({ date: -1 });
-      const itemBMI = await DutyHandover.find({ location: 'Baitul Makmur I' }).sort({ date: -1 });
+      const itemBMI = await DutyHandover.find({
+        location: 'Baitul Makmur I'
+      }).sort({ date: -1 });
       const itemBMII = await DutyHandover.find({
         location: 'Baitul Makmur II'
       }).sort({ date: -1 });
-      const itemJM = await DutyHandover.find({ location: 'Jamek Mosque' }).sort({ date: -1 });
-      const itemCM = await DutyHandover.find({ location: 'City Mosque' }).sort({ date: -1 });
-      const itemRS = await DutyHandover.find({ location: 'Raudhatul Sakinah' }).sort({ date: -1 });
+      const itemJM = await DutyHandover.find({ location: 'Jamek Mosque' }).sort(
+        { date: -1 }
+      );
+      const itemCM = await DutyHandover.find({ location: 'City Mosque' }).sort({
+        date: -1
+      });
+      const itemRS = await DutyHandover.find({
+        location: 'Raudhatul Sakinah'
+      }).sort({ date: -1 });
 
       if (itemReports.length > 0) {
         res.render('duty-handover-view', {
@@ -3911,13 +4025,21 @@ app.get('/duty-handover/view/:customListName', async function (req, res) {
 
     if (checkUser) {
       const itemReports = await DutyHandover.find({}).sort({ date: -1 });
-      const itemBMI = await DutyHandover.find({ location: 'Baitul Makmur I' }).sort({ date: -1 });
+      const itemBMI = await DutyHandover.find({
+        location: 'Baitul Makmur I'
+      }).sort({ date: -1 });
       const itemBMII = await DutyHandover.find({
         location: 'Baitul Makmur II'
       }).sort({ date: -1 });
-      const itemJM = await DutyHandover.find({ location: 'Jamek Mosque' }).sort({ date: -1 });
-      const itemCM = await DutyHandover.find({ location: 'City Mosque' }).sort({ date: -1 });
-      const itemRS = await DutyHandover.find({ location: 'Raudhatul Sakinah' }).sort({ date: -1 });
+      const itemJM = await DutyHandover.find({ location: 'Jamek Mosque' }).sort(
+        { date: -1 }
+      );
+      const itemCM = await DutyHandover.find({ location: 'City Mosque' }).sort({
+        date: -1
+      });
+      const itemRS = await DutyHandover.find({
+        location: 'Raudhatul Sakinah'
+      }).sort({ date: -1 });
 
       // check customlistname
       if (customListName === 'BMI') {
@@ -4432,7 +4554,9 @@ app
             const itemJM = await DutyHandover.find({
               location: 'Jamek Mosque'
             }).sort({ date: -1 });
-            const itemCM = await DutyHandover.find({ location: 'City Mosque' }).sort({ date: -1 });
+            const itemCM = await DutyHandover.find({
+              location: 'City Mosque'
+            }).sort({ date: -1 });
             const itemRS = await DutyHandover.find({
               location: 'Raudhatul Sakinah'
             }).sort({ date: -1 });
@@ -4505,7 +4629,9 @@ app
             const itemJM = await DutyHandover.find({
               location: 'Jamek Mosque'
             }).sort({ date: -1 });
-            const itemCM = await DutyHandover.find({ location: 'City Mosque' }).sort({ date: -1 });
+            const itemCM = await DutyHandover.find({
+              location: 'City Mosque'
+            }).sort({ date: -1 });
             const itemRS = await DutyHandover.find({
               location: 'Raudhatul Sakinah'
             }).sort({ date: -1 });
@@ -4579,7 +4705,9 @@ app
           const itemJM = await DutyHandover.find({
             location: 'Jamek Mosque'
           }).sort({ date: -1 });
-          const itemCM = await DutyHandover.find({ location: 'City Mosque' }).sort({ date: -1 });
+          const itemCM = await DutyHandover.find({
+            location: 'City Mosque'
+          }).sort({ date: -1 });
           const itemRS = await DutyHandover.find({
             location: 'Raudhatul Sakinah'
           }).sort({ date: -1 });
@@ -5042,7 +5170,7 @@ app.get('/sign-out', function (req, res) {
   });
 });
 
-//check server
-app.listen(3000, function () {
-  console.log('Server started on port 3000.');
-});
+const PORT = process.env.PORT || 5001
+
+app.get('/cool', (req, res) => res.send(cool()));
+app.listen(PORT, () => console.log(`Listening on ${PORT}`));
