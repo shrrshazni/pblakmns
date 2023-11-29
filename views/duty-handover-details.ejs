@@ -582,7 +582,7 @@
                           id="givestaffonsickleave"
                           class="border border-primary-300 rounded-3 p-2"
                         >
-                          <%= receiveStaffSickLeave%>
+                          <%= receiveStaffSickLeave %>
                         </p>
                       </div>
                       <div class="col-12 col-xxl-6 mb-3">
@@ -664,49 +664,73 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="verticallyCenteredModalLabel">
-          Modal title
-        </h5>
+        <h5 class="modal-title" id="verticallyCenteredModalLabel">Notes</h5>
         <button
           class="btn p-1"
           type="button"
           data-bs-dismiss="modal"
           aria-label="Close"
         >
-          <svg
-            class="svg-inline--fa fa-xmark fs--1"
-            aria-hidden="true"
-            focusable="false"
-            data-prefix="fas"
-            data-icon="xmark"
-            role="img"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 320 512"
-            data-fa-i2svg=""
+          <span class="fas fa-times fs--1"></span>
+        </button>
+      </div>
+
+      <div class="modal-body row">
+        <form action="/notes-update/duty-handover" method="post" id="notesUpdateForm">
+          <div class="col-12 gy-4">
+            <textarea
+              class="form-control scrollbar-overlay mb-3"
+              id="notesInput"
+              placeholder="Leave a note here"
+              style="height: 75px"
+              name="notes"
+            ></textarea>
+          </div>
+
+          <input
+            type="text"
+            style="display: none"
+            value="<%= reportId %>"
+            name="confirmRid"
+          />
+
+          <button
+            class="btn btn-primary myButton"
+            type="submit"
+            id="updateNotes"
           >
-            <path
-              fill="currentColor"
-              d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z"
-            ></path></svg
-          ><!-- <span class="fas fa-times fs--1"></span> Font Awesome fontawesome.com -->
-        </button>
+            <div class="btn-content">Update</div>
+          </button>
+        </form>
       </div>
-      <div class="modal-body">
-        <p class="text-700 lh-lg mb-0">
-          This is a static modal example (meaning its position and display have
-          been overridden). Included are the modal header, modal body (required
-          for padding), and modal footer (optional).
-        </p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary" type="button">Okay</button>
-        <button
-          class="btn btn-outline-primary"
-          type="button"
-          data-bs-dismiss="modal"
-        >
-          Cancel
-        </button>
+    </div>
+  </div>
+
+  <!-- alert toast upload -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+    <div class="d-flex">
+      <div
+        class="toast align-items-center text-white bg-primary border-0 light"
+        role="alert"
+        data-bs-autohide="false"
+        aria-live="assertive"
+        aria-atomic="true"
+        id="alertUpdateToast"
+      >
+        <div class="d-flex justify-content-between">
+          <div class="toast-body px-0 py-3">
+            <code id="notesAlertContent" class="text-white"></code>
+          </div>
+
+          <button
+            class="btn ms-2 p-0 btn-close-white"
+            type="button"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          >
+            <span class="uil uil-times fs-1"></span>
+          </button>
+        </div>
       </div>
     </div>
   </div>

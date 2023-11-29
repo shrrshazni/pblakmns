@@ -47,27 +47,50 @@
 <script src="/assets/js/flatpickr.js"></script>
 
 <script>
+  // print
+  $(document).ready(function () {
+    $('#printLink').on('click', function () {
+      window.print();
+      return false; // Prevent the default behavior of the link
+    });
+  });
+
   // button loading function
   $(document).ready(function () {
     $('.myButton').on('click', function () {
-      // Add the loading class
-      // $('.btn-status').addClass('spinner-border');
-      // $('.btn-status').addClass('spinner-border-sm');
-      // $('.btn-content').addClass('visually-hidden');
       $('.myButton').addClass('loading');
       $('.btn-content').addClass('noshow');
-      // $('.myButton').prop('disabled', true);
 
-      // Simulate a delay (replace this with your actual loading logic)
       setTimeout(function () {
-        // Remove the loading class after the loading is complete
-        // $('.btn-status').removeClass('spinner-border');
-        // $('.btn-status').removeClass('spinner-border-sm');
-        // $('.btn-content').removeClass('visually-hidden');
         $('.myButton').removeClass('loading');
         $('.btn-content').removeClass('noshow');
-        // $('.myButton').prop('disabled', false);
-      }, 3000); // Replace 3000 with the duration of your loading process in milliseconds
+      }, 2500);
+    });
+  });
+
+  //update notes
+  $(document).ready(function () {
+    // Function to show the toast
+    function showNotesUpdateToast(content) {
+      $('#notesAlertContent').text(content);
+
+      var toast = new bootstrap.Toast(
+        document.getElementById('alertUpdateToast')
+      );
+      toast.show();
+    }
+
+    $('#updateNotes').on('click', function () {
+      setTimeout(function () {
+        var notes = $('#notesInput').val();
+        // Check if the fields are not empty
+        if (notes === '') {
+          showNotesUpdateToast('Please fill in notes field.');
+        } else {
+          // Perform your update logic here
+          showNotesUpdateToast('Form submitted successfully!');
+        }
+      }, 2000);
     });
   });
 
@@ -153,7 +176,7 @@
       // Check if there are files selected
       if (files.length > 0) {
         // Log or process the first file in the array
-        showProfileToast('Queued file:', files[0].name);
+        showProfileToast('Queued file submitted');
       } else {
         showProfileToast('No file selected.');
       }

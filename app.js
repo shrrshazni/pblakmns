@@ -19,7 +19,8 @@ const dateLocal = require('./public/assets/js/date');
 // const { string, check } = require('yargs');
 const cool = require('cool-ascii-faces');
 
-const mongoURI = 'mongodb+srv://shrrshazni:protechlakmns123@cluster0.rembern.mongodb.net/sessions';
+const mongoURI =
+  'mongodb+srv://shrrshazni:protechlakmns123@cluster0.rembern.mongodb.net/sessions';
 
 const app = express();
 
@@ -104,10 +105,7 @@ let transporter = nodemailer.createTransport({
   }
 });
 
-//PAGES INITIALISATION
-
 //HOME
-
 app.get('/', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -128,7 +126,6 @@ app.get('/', async function (req, res) {
 });
 
 // SIGN IN
-
 app
   .get('/sign-in', function (req, res) {
     res.render('sign-in', {
@@ -229,7 +226,6 @@ app
   });
 
 //SIGN UP
-
 app
   .get('/sign-up', function (req, res) {
     res.render('sign-up');
@@ -259,7 +255,6 @@ app
   });
 
 //FORGOT PASSWORD
-
 app
   .get('/forgot-password', function (req, res) {
     res.render('forgot-password', {
@@ -302,7 +297,9 @@ app
     }
 
     if (validationEmail === 'is-valid') {
-      const resetPasswordUrl = 'https://whispering-coast-01823-a731e7840e6b.herokuapp.com/reset-password/' + userId;
+      const resetPasswordUrl =
+        'https://whispering-coast-01823-a731e7840e6b.herokuapp.com/reset-password/' +
+        userId;
 
       let mailOptions = {
         from: 'shrrshazni@gmail.com',
@@ -442,27 +439,25 @@ app
     }
   });
 
-// iTEM ACTIVITY
-
-const itemActivitySchema = new mongoose.Schema({
-  time: String,
-  by: String,
-  username: String,
-  type: String,
-  title: String,
-  about: String
-});
+// // iTEM ACTIVITY SCHEMA
+// const itemActivitySchema = new mongoose.Schema({
+//   time: String,
+//   by: String,
+//   username: String,
+//   type: String,
+//   title: String,
+//   about: String
+// });
 
 // ACTIVITY
 const ActivitySchema = new mongoose.Schema({
   date: String,
-  items: [itemActivitySchema]
+  items: []
 });
 
 const Activity = mongoose.model('Activity', ActivitySchema);
 
-// FILES
-// Define a schema for your model (e.g., for storing file metadata)
+// FILES SCHEMA MODEL
 const FileSchema = new mongoose.Schema({
   reportId: String,
   by: String,
@@ -474,9 +469,9 @@ const FileSchema = new mongoose.Schema({
 
 const File = mongoose.model('File', FileSchema);
 
-//PATROL REPORT SECTION
+// PATROL REPORT SECTION
 
-//patrol schema init
+// PATROL SCHEMA
 const patrolReportSchema = new mongoose.Schema({
   reportId: String,
   username: String,
@@ -492,7 +487,7 @@ const patrolReportSchema = new mongoose.Schema({
 
 const PatrolReport = mongoose.model('PatrolReport', patrolReportSchema);
 
-// for upload report files
+// UPLOAD FILES PATROL REPORT
 app.post('/upload-patrol', async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
     console.log('There is no files selected');
@@ -576,7 +571,7 @@ app.post('/upload-patrol', async (req, res) => {
   }
 });
 
-// view
+// VIEW
 app.get('/patrol-report/view', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -658,7 +653,7 @@ app.get('/patrol-report/view', async function (req, res) {
   }
 });
 
-// view custom name list other locations
+// VIEW CUSTOM NAME LIST BASED ON LOCATION
 app.get('/patrol-report/view/:customListName', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -959,7 +954,7 @@ app.get('/patrol-report/view/:customListName', async function (req, res) {
   }
 });
 
-//submit form
+// SUBMIT REPORT FORM
 app
   .get('/patrol-report/submit', async function (req, res) {
     if (req.isAuthenticated()) {
@@ -1395,7 +1390,7 @@ app
     }
   });
 
-//details
+// REPORT DETAILS
 app.get('/patrol-report/details', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -1424,6 +1419,7 @@ app.get('/patrol-report/details', async function (req, res) {
             endTime: checkReport.end,
             reportSummary: checkReport.summary,
             notes: checkReport.notes,
+            reportId: reportId,
             // files
             files: checkFiles
           });
@@ -1440,6 +1436,7 @@ app.get('/patrol-report/details', async function (req, res) {
             endTime: checkReport.end,
             reportSummary: checkReport.summary,
             notes: checkReport.notes,
+            reportId: reportId,
             // files
             files: checkFiles
           });
@@ -1456,7 +1453,8 @@ app.get('/patrol-report/details', async function (req, res) {
           endTime: '',
           reportSummary: '',
           notes: '',
-          files: ''
+          files: '',
+          reportId: ''
         });
       }
     }
@@ -1465,9 +1463,9 @@ app.get('/patrol-report/details', async function (req, res) {
   }
 });
 
-//CASE REPORT
+// CASE REPORT
 
-// case schema init
+// CASE SCHEMA/MODEL
 const caseReportSchema = new mongoose.Schema({
   reportId: String,
   username: String,
@@ -1479,12 +1477,13 @@ const caseReportSchema = new mongoose.Schema({
   summary: String,
   actionTaken: String,
   eventSummary: String,
-  staffOnDuty: String
+  staffOnDuty: String,
+  notes: String
 });
 
 const CaseReport = mongoose.model('CaseReport', caseReportSchema);
 
-// for upload report files
+// UPLOAD FILES CASE REPORT
 app.post('/upload-case', async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
     console.log('There is no files selected');
@@ -1568,7 +1567,7 @@ app.post('/upload-case', async (req, res) => {
   }
 });
 
-// view
+// VIEW
 app.get('/case-report/view', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -1656,7 +1655,7 @@ app.get('/case-report/view', async function (req, res) {
   }
 });
 
-// view custom name list other locations
+// VIEW CUSTOM NAME LIST BASED ON LOCATIONS
 app.get('/case-report/view/:customListName', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -1964,7 +1963,7 @@ app.get('/case-report/view/:customListName', async function (req, res) {
   }
 });
 
-//submit form
+// SUBMIT REPORT FORM
 app
   .get('/case-report/submit', async function (req, res) {
     if (req.isAuthenticated()) {
@@ -2148,7 +2147,8 @@ app
         actionTaken: actionTaken,
         eventSummary: eventSummary,
         staffOnDuty: staffOnDuty,
-        location: location
+        location: location,
+        notes: ''
       });
 
       const existing = await CaseReport.findOne({ reportId: confirmRid });
@@ -2433,7 +2433,7 @@ app
     }
   });
 
-//case-report-details
+// DETAILS
 app.get('/case-report/details', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -2464,6 +2464,8 @@ app.get('/case-report/details', async function (req, res) {
             actionTaken: checkReport.actionTaken,
             eventSummary: checkReport.eventSummary,
             staffOnDuty: checkReport.staffOnDuty,
+            notes: checkReport.notes,
+            reportId: checkReport.reportId,
             // files
             files: checkFiles
           });
@@ -2482,6 +2484,8 @@ app.get('/case-report/details', async function (req, res) {
             actionTaken: checkReport.actionTaken,
             eventSummary: checkReport.eventSummary,
             staffOnDuty: checkReport.staffOnDuty,
+            notes: checkReport.notes,
+            reportId: checkReport.reportId,
             // files
             files: checkFiles
           });
@@ -2491,6 +2495,7 @@ app.get('/case-report/details', async function (req, res) {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
           currentProfile: checkUser.profile,
+          reportId: '',
           reportType: '',
           madeBy: '',
           pbNumber: '',
@@ -2500,7 +2505,8 @@ app.get('/case-report/details', async function (req, res) {
           actionTaken: '',
           eventSummary: '',
           staffOnDuty: '',
-          files: ''
+          files: '',
+          notes: ''
         });
       }
     }
@@ -2511,7 +2517,7 @@ app.get('/case-report/details', async function (req, res) {
 
 // SCHEDULE
 
-// schedule schema init
+// SCHEDULE SCHEMA/MODEL
 const scheduleSchema = new mongoose.Schema({
   reportId: String,
   by: String,
@@ -2526,8 +2532,7 @@ const scheduleSchema = new mongoose.Schema({
 
 const Schedule = mongoose.model('Schedule', scheduleSchema);
 
-// file schedule schema init
-
+// FILES SCHEDULE SCHEMA/MODEL
 const fileScheduleSchema = new mongoose.Schema({
   reportId: String,
   by: String,
@@ -2539,7 +2544,7 @@ const fileScheduleSchema = new mongoose.Schema({
 
 const FileSchedule = mongoose.model('FileSchedule', fileScheduleSchema);
 
-// schedule file upload
+// UPLOAD FILE SCHEDULE
 app.post('/upload-schedule', async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
     console.log('There is no files selected');
@@ -2623,7 +2628,7 @@ app.post('/upload-schedule', async (req, res) => {
   }
 });
 
-// schedule submit
+// SUBMIT FORM
 app
   .get('/schedule/submit', async function (req, res) {
     if (req.isAuthenticated()) {
@@ -3085,6 +3090,7 @@ app
     }
   });
 
+// VIEW
 app.get('/schedule', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -3170,6 +3176,7 @@ app.get('/schedule', async function (req, res) {
   }
 });
 
+// VIEW CUSTOM NAME LIST BASED ON LOCATION
 app.get('/schedule/:customListName', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -3486,6 +3493,7 @@ app.get('/schedule/:customListName', async function (req, res) {
 
 //PROFILE
 
+// SHOW PROFILE
 app.get('/social/profile', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -3542,7 +3550,6 @@ app.get('/social/profile', async function (req, res) {
 });
 
 //SETTINGS
-
 app.get('/social/settings', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -3579,6 +3586,7 @@ app.get('/social/settings', async function (req, res) {
   }
 });
 
+// SUBMIT SETTINGS
 app.post('/social/settings/:customListName', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -3910,6 +3918,9 @@ app.post('/social/settings/:customListName', async function (req, res) {
   }
 });
 
+// DUTY HANDOVER
+
+// DUTY HANDOVER SCHEMA/MODEL
 const dutyHandoverSchema = new mongoose.Schema({
   reportId: String,
   giveShift: String,
@@ -3934,7 +3945,7 @@ const dutyHandoverSchema = new mongoose.Schema({
 
 const DutyHandover = mongoose.model('DutyHandover', dutyHandoverSchema);
 
-// view
+// VIEW
 app.get('/duty-handover/view', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -4016,7 +4027,7 @@ app.get('/duty-handover/view', async function (req, res) {
   }
 });
 
-// view custom name list other locations
+// VIEW CUSTOM NAME LIST BASE ON LOCATIONS
 app.get('/duty-handover/view/:customListName', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -4317,6 +4328,7 @@ app.get('/duty-handover/view/:customListName', async function (req, res) {
   }
 });
 
+// SUBMIT
 app
   .get('/duty-handover/submit', async function (req, res) {
     if (req.isAuthenticated()) {
@@ -4799,6 +4811,7 @@ app
     }
   });
 
+// DETAILS
 app
   .get('/duty-handover/details', async function (req, res) {
     if (req.isAuthenticated()) {
@@ -5062,52 +5075,7 @@ app
 
       if (updatedHandover) {
         console.log('Update success');
-        res.redirect('/duty-handover/details?id='+ reportId);
-        // res.render('duty-handover-details', {
-        //   currentFullName: checkUser.fullname,
-        //   currentUser: checkUser.username,
-        //   currentProfile: checkUser.profile,
-        //   // duty handover details
-        //   reportId: checkReport.reportId,
-        //   giveShift: checkReport.giveShift,
-        //   giveDate: checkReport.giveDate,
-        //   giveHeadShift: checkReport.giveHeadShift,
-        //   giveStaffOnDuty: checkReport.giveStaffOnDuty,
-        //   giveStaffSickLeave: checkReport.giveStaffSickLeave,
-        //   giveStaffAbsent: checkReport.giveStaffAbsent,
-        //   receiveShift: checkReport.receiveShift,
-        //   receiveDate: checkReport.receiveDate,
-        //   receiveHeadShift: checkReport.receiveHeadShift,
-        //   receiveStaffOnDuty: checkReport.receiveStaffOnDuty,
-        //   receiveStaffSickLeave: checkReport.receiveStaffSickLeave,
-        //   receiveStaffAbsent: checkReport.receiveStaffAbsent,
-        //   giveLog: checkReport.giveLog,
-        //   receiveLog: checkReport.receiveLog,
-        //   location: checkReport.location,
-        //   status: checkReport.status,
-        //   notes: checkReport.notes,
-        //   date: checkReport.giveDate,
-        //   handoverShift: checkReport.handoverShift,
-        //   shift: checkReport.giveShift,
-        //   // input form for receive handover
-        //   headShift: '',
-        //   staffOnDuty: '',
-        //   staffSickLeave: '',
-        //   staffAbsent: '',
-        //   // validation
-        //   validationHeadShift: '',
-        //   validationStaffOnDuty: '',
-        //   validationStaffSickLeave: '',
-        //   validationStaffAbsent: '',
-        //   validationNotes: '',
-        //   // tab-pane
-        //   showTabPane1: '',
-        //   showTabPane2: '',
-        //   showTabPane3: 'active',
-        //   // toast alert
-        //   toastShow: 'show',
-        //   toastMsg: 'The handover duty have completed'
-        // });
+        res.redirect('/duty-handover/details?id=' + reportId);
       } else {
         console.log('Report Id are not exist');
       }
@@ -5162,6 +5130,132 @@ app
     }
   });
 
+// NOTES UPDATE
+
+// SUBMIT BASED ON CUSTOM NAME LIST
+app.post('/notes-update/:customNameList', async function (req, res) {
+  // initialize data
+  const customNameList = req.params.customNameList;
+  const notes = req.body.notes;
+  const reportId = req.body.confirmRid;
+
+  // find current user
+  var currentUsername = req.session.user.username;
+  const checkUser = await User.findOne({ username: currentUsername });
+
+  // initialize updated data
+  const updatedData = {
+    reportId: reportId,
+    notes: notes
+  };
+
+  // initialize activity
+  // current date time
+  var currentTime = dateLocal.getCurrentTime();
+  var currentDate = dateLocal.getDateYear();
+
+  // Activity
+  const newItemActivity = {
+    time: currentTime,
+    by: checkUser.fullName,
+    username: checkUser.username,
+    type: 'Duty Handover',
+    title: 'Updated notes of ' + customNameList,
+    about: notes
+  };
+
+  const newActivity = new Activity({
+    date: currentDate,
+    items: newItemActivity
+  });
+
+  const findDate = await Activity.findOne({ date: currentDate });
+
+  if (findDate) {
+    findDate.items.push(newItemActivity);
+    await findDate.save();
+    console.log('Activity added to existing date');
+  } else {
+    const resultActivity = Activity.create(newActivity);
+
+    if (resultActivity) {
+      console.log('Added new activity');
+    } else {
+      console.log('Something is wrong');
+    }
+  }
+
+  // duty handover
+  if (customNameList === 'duty-handover') {
+    const updatedHandover = await DutyHandover.findOneAndUpdate(
+      { reportId: reportId },
+      { $set: updatedData },
+      { new: true }
+    );
+
+    if (updatedHandover) {
+      console.log('Update success');
+      res.redirect('/duty-handover/details?id=' + reportId);
+    } else {
+      console.log('Report Id are not exist');
+    }
+  } else if (customNameList === 'patrol-report') {
+    const updatedHandover = await PatrolReport.findOneAndUpdate(
+      { reportId: reportId },
+      { $set: updatedData },
+      { new: true }
+    );
+
+    if (updatedHandover) {
+      console.log('Update success');
+      res.redirect('/patrol-report/details?id=' + reportId);
+    } else {
+      console.log('Report Id are not exist');
+    }
+  } else if (customNameList === 'case-report') {
+    const updatedHandover = await CaseReport.findOneAndUpdate(
+      { reportId: reportId },
+      { $set: updatedData },
+      { new: true }
+    );
+
+    if (updatedHandover) {
+      console.log('Update success');
+      res.redirect('/case-report/details?id=' + reportId);
+    } else {
+      console.log('Report Id are not exist');
+    }
+  }
+});
+
+// DOWNLOAD
+app.get('/download/:fileName', async function (req, res) {
+  const fileName = req.params.fileName;
+
+  const file = await File.findOne({ filename: fileName });
+
+  if (!file) {
+    console.log('File are not found');
+    const fileSchedule = await FileSchedule({ filename: fileName });
+
+    if (fileSchedule) {
+      const filePath = __dirname + '/public/uploads/' + file.filename;
+
+      // Send the file as a response
+      res.download(filePath, file.filename);
+      console.log('Downloading file schedule...');
+    }else{
+      console.log("Error downloading");
+    }
+  } else {
+    const filePath = __dirname + '/public/uploads/' + file.filename;
+
+    // Send the file as a response
+    res.download(filePath, file.filename);
+    console.log('Downloading file...');
+  }
+});
+
 // SIGN OUT
 app.get('/sign-out', function (req, res) {
   req.session.destroy(function (err) {
@@ -5172,6 +5266,7 @@ app.get('/sign-out', function (req, res) {
   });
 });
 
+// PORT INITIALIZATION ON CLOUD OR LOCAL (5001)
 const PORT = process.env.PORT || 5001;
 
 app.get('/cool', (req, res) => res.send(cool()));

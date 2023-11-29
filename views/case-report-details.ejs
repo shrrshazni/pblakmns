@@ -135,6 +135,21 @@
         <hr />
         <h3 class="text-1100 mb-4 mt-4">Summary Report</h3>
         <p class="text-800 mb-4"><%= reportSummary %></p>
+
+        <hr />
+        <div class="mt-4">
+          <div class="d-flex align-items-center mb-4">
+            <h3 class="text-1100 me-3">Notes</h3>
+            <button
+              class="btn btn-link p-0"
+              data-bs-toggle="modal"
+              data-bs-target="#modalNotes"
+            >
+              <span class="fa-solid fa-pen"></span>
+            </button>
+          </div>
+          <p class="text-800"><%= notes || '' %></p>
+        </div>
         
       </div>
     </div>
@@ -257,5 +272,93 @@
     </div>
   </div>
 </div>
+
+<div
+  class="modal fade"
+  id="modalNotes"
+  tabindex="-1"
+  aria-labelledby="verticallyCenteredModalLabel"
+  aria-hidden="true"
+  style="display: none"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="verticallyCenteredModalLabel">Notes</h5>
+        <button
+          class="btn p-1"
+          type="button"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <span class="fas fa-times fs--1"></span>
+        </button>
+      </div>
+
+      <div class="modal-body row">
+        <form
+          action="/notes-update/case-report"
+          method="post"
+          id="notesUpdateForm"
+        >
+          <div class="col-12 gy-4">
+            <textarea
+              class="form-control scrollbar-overlay mb-3"
+              id="notesInput"
+              placeholder="Leave a note here"
+              style="height: 75px"
+              name="notes"
+            ><%= reportId %></textarea>
+          </div>
+
+          <input
+            type="text"
+            style="display: none"
+            value="<%= reportId %>"
+            name="confirmRid"
+          />
+
+          <button
+            class="btn btn-primary myButton"
+            type="submit"
+            id="updateNotes"
+          >
+            <div class="btn-content">Update</div>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- alert toast upload -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+    <div class="d-flex">
+      <div
+        class="toast align-items-center text-white bg-primary border-0 light"
+        role="alert"
+        data-bs-autohide="false"
+        aria-live="assertive"
+        aria-atomic="true"
+        id="alertUpdateToast"
+      >
+        <div class="d-flex justify-content-between">
+          <div class="toast-body px-0 py-3">
+            <code id="notesAlertContent" class="text-white"></code>
+          </div>
+
+          <button
+            class="btn ms-2 p-0 btn-close-white"
+            type="button"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          >
+            <span class="uil uil-times fs-1"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <%- include("partials/navbar-script") %> <%- include("partials/footer") %>
