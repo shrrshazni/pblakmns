@@ -105,7 +105,7 @@ let transporter = nodemailer.createTransport({
   }
 });
 
-//HOME
+// HOME
 app.get('/', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -113,12 +113,25 @@ app.get('/', async function (req, res) {
     const checkUser = await User.findOne({ username: currentUsername });
 
     if (checkUser) {
-      res.render('home', {
-        currentFullName: checkUser.fullname,
-        currentUser: checkUser.username,
-        currentProfile: checkUser.profile,
-        rid: crypto.randomBytes(6).toString('hex').toUpperCase()
-      });
+      const selectedNamesDocument = await SelectedNames.findOne();
+
+      if (selectedNamesDocument) {
+        res.render('home', {
+          currentFullName: checkUser.fullname,
+          currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
+          rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+          names: selectedNamesDocument.names
+        });
+      } else {
+        res.render('home', {
+          currentFullName: checkUser.fullname,
+          currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
+          rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+          names: []
+        });
+      }
     }
   } else {
     res.redirect('/sign-in');
@@ -3656,12 +3669,12 @@ app.post('/social/settings/:customListName', async function (req, res) {
 
           if (updatedUser) {
             console.log('Successful update user data');
-            res.render('settings', {
-              currentFullName: checkUser.fullname,
+            res.redirect('/social/settings', {
+              currentFullName: fullName,
               currentUser: checkUser.username,
               currentProfile: checkUser.profile,
-              currentEmail: checkUser.email,
-              currentPhone: checkUser.phone,
+              currentEmail: email,
+              currentPhone: phone,
               // validation
               validationFullName: '',
               validationEmail: '',
@@ -4378,9 +4391,6 @@ app
     var validationDate = '';
     var validationLocation = '';
     var validationHeadShift = '';
-    var validationStaffOnDuty = '';
-    var validationStaffSickLeave = '';
-    var validationStaffAbsent = '';
     var validationNotes = '';
     var validationHandoverShift = '';
 
@@ -4393,8 +4403,6 @@ app
     const date = req.body.date;
     const headShift = req.body.headShift;
     const staffOnDuty = req.body.staffOnDuty;
-    const staffSickLeave = req.body.staffSickLeave;
-    const staffAbsent = req.body.staffAbsent;
     const notes = req.body.notes;
     const handoverShift = req.body.handoverShift;
 
@@ -4433,27 +4441,6 @@ app
       validationHeadShift = 'is-valid';
     }
 
-    // Validate the staffOnDuty
-    if (!staffOnDuty || staffOnDuty === '') {
-      validationStaffOnDuty = 'is-invalid';
-    } else {
-      validationStaffOnDuty = 'is-valid';
-    }
-
-    // Validate the staffSickLeave
-    if (!staffSickLeave || staffSickLeave === '') {
-      validationStaffSickLeave = 'is-invalid';
-    } else {
-      validationStaffSickLeave = 'is-valid';
-    }
-
-    // Validate the staffAbsent
-    if (!staffAbsent || staffAbsent === '') {
-      validationStaffAbsent = 'is-invalid';
-    } else {
-      validationStaffAbsent = 'is-valid';
-    }
-
     // Validate the notes
     if (!notes || notes === '') {
       validationNotes = 'is-invalid';
@@ -4474,8 +4461,6 @@ app
       validationLocation === 'is-valid' &&
       validationHeadShift === 'is-valid' &&
       validationStaffOnDuty === 'is-valid' &&
-      validationStaffSickLeave === 'is-valid' &&
-      validationStaffAbsent === 'is-valid' &&
       validationNotes === 'is-valid' &&
       validationHandoverShift === 'is-valid'
     ) {
@@ -4536,9 +4521,6 @@ app
         giveShift: shift,
         giveDate: date,
         giveHeadShift: headShift,
-        giveStaffOnDuty: staffOnDuty,
-        giveStaffSickLeave: staffSickLeave,
-        giveStaffAbsent: staffAbsent,
         status: status,
         notes: notes,
         location: location,
@@ -4789,9 +4771,6 @@ app
         validationDate: validationDate,
         validationLocation: validationLocation,
         validationHeadShift: validationHeadShift,
-        validationStaffOnDuty: validationStaffOnDuty,
-        validationStaffSickLeave: validationStaffSickLeave,
-        validationStaffAbsent: validationStaffAbsent,
         validationNotes: validationNotes,
         validationHandoverShift: validationHandoverShift,
         //form name
@@ -5244,8 +5223,8 @@ app.get('/download/:fileName', async function (req, res) {
       // Send the file as a response
       res.download(filePath, file.filename);
       console.log('Downloading file schedule...');
-    }else{
-      console.log("Error downloading");
+    } else {
+      console.log('Error downloading');
     }
   } else {
     const filePath = __dirname + '/public/uploads/' + file.filename;
@@ -5253,6 +5232,58 @@ app.get('/download/:fileName', async function (req, res) {
     // Send the file as a response
     res.download(filePath, file.filename);
     console.log('Downloading file...');
+  }
+});
+
+// SEARCH
+app.get('/search', async function (req, res) {
+  const query = req.query.query;
+
+  try {
+    let results;
+    if (query && query.trim() !== '') {
+      results = await User.find({ fullname: { $regex: query, $options: 'i' } });
+    } else {
+      results = [];
+    }
+
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// EXAMPLE SCHEMA
+const SelectedNames = mongoose.model(
+  'SelectedNames',
+  new mongoose.Schema({
+    reportId: String,
+    names: [String]
+  })
+);
+
+// EXAMPLE SAVE
+app.post('/save', async (req, res) => {
+  const { reportId, names } = req.body;
+
+  try {
+    // Find the document with selected names for the given report ID or create a new one if it doesn't exist
+    let selectedNamesDocument = await SelectedNames.findOne({ reportId });
+    if (!selectedNamesDocument) {
+      selectedNamesDocument = new SelectedNames({ reportId });
+    }
+
+    // Add the new names to the existing array
+    selectedNamesDocument.names = [...selectedNamesDocument.names, ...names];
+
+    // Save the updated document
+    const result = await selectedNamesDocument.save();
+
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Internal Server Error');
   }
 });
 

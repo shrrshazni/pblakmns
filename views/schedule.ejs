@@ -340,10 +340,11 @@ itemSchedules.forEach(function (item) { %>
                       <span class="fas fa-ellipsis-h"></span>
                     </button>
                     <div class="dropdown-menu dropdown-menu-end py-2">
-                      <a class="dropdown-item" href="#!">Edit</a
-                      ><a class="dropdown-item text-danger" href="#!">Delete</a
-                      ><a class="dropdown-item" href="#!">Download</a
-                      ><a class="dropdown-item" href="#!">Report abuse</a>
+                      <a
+                        class="dropdown-item"
+                        href="/download/<%= item2.filename %>"
+                        >Download</a
+                      >
                     </div>
                   </div>
                 </div>

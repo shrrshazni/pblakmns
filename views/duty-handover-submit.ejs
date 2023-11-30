@@ -148,57 +148,6 @@
                     <div class="invalid-feedback">Please select a shift.</div>
                   </div>
 
-                  <div class="col-md-12">
-                    <label class="form-label" for="validationCustom03"
-                      >Staff on duty</label
-                    >
-
-                    <input
-                      class="form-control <%= validationStaffOnDuty %>"
-                      id="validationCustom03"
-                      type="text"
-                      name="staffOnDuty"
-                      value="<%= staffOnDuty %>"
-                    />
-                    <div class="invalid-feedback">
-                      Please provide a staff assigned.
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <label class="form-label" for="validationCustom03"
-                      >Staff on sick leave</label
-                    >
-
-                    <input
-                      class="form-control <%= validationStaffSickLeave %>"
-                      id="validationCustom03"
-                      type="text"
-                      name="staffSickLeave"
-                      value="<%= staffSickLeave %>"
-                    />
-                    <div class="invalid-feedback">
-                      Please provide a staff on sick leave.
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <label class="form-label" for="validationCustom03"
-                      >Staff absent</label
-                    >
-
-                    <input
-                      class="form-control <%= validationStaffAbsent %>"
-                      id="validationCustom03"
-                      type="text"
-                      name="staffAbsent"
-                      value="<%= staffAbsent %>"
-                    />
-                    <div class="invalid-feedback">
-                      Please provide a staff absent.
-                    </div>
-                  </div>
-
                   <div class="col-12 gy-4 mb-3">
                     <label class="form-label" for="floatingProjectDescription2"
                       >Notes</label
@@ -218,9 +167,36 @@
                     </div>
                   </div>
 
+                  <div class="col-md-12">
+                    <h4 class="form-label">Staff On Duty</h4>
+                    <div
+                      id="selectedNames"
+                      class="d-flex flex-wrap border border-300 rounded-3 px-2"
+                      style="min-height: 3rem;"
+                    ></div>
+                  </div>
+
+                  <div class="col-md-12">
+                    <label class="form-label" for="validationCustom03"
+                      >Search & Select Staff Name</label
+                    >
+                    <input
+                      type="text"
+                      name="query"
+                      id="queryInput"
+                      class="form-control mb-3"
+                      placeholder="Search staff name here..."
+                    />
+                    <div class="invalid-feedback">
+                      Please provide a staff assigned.
+                    </div>
+                    <div id="results" class="mt-3 mb-3"></div>
+                  </div>
+
                   <input
                     type="text"
                     style="display: none"
+                    id="reportIdInput"
                     value="<%= reportId %>"
                     name="confirmRid"
                   />

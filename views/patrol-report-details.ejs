@@ -2,7 +2,7 @@
 
 <div class="content px-0 pt-9">
   <div class="row g-0">
-    <div class="col-12 col-xxl-10 px-0 bg-soft">
+    <div class="col-12 col-xxl-9 px-0 bg-soft">
       <div class="px-4 px-lg-6 pt-6 pb-9">
         <!-- top header section -->
         <div class="mb-5">
@@ -28,9 +28,9 @@
                 <span class="fas fa-ellipsis-h"></span>
               </button>
               <div class="dropdown-menu dropdown-menu-end py-2">
-                <a class="dropdown-item" href="#!">Edit</a
-                ><a class="dropdown-item text-danger" href="#!">Delete</a
-                ><a class="dropdown-item" href="#!" id="printLink">Print</a>
+                <!-- <a class="dropdown-item" href="#!">Edit</a
+                ><a class="dropdown-item text-danger" href="#!">Delete</a> -->
+                <a class="dropdown-item" href="#!" id="printLink">Print</a>
               </div>
             </div>
           </div>
@@ -142,7 +142,7 @@
     </div>
 
     <div
-      class="col-12 col-xxl-2 px-0 border-start-xxl border-300 border-top-sm"
+      class="col-12 col-xxl-3 px-0 border-start-xxl border-300 border-top-sm"
     >
       <div class="h-100">
         <div class="bg-light dark__bg-1100 min-vh-100">
@@ -175,8 +175,7 @@
                     <span class="fas fa-ellipsis-h"></span>
                   </button>
                   <div class="dropdown-menu dropdown-menu-end py-2">
-                    <a class="dropdown-item text-danger" href="#!">Delete</a
-                    ><a
+                    <a
                       class="dropdown-item"
                       href="/download/<%= item.filename %>"
                       >Download</a
@@ -185,7 +184,7 @@
                 </div>
               </div>
               <div class="d-flex fs--1 text-700 mb-2 flex-wrap">
-                <a href="#!"><%= item.by %> </a
+                <a href="#!"><%= item.by %></a
                 ><span class="text-400 mx-1">| </span
                 ><span class="text-nowrap"><%= item.date %></span>
               </div>
@@ -231,8 +230,7 @@
                     <span class="fas fa-ellipsis-h"></span>
                   </button>
                   <div class="dropdown-menu dropdown-menu-end py-2">
-                    <a class="dropdown-item text-danger" href="#!">Delete</a
-                    ><a
+                    <a
                       class="dropdown-item"
                       href="/download/<%= item.filename %>"
                       >Download</a
@@ -256,9 +254,6 @@
           </div>
           <% } %>
           <div class="px-5 py-3 px-md-6 mt-3 mb-9">
-            <a class="fw-bold fs--1" href="#!"
-              ><span class="fas fa-plus me-1"></span>Add file(s)</a
-            >
           </div>
         </div>
       </div>
