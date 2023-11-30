@@ -3939,13 +3939,13 @@ const dutyHandoverSchema = new mongoose.Schema({
   giveShift: String,
   giveDate: String,
   giveHeadShift: String,
-  giveStaffOnDuty: String,
+  giveStaffOnDuty: [String],
   giveStaffSickLeave: String,
   giveStaffAbsent: String,
   receiveShift: String,
   receiveDate: String,
   receiveHeadShift: String,
-  receiveStaffOnDuty: String,
+  receiveStaffOnDuty: [String],
   receiveStaffSickLeave: String,
   receiveStaffAbsent: String,
   location: String,
@@ -4404,7 +4404,8 @@ app
     const headShift = req.body.headShift;
     const staffOnDuty = req.body.staffOnDuty;
     const notes = req.body.notes;
-    const handoverShift = req.body.handoverShift;
+    const handoverShift = req.body.handoverShift; 
+    const {names} = req.body;
 
     // generated rid
     const confirmRid = req.body.confirmRid;
@@ -4460,7 +4461,6 @@ app
       validationDate === 'is-valid' &&
       validationLocation === 'is-valid' &&
       validationHeadShift === 'is-valid' &&
-      validationStaffOnDuty === 'is-valid' &&
       validationNotes === 'is-valid' &&
       validationHandoverShift === 'is-valid'
     ) {
@@ -4524,6 +4524,7 @@ app
         status: status,
         notes: notes,
         location: location,
+        giveStaffOnDuty : [names],
         handoverShift: handoverShift,
         giveLog: giveLog
       });
