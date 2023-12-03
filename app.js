@@ -3939,13 +3939,19 @@ const dutyHandoverSchema = new mongoose.Schema({
   giveShift: String,
   giveDate: String,
   giveHeadShift: String,
-  giveStaffOnDuty: [String],
+  giveStaffOnDuty: {
+    type: [String], // Assuming names are strings
+    default: []
+  },
   giveStaffSickLeave: String,
   giveStaffAbsent: String,
   receiveShift: String,
   receiveDate: String,
   receiveHeadShift: String,
-  receiveStaffOnDuty: [String],
+  receiveStaffOnDuty: {
+    type: [String], // Assuming names are strings
+    default: []
+  },
   receiveStaffSickLeave: String,
   receiveStaffAbsent: String,
   location: String,
@@ -4402,10 +4408,8 @@ app
     const location = req.body.location;
     const date = req.body.date;
     const headShift = req.body.headShift;
-    const staffOnDuty = req.body.staffOnDuty;
     const notes = req.body.notes;
-    const handoverShift = req.body.handoverShift; 
-    const {names} = req.body;
+    const handoverShift = req.body.handoverShift;
 
     // generated rid
     const confirmRid = req.body.confirmRid;
@@ -4524,10 +4528,21 @@ app
         status: status,
         notes: notes,
         location: location,
-        giveStaffOnDuty : [names],
+        giveStaffOnDuty: [],
         handoverShift: handoverShift,
         giveLog: giveLog
       });
+
+      const { names } = req.body;
+
+      if (names && names.length > 0) {
+        // Assuming giveStaffOnDuty is an array, you can assign the names directly
+        newHandover.giveStaffOnDuty = names;
+        console.log(names);
+      } else {
+        // Handle the case where names are not provided or empty
+        console.log('No staff names provided or the names array is empty.');
+      }
 
       const existing = await DutyHandover.findOne({ reportId: confirmRid });
 
@@ -4779,9 +4794,6 @@ app
         date: date,
         location: location,
         headShift: headShift,
-        staffOnDuty: staffOnDuty,
-        staffSickLeave: staffSickLeave,
-        staffAbsent: staffAbsent,
         notes: notes,
         handoverShift: handoverShift,
         //toast alert
@@ -5270,13 +5282,18 @@ app.post('/save', async (req, res) => {
 
   try {
     // Find the document with selected names for the given report ID or create a new one if it doesn't exist
-    let selectedNamesDocument = await SelectedNames.findOne({ reportId });
+    let selectedNamesDocument = await DutyHandover.findOne({ reportId });
     if (!selectedNamesDocument) {
       selectedNamesDocument = new SelectedNames({ reportId });
     }
 
     // Add the new names to the existing array
-    selectedNamesDocument.names = [...selectedNamesDocument.names, ...names];
+    selectedNamesDocument.giveStaffOnDuty = [
+      ...selectedNamesDocument.giveStaffOnDuty,
+      ...names
+    ];
+
+    console.log(selectedNamesDocument);
 
     // Save the updated document
     const result = await selectedNamesDocument.save();

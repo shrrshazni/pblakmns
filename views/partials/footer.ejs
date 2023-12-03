@@ -166,21 +166,15 @@
     }
 
     function saveSelectedNamesToServer() {
-      // Get report ID from the input field
-      const reportId = reportIdInput.val();
 
       // Make a POST request to the server to save the selected names
       $.ajax({
-        url: '/save',
+        url: '/duty-handover/submit',
         method: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({ reportId, names: selectedNames }),
+        data: JSON.stringify({ names: selectedNames }),
         success: function (savedItems) {
           console.log('Names saved:', savedItems);
-          // Optionally, you can perform additional actions after saving
-
-          // Display the names on the same page
-          fetchAndDisplayNames(reportId);
         },
         error: function (error) {
           console.error('Error saving names:', error);
