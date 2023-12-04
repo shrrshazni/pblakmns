@@ -45,17 +45,20 @@
                 >
                   <!-- form title report -->
                   <div class="col-md-4">
-                    <label class="form-label" for="validationCustom04"
+                    <label class="form-label" for="giveShift"
                       >Shift</label
                     >
 
                     <select
                       class="form-select <%= validationShift %>"
-                      id="validationCustom04"
+                      id="giveShift"
                       name="shift"
                     >
+                    <% if(shift === ''){
+                      shift = 'Choose a shift'
+                    } %>
                       <option selected="" value="<%= shift %>">
-                        Choose Shift
+                        <%= shift %>
                       </option>
                       <option value="Shift A">Shift A</option>
                       <option value="Shift B">Shift B</option>
@@ -66,11 +69,11 @@
                   </div>
 
                   <div class="col-md-4">
-                    <label class="form-label" for="datepicker1">Date</label>
+                    <label class="form-label" for="giveDate">Date</label>
 
                     <input
                       class="form-control <%= validationDate %> datetimepicker flatpickr-input"
-                      id="datepicker1"
+                      id="giveDate"
                       type="text"
                       placeholder="day/month/year"
                       data-options='{"dateFormat":"d/m/y","disableMobile":true,"allowInput":true}'
@@ -84,17 +87,20 @@
                   </div>
 
                   <div class="col-md-4">
-                    <label class="form-label" for="validationCustom05"
+                    <label class="form-label" for="handoverLocation"
                       >Location</label
                     >
 
                     <select
                       class="form-select <%= validationLocation %>"
-                      id="validationCustom05"
+                      id="handoverLocation"
                       name="location"
                     >
+                    <% if(location === ''){
+                      location = 'Choose a location'
+                    } %>
                       <option selected="" value="<%= location %>">
-                        Choose location
+                        <%= location %>
                       </option>
                       <option value="Baitul Makmur I">Baitul Makmur I</option>
                       <option value="Baitul Makmur II">Baitul Makmur II</option>
@@ -110,14 +116,14 @@
                     </div>
                   </div>
 
-                  <div class="col-md-6">
-                    <label class="form-label" for="validationCustom03"
+                  <div class="col-md-4">
+                    <label class="form-label" for="giveHeadShift"
                       >Head of Shift</label
                     >
 
                     <input
                       class="form-control <%= validationHeadShift %>"
-                      id="validationCustom03"
+                      id="giveHeadShift"
                       type="text"
                       name="headShift"
                       value="<%= headShift %>"
@@ -127,18 +133,20 @@
                     </div>
                   </div>
 
-                  <div class="col-md-6">
-                    <label class="form-label" for="validationCustom04"
+                  <div class="col-md-4">
+                    <label class="form-label" for="giveHandoverShift"
                       >Handover shift to be received</label
                     >
-
+                    <% if(handoverShift === ''){
+                      handoverShift = 'Choose a handover shift'
+                    } %>
                     <select
                       class="form-select <%= validationHandoverShift %>"
-                      id="validationCustom04"
+                      id="giveHandoverShift"
                       name="handoverShift"
                     >
                       <option selected="" value="<%= handoverShift %>">
-                        Choose Shift
+                        <%= handoverShift %>
                       </option>
                       <option value="Shift A">Shift A</option>
                       <option value="Shift B">Shift B</option>
@@ -148,13 +156,30 @@
                     <div class="invalid-feedback">Please select a shift.</div>
                   </div>
 
+                  <div class="col-md-4">
+                    <label class="form-label" for="giveStaffAbsent"
+                      >Staff Absent</label
+                    >
+
+                    <input
+                      class="form-control <%= validationStaffAbsent %>"
+                      id="giveStaffAbsent"
+                      type="text"
+                      name="staffAbsent"
+                      value="<%= staffAbsent %>"
+                    />
+                    <div class="invalid-feedback">
+                      Please provide head shift assigned.
+                    </div>
+                  </div>
+
                   <div class="col-12 gy-4 mb-3">
-                    <label class="form-label" for="floatingProjectDescription2"
+                    <label class="form-label" for="giveNotes"
                       >Notes</label
                     >
                     <textarea
                       class="form-control <%= validationNotes %> scrollbar-overlay"
-                      id="floatingProjectDescription2"
+                      id="giveNotes"
                       placeholder="Leave a note here"
                       style="height: 64px"
                       name="notes"
@@ -172,25 +197,31 @@
                     <div
                       id="selectedNames"
                       class="d-flex flex-wrap border border-300 rounded-3 px-2"
-                      style="min-height: 3rem;"
+                      style="min-height: 2.5rem"
                     ></div>
                   </div>
 
-                  <div class="col-md-12">
-                    <label class="form-label" for="validationCustom03"
-                      >Search & Select Staff Name</label
-                    >
-                    <input
-                      type="text"
-                      name="query"
-                      id="queryInput"
-                      class="form-control mb-3"
-                      placeholder="Search staff name here..."
-                    />
-                    <div class="invalid-feedback">
-                      Please provide a staff assigned.
+                  <div class="col-md-12 mb-3">
+                    <div class="row">
+                      <div class="col-4">
+                        <label class="form-label" for="validationCustom03"
+                          >Search & Select Staff Name</label
+                        >
+                        <input
+                          type="text"
+                          name="query"
+                          id="queryInput"
+                          class="form-control"
+                          placeholder="Search staff name here..."
+                        />
+                        <div class="invalid-feedback">
+                          Please provide a staff assigned.
+                        </div>
+                        <div class="valid-feedback">Looks good!</div>
+                      </div>
+
+                      <div id="results" class="mt-3 mb-3 col-12"></div>
                     </div>
-                    <div id="results" class="mt-3 mb-3"></div>
                   </div>
 
                   <input

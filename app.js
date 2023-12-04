@@ -3669,7 +3669,7 @@ app.post('/social/settings/:customListName', async function (req, res) {
 
           if (updatedUser) {
             console.log('Successful update user data');
-            res.redirect('/social/settings', {
+            res.render('settings', {
               currentFullName: fullName,
               currentUser: checkUser.username,
               currentProfile: checkUser.profile,
@@ -4399,20 +4399,26 @@ app
     var validationHeadShift = '';
     var validationNotes = '';
     var validationHandoverShift = '';
+    var validationStaffAbsent = '';
 
     // current date time
     var currentTime = dateLocal.getCurrentTime();
     var currentDate = dateLocal.getDateYear();
 
-    const shift = req.body.shift;
-    const location = req.body.location;
-    const date = req.body.date;
-    const headShift = req.body.headShift;
-    const notes = req.body.notes;
-    const handoverShift = req.body.handoverShift;
+    const formData = req.body;
 
-    // generated rid
-    const confirmRid = req.body.confirmRid;
+    console.log(formData);
+
+    const shift = formData.shift;
+    const location = formData.location;
+    const date = formData.date;
+    const headShift = formData.headShift;
+    const notes = formData.notes;
+    const handoverShift = formData.handoverShift;
+    const staffAbsent = formData.staffAbsent;
+    const confirmRid = formData.reportId;
+
+    console.log(confirmRid);
 
     const currentUsername = req.session.user.username;
 
@@ -4460,13 +4466,28 @@ app
       validationHandoverShift = 'is-valid';
     }
 
+    // Validate the handoverShift
+    if (!handoverShift || handoverShift === '') {
+      validationHandoverShift = 'is-invalid';
+    } else {
+      validationHandoverShift = 'is-valid';
+    }
+
+    // Validate the staffAbsent
+    if (!staffAbsent || staffAbsent === '') {
+      validationStaffAbsent = 'is-invalid';
+    } else {
+      validationStaffAbsent = 'is-valid';
+    }
+
     if (
       validationShift === 'is-valid' &&
       validationDate === 'is-valid' &&
       validationLocation === 'is-valid' &&
       validationHeadShift === 'is-valid' &&
       validationNotes === 'is-valid' &&
-      validationHandoverShift === 'is-valid'
+      validationHandoverShift === 'is-valid' &&
+      validationStaffAbsent === 'is-valid'
     ) {
       const currentFullName = checkUser.fullname;
       const currentUser = checkUser.username;
@@ -4478,302 +4499,145 @@ app
         headShift +
         ' selaku ketua syif ' +
         _.lowerCase(shift) +
-        ' telah menyerahkan tugas kepada selaku ketua syif' +
+        ' telah menyerahkan tugas kepada selaku ketua syif, ' +
         _.lowerCase(handoverShift) +
         ' dalam keadaan baik dan senarai peralatan tugas mencukupi di ' +
         location +
         ' pada tarikh ' +
         date;
 
-      // Activity
-      const newItemActivity = {
-        time: currentTime,
-        by: currentFullName,
-        username: currentUser,
-        type: 'Duty Handover',
-        title:
-          'Submitted a duty handover report of ' +
-          shift +
-          ' & status is ' +
-          status,
-        about: notes
-      };
-
-      const newActivity = new Activity({
-        date: currentDate,
-        items: newItemActivity
-      });
-
-      const findDate = await Activity.findOne({ date: currentDate });
-
-      if (findDate) {
-        findDate.items.push(newItemActivity);
-        await findDate.save();
-        console.log('Activity added to existing date');
-      } else {
-        const resultActivity = Activity.create(newActivity);
-
-        if (resultActivity) {
-          console.log('Added new activity');
-        } else {
-          console.log('Something is wrong');
-        }
-      }
-
       const newHandover = new DutyHandover({
-        reportId: confirmRid,
-        giveShift: shift,
-        giveDate: date,
-        giveHeadShift: headShift,
+        reportId: formData.reportId,
+        giveShift: formData.shift,
+        giveDate: formData.date,
+        giveHeadShift: formData.headShift,
         status: status,
-        notes: notes,
-        location: location,
+        notes: formData.notes,
+        location: formData.location,
         giveStaffOnDuty: [],
-        handoverShift: handoverShift,
+        handoverShift: formData.handoverShift,
+        giveStaffAbsent: formData.staffAbsent,
         giveLog: giveLog
       });
 
-      const { names } = req.body;
-
-      if (names && names.length > 0) {
-        // Assuming giveStaffOnDuty is an array, you can assign the names directly
-        newHandover.giveStaffOnDuty = names;
-        console.log(names);
-      } else {
-        // Handle the case where names are not provided or empty
-        console.log('No staff names provided or the names array is empty.');
-      }
-
-      const existing = await DutyHandover.findOne({ reportId: confirmRid });
+      const existing = await DutyHandover.findOne({
+        reportId: formData.reportId
+      });
 
       if (!existing) {
-        const result = DutyHandover.create(newHandover);
+        // Activity
+        const newItemActivity = {
+          time: currentTime,
+          by: currentFullName,
+          username: currentUser,
+          type: 'Duty Handover',
+          title:
+            'Submitted a duty handover report of ' +
+            _.lowerCase(shift) +
+            ' & status is ' +
+            status,
+          about: notes
+        };
+
+        const newActivity = new Activity({
+          date: currentDate,
+          items: newItemActivity
+        });
+
+        const findDate = await Activity.findOne({ date: currentDate });
+
+        if (findDate) {
+          findDate.items.push(newItemActivity);
+          await findDate.save();
+          console.log('Activity added to existing date');
+        } else {
+          const resultActivity = Activity.create(newActivity);
+
+          if (resultActivity) {
+            console.log('Added new activity');
+          } else {
+            console.log('Something is wrong');
+          }
+        }
+
+        if (formData.names && formData.names.length > 0) {
+          // Assuming giveStaffOnDuty is an array, you can assign the names directly
+          newHandover.giveStaffOnDuty = formData.names;
+        }
+
+        const result = await newHandover.save();
 
         if (result) {
           console.log('Successfully added report.');
-
-          const checkUser = await User.findOne({ username: currentUsername });
-
-          if (checkUser) {
-            const itemReports = await DutyHandover.find({}).sort({ date: -1 });
-            const itemBMI = await DutyHandover.find({
-              location: 'Baitul Makmur I'
-            }).sort({ date: -1 });
-            const itemBMII = await DutyHandover.find({
-              location: 'Baitul Makmur II'
-            }).sort({ date: -1 });
-            const itemJM = await DutyHandover.find({
-              location: 'Jamek Mosque'
-            }).sort({ date: -1 });
-            const itemCM = await DutyHandover.find({
-              location: 'City Mosque'
-            }).sort({ date: -1 });
-            const itemRS = await DutyHandover.find({
-              location: 'Raudhatul Sakinah'
-            }).sort({ date: -1 });
-
-            if (itemReports.length > 0) {
-              res.render('duty-handover-view', {
-                currentFullName: checkUser.fullname,
-                currentUser: checkUser.username,
-                currentProfile: checkUser.profile,
-                itemReports: itemReports,
-                totalReports: itemReports.length,
-                amountBMI: itemBMI.length,
-                amountBMII: itemBMII.length,
-                amountJM: itemJM.length,
-                amountCM: itemCM.length,
-                amountRS: itemRS.length,
-                topNav: 'All',
-                classActive1: 'active',
-                classActive2: '',
-                classActive3: '',
-                classActive4: '',
-                classActive5: '',
-                classActive6: '',
-                // generated random id
-                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
-                // toast alert
-                toastShow: 'show',
-                toastMsg: 'Submit report successful!'
-              });
-            } else {
-              res.render('duty-handover-view', {
-                currentFullName: checkUser.fullname,
-                currentUser: checkUser.username,
-                currentProfile: checkUser.profile,
-                itemReports: 'There is no case report submitted yet.',
-                totalReports: '0',
-                amountBMI: '0',
-                amountBMII: '0',
-                amountJM: '0',
-                amountCM: '0',
-                amountRS: '0',
-                topNav: 'All',
-                classActive1: 'active',
-                classActive2: '',
-                classActive3: '',
-                classActive4: '',
-                classActive5: '',
-                classActive6: '',
-                // generated random id
-                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
-                // toast alert
-                toastShow: 'show',
-                toastMsg: 'Submit report successful!'
-              });
-            }
-          }
-        } else {
-          console.log('Add report failed');
-
-          const checkUser = await User.findOne({ username: currentUsername });
-
-          if (checkUser) {
-            const itemReports = await DutyHandover.find({}).sort({ date: -1 });
-            const itemBMI = await DutyHandover.find({
-              location: 'Baitul Makmur I'
-            }).sort({ date: -1 });
-            const itemBMII = await DutyHandover.find({
-              location: 'Baitul Makmur II'
-            }).sort({ date: -1 });
-            const itemJM = await DutyHandover.find({
-              location: 'Jamek Mosque'
-            }).sort({ date: -1 });
-            const itemCM = await DutyHandover.find({
-              location: 'City Mosque'
-            }).sort({ date: -1 });
-            const itemRS = await DutyHandover.find({
-              location: 'Raudhatul Sakinah'
-            }).sort({ date: -1 });
-
-            if (itemReports.length > 0) {
-              res.render('duty-handover-view', {
-                currentFullName: checkUser.fullname,
-                currentUser: checkUser.username,
-                currentProfile: checkUser.profile,
-                itemReports: itemReports,
-                totalReports: itemReports.length,
-                amountBMI: itemBMI.length,
-                amountBMII: itemBMII.length,
-                amountJM: itemJM.length,
-                amountCM: itemCM.length,
-                amountRS: itemRS.length,
-                topNav: 'All',
-                classActive1: 'active',
-                classActive2: '',
-                classActive3: '',
-                classActive4: '',
-                classActive5: '',
-                classActive6: '',
-                // generated random id
-                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
-                // toast alert
-                toastShow: 'show',
-                toastMsg: 'Add report failed!'
-              });
-            } else {
-              res.render('duty-handover-view', {
-                currentFullName: checkUser.fullname,
-                currentUser: checkUser.username,
-                currentProfile: checkUser.profile,
-                itemReports: 'There is no case report submitted yet.',
-                totalReports: '0',
-                amountBMI: '0',
-                amountBMII: '0',
-                amountJM: '0',
-                amountCM: '0',
-                amountRS: '0',
-                topNav: 'All',
-                classActive1: 'active',
-                classActive2: '',
-                classActive3: '',
-                classActive4: '',
-                classActive5: '',
-                classActive6: '',
-                // generated random id
-                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
-                // toast alert
-                toastShow: 'show',
-                toastMsg: 'Add report failed!'
-              });
-            }
-          }
         }
       } else {
-        console.log('There is existing report!');
+        const itemReports = await DutyHandover.find({}).sort({ date: -1 });
+        const itemBMI = await DutyHandover.find({
+          location: 'Baitul Makmur I'
+        }).sort({ date: -1 });
+        const itemBMII = await DutyHandover.find({
+          location: 'Baitul Makmur II'
+        }).sort({ date: -1 });
+        const itemJM = await DutyHandover.find({
+          location: 'Jamek Mosque'
+        }).sort({ date: -1 });
+        const itemCM = await DutyHandover.find({
+          location: 'City Mosque'
+        }).sort({ date: -1 });
+        const itemRS = await DutyHandover.find({
+          location: 'Raudhatul Sakinah'
+        }).sort({ date: -1 });
 
-        const checkUser = await User.findOne({ username: currentUsername });
-
-        if (checkUser) {
-          const itemReports = await DutyHandover.find({}).sort({ date: -1 });
-          const itemBMI = await DutyHandover.find({
-            location: 'Baitul Makmur I'
-          }).sort({ date: -1 });
-          const itemBMII = await DutyHandover.find({
-            location: 'Baitul Makmur II'
-          }).sort({ date: -1 });
-          const itemJM = await DutyHandover.find({
-            location: 'Jamek Mosque'
-          }).sort({ date: -1 });
-          const itemCM = await DutyHandover.find({
-            location: 'City Mosque'
-          }).sort({ date: -1 });
-          const itemRS = await DutyHandover.find({
-            location: 'Raudhatul Sakinah'
-          }).sort({ date: -1 });
-
-          if (itemReports.length > 0) {
-            res.render('duty-handover-view', {
-              currentFullName: checkUser.fullname,
-              currentUser: checkUser.username,
-              currentProfile: checkUser.profile,
-              itemReports: itemReports,
-              totalReports: itemReports.length,
-              amountBMI: itemBMI.length,
-              amountBMII: itemBMII.length,
-              amountJM: itemJM.length,
-              amountCM: itemCM.length,
-              amountRS: itemRS.length,
-              topNav: 'All',
-              classActive1: 'active',
-              classActive2: '',
-              classActive3: '',
-              classActive4: '',
-              classActive5: '',
-              classActive6: '',
-              // generated random id
-              rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
-              // toast alert
-              toastShow: 'show',
-              toastMsg: 'There is an exisitng report!'
-            });
-          } else {
-            res.render('duty-handover-view', {
-              currentFullName: checkUser.fullname,
-              currentUser: checkUser.username,
-              currentProfile: checkUser.profile,
-              itemReports: 'There is no case report submitted yet.',
-              totalReports: '0',
-              amountBMI: '0',
-              amountBMII: '0',
-              amountJM: '0',
-              amountCM: '0',
-              amountRS: '0',
-              topNav: 'All',
-              classActive1: 'active',
-              classActive2: '',
-              classActive3: '',
-              classActive4: '',
-              classActive5: '',
-              classActive6: '',
-              // generated random id
-              rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
-              // toast alert
-              toastShow: 'show',
-              toastMsg: 'There is an existing report!'
-            });
-          }
+        if (itemReports.length > 0) {
+          res.render('duty-handover-view', {
+            currentFullName: checkUser.fullname,
+            currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
+            itemReports: itemReports,
+            totalReports: itemReports.length,
+            amountBMI: itemBMI.length,
+            amountBMII: itemBMII.length,
+            amountJM: itemJM.length,
+            amountCM: itemCM.length,
+            amountRS: itemRS.length,
+            topNav: 'All',
+            classActive1: 'active',
+            classActive2: '',
+            classActive3: '',
+            classActive4: '',
+            classActive5: '',
+            classActive6: '',
+            // generated random id
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: 'show',
+            toastMsg: 'Submit report successful!'
+          });
+        } else {
+          res.render('duty-handover-view', {
+            currentFullName: checkUser.fullname,
+            currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
+            itemReports: 'There is no case report submitted yet.',
+            totalReports: '0',
+            amountBMI: '0',
+            amountBMII: '0',
+            amountJM: '0',
+            amountCM: '0',
+            amountRS: '0',
+            topNav: 'All',
+            classActive1: 'active',
+            classActive2: '',
+            classActive3: '',
+            classActive4: '',
+            classActive5: '',
+            classActive6: '',
+            // generated random id
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: 'show',
+            toastMsg: 'Submit report successful!'
+          });
         }
       }
     } else {
@@ -4789,16 +4653,19 @@ app
         validationHeadShift: validationHeadShift,
         validationNotes: validationNotes,
         validationHandoverShift: validationHandoverShift,
+        validationStaffAbsent: validationStaffAbsent,
         //form name
-        shift: shift,
-        date: date,
-        location: location,
-        headShift: headShift,
-        notes: notes,
-        handoverShift: handoverShift,
+        shift: formData.shift,
+        date: formData.date,
+        location: formData.location,
+        headShift: formData.headShift,
+        notes: formData.notes,
+        handoverShift: formData.handoverShift,
+        staffAbsent: formData.staffAbsent,
         //toast alert
         toastShow: 'show',
-        toastMsg: 'There is an error at your input, please do check it again'
+        toastMsg:
+          'There is an error at your input or staff on duty is empty, please do check it again'
       });
     }
   });

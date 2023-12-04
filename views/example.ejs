@@ -1,0 +1,10 @@
+<%- include("partials/header") %> <%- include("partials/navbar") %>
+
+<form id="searchForm" action="/search" method="GET">
+  <input type="text" name="query" placeholder="Search..." />
+  <button type="submit">Search</button>
+</form>
+<!-- Add a div to display search results -->
+<div id="results"></div>
+
+<%- include("partials/navbar-script") %> <%- include("partials/footer") %>
