@@ -4373,6 +4373,7 @@ app
           validationStaffAbsent: '',
           validationNotes: '',
           validationHandoverShift: '',
+          validationSelectedNames: '',
           //form name
           shift: '',
           date: '',
@@ -4383,6 +4384,7 @@ app
           staffAbsent: '',
           notes: '',
           handoverShift: '',
+          selectedNames: '',
           //toast alert
           toastShow: '',
           toastMsg: ''
@@ -4400,6 +4402,7 @@ app
     var validationNotes = '';
     var validationHandoverShift = '';
     var validationStaffAbsent = '';
+    var validationSelectedNames = '';
 
     // current date time
     var currentTime = dateLocal.getCurrentTime();
@@ -4407,18 +4410,17 @@ app
 
     const formData = req.body;
 
-    console.log(formData);
-
-    const shift = formData.shift;
-    const location = formData.location;
-    const date = formData.date;
-    const headShift = formData.headShift;
-    const notes = formData.notes;
-    const handoverShift = formData.handoverShift;
-    const staffAbsent = formData.staffAbsent;
-    const confirmRid = formData.reportId;
-
-    console.log(confirmRid);
+    const shift = req.body.shift;
+    const location = req.body.location;
+    const date = req.body.date;
+    const headShift = req.body.headShift;
+    const notes = req.body.notes;
+    const handoverShift = req.body.handoverShift;
+    const staffAbsent = req.body.staffAbsent;
+    const confirmRid = req.body.confirmRid;
+    const selectedNames = req.body.selectedNames
+      ? req.body.selectedNames.split(',')
+      : [];
 
     const currentUsername = req.session.user.username;
 
@@ -4480,6 +4482,13 @@ app
       validationStaffAbsent = 'is-valid';
     }
 
+    // Validate the selectedNames
+    if (selectedNames.length === 0) {
+      validationSelectedNames = 'is-invalid';
+    } else {
+      validationSelectedNames = 'is-valid';
+    }
+
     if (
       validationShift === 'is-valid' &&
       validationDate === 'is-valid' &&
@@ -4487,7 +4496,8 @@ app
       validationHeadShift === 'is-valid' &&
       validationNotes === 'is-valid' &&
       validationHandoverShift === 'is-valid' &&
-      validationStaffAbsent === 'is-valid'
+      validationStaffAbsent === 'is-valid' &&
+      validationSelectedNames === 'is-valid'
     ) {
       const currentFullName = checkUser.fullname;
       const currentUser = checkUser.username;
@@ -4507,21 +4517,21 @@ app
         date;
 
       const newHandover = new DutyHandover({
-        reportId: formData.reportId,
-        giveShift: formData.shift,
-        giveDate: formData.date,
-        giveHeadShift: formData.headShift,
+        reportId: confirmRid,
+        giveShift: shift,
+        giveDate: date,
+        giveHeadShift: headShift,
         status: status,
-        notes: formData.notes,
-        location: formData.location,
-        giveStaffOnDuty: [],
-        handoverShift: formData.handoverShift,
-        giveStaffAbsent: formData.staffAbsent,
+        notes: notes,
+        location: location,
+        giveStaffOnDuty: selectedNames,
+        handoverShift: handoverShift,
+        giveStaffAbsent: staffAbsent,
         giveLog: giveLog
       });
 
       const existing = await DutyHandover.findOne({
-        reportId: formData.reportId
+        reportId: confirmRid
       });
 
       if (!existing) {
@@ -4560,17 +4570,12 @@ app
           }
         }
 
-        if (formData.names && formData.names.length > 0) {
-          // Assuming giveStaffOnDuty is an array, you can assign the names directly
-          newHandover.giveStaffOnDuty = formData.names;
-        }
-
         const result = await newHandover.save();
 
         if (result) {
           console.log('Successfully added report.');
         }
-      } else {
+
         const itemReports = await DutyHandover.find({}).sort({ date: -1 });
         const itemBMI = await DutyHandover.find({
           location: 'Baitul Makmur I'
@@ -4639,6 +4644,75 @@ app
             toastMsg: 'Submit report successful!'
           });
         }
+      } else {
+        const itemReports = await DutyHandover.find({}).sort({ date: -1 });
+        const itemBMI = await DutyHandover.find({
+          location: 'Baitul Makmur I'
+        }).sort({ date: -1 });
+        const itemBMII = await DutyHandover.find({
+          location: 'Baitul Makmur II'
+        }).sort({ date: -1 });
+        const itemJM = await DutyHandover.find({
+          location: 'Jamek Mosque'
+        }).sort({ date: -1 });
+        const itemCM = await DutyHandover.find({
+          location: 'City Mosque'
+        }).sort({ date: -1 });
+        const itemRS = await DutyHandover.find({
+          location: 'Raudhatul Sakinah'
+        }).sort({ date: -1 });
+
+        if (itemReports.length > 0) {
+          res.render('duty-handover-view', {
+            currentFullName: checkUser.fullname,
+            currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
+            itemReports: itemReports,
+            totalReports: itemReports.length,
+            amountBMI: itemBMI.length,
+            amountBMII: itemBMII.length,
+            amountJM: itemJM.length,
+            amountCM: itemCM.length,
+            amountRS: itemRS.length,
+            topNav: 'All',
+            classActive1: 'active',
+            classActive2: '',
+            classActive3: '',
+            classActive4: '',
+            classActive5: '',
+            classActive6: '',
+            // generated random id
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: 'show',
+            toastMsg: 'Got existing duty handover'
+          });
+        } else {
+          res.render('duty-handover-view', {
+            currentFullName: checkUser.fullname,
+            currentUser: checkUser.username,
+            currentProfile: checkUser.profile,
+            itemReports: 'There is no case report submitted yet.',
+            totalReports: '0',
+            amountBMI: '0',
+            amountBMII: '0',
+            amountJM: '0',
+            amountCM: '0',
+            amountRS: '0',
+            topNav: 'All',
+            classActive1: 'active',
+            classActive2: '',
+            classActive3: '',
+            classActive4: '',
+            classActive5: '',
+            classActive6: '',
+            // generated random id
+            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+            // toast alert
+            toastShow: 'show',
+            toastMsg: 'Got existing duty handover'
+          });
+        }
       }
     } else {
       res.render('duty-handover-submit', {
@@ -4654,6 +4728,7 @@ app
         validationNotes: validationNotes,
         validationHandoverShift: validationHandoverShift,
         validationStaffAbsent: validationStaffAbsent,
+        validationSelectedNames: validationSelectedNames,
         //form name
         shift: formData.shift,
         date: formData.date,
@@ -4662,6 +4737,7 @@ app
         notes: formData.notes,
         handoverShift: formData.handoverShift,
         staffAbsent: formData.staffAbsent,
+        selectedNames: selectedNames,
         //toast alert
         toastShow: 'show',
         toastMsg:
@@ -4685,12 +4761,12 @@ app
         });
 
         if (checkReport.status === 'Completed') {
-          console.log(checkReport.status);
           res.render('duty-handover-details', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
             // duty handover details
+            dutyHandover: checkReport,
             reportId: checkReport.reportId,
             giveShift: checkReport.giveShift,
             giveDate: checkReport.giveDate,
@@ -4718,11 +4794,13 @@ app
             validationStaffSickLeave: '',
             validationStaffAbsent: '',
             validationNotes: '',
+            validationSelectedNames: '',
             //form name
             headShift: '',
             staffOnDuty: '',
             staffSickLeave: '',
             staffAbsent: '',
+            selectedNames: '',
             // tab-pane
             showTabPane1: '',
             showTabPane2: '',
@@ -4731,12 +4809,13 @@ app
             toastShow: '',
             toastMsg: ''
           });
-        } else {
+        } else if (checkReport.status === 'Incompleted') {
           res.render('duty-handover-details', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
             // duty handover details
+            dutyHandover: checkReport,
             reportId: checkReport.reportId,
             giveShift: checkReport.giveShift,
             giveDate: checkReport.giveDate,
@@ -4764,11 +4843,13 @@ app
             validationStaffSickLeave: '',
             validationStaffAbsent: '',
             validationNotes: '',
+            validationSelectedNames: '',
             //form name
             headShift: '',
             staffOnDuty: '',
             staffSickLeave: '',
             staffAbsent: '',
+            selectedNames: '',
             // tab-pane
             showTabPane1: 'active',
             showTabPane2: '',
@@ -4805,15 +4886,18 @@ app
     const headShift = req.body.headShift;
     const handoverShift = req.body.handoverShift;
     const staffOnDuty = req.body.staffOnDuty;
-    const staffSickLeave = req.body.staffSickLeave;
     const staffAbsent = req.body.staffAbsent;
     const notes = req.body.notes;
+    const selectedNames = req.body.selectedNames
+      ? req.body.selectedNames.split(',')
+      : [];
 
     var validationHeadShift = '';
     var validationStaffOnDuty = '';
     var validationStaffSickLeave = '';
     var validationStaffAbsent = '';
     var validationNotes = '';
+    var validationSelectedNames = '';
 
     // validation head shift
     if (headShift === '') {
@@ -4827,13 +4911,6 @@ app
       validationStaffOnDuty = 'is-invalid';
     } else {
       validationStaffOnDuty = 'is-valid';
-    }
-
-    // validation staff sick leave
-    if (staffSickLeave === '') {
-      validationStaffSickLeave = 'is-invalid';
-    } else {
-      validationStaffSickLeave = 'is-valid';
     }
 
     // validation absent
@@ -4850,12 +4927,19 @@ app
       validationNotes = 'is-valid';
     }
 
+    // Validate the selectedNames
+    if (selectedNames.length === 0) {
+      validationSelectedNames = 'is-invalid';
+    } else {
+      validationSelectedNames = 'is-valid';
+    }
+
     if (
       validationHeadShift === 'is-valid' &&
       validationStaffOnDuty === 'is-valid' &&
-      validationStaffSickLeave === 'is-valid' &&
       validationStaffAbsent === 'is-valid' &&
-      validationNotes === 'is-valid'
+      validationNotes === 'is-valid' &&
+      validationSelectedNames === 'is-valid'
     ) {
       console.log('Succesful!');
 
@@ -4876,48 +4960,12 @@ app
         ' pada tarikh ' +
         date;
 
-      // Activity
-      const newItemActivity = {
-        time: currentTime,
-        by: currentFullName,
-        username: currentUser,
-        type: 'Duty Handover',
-        title:
-          'Submitted a received duty report of ' +
-          shift +
-          ' & status is ' +
-          status,
-        about: notes
-      };
-
-      const newActivity = new Activity({
-        date: currentDate,
-        items: newItemActivity
-      });
-
-      const findDate = await Activity.findOne({ date: currentDate });
-
-      if (findDate) {
-        findDate.items.push(newItemActivity);
-        await findDate.save();
-        console.log('Activity added to existing date');
-      } else {
-        const resultActivity = Activity.create(newActivity);
-
-        if (resultActivity) {
-          console.log('Added new activity');
-        } else {
-          console.log('Something is wrong');
-        }
-      }
-
       const updatedData = {
         reportId: reportId,
         receiveShift: shift,
         receiveDate: date,
         receiveHeadShift: headShift,
-        receiveStaffOnDuty: staffOnDuty,
-        receiveStaffSickLeave: staffSickLeave,
+        receiveStaffOnDuty: selectedNames,
         receiveStaffAbsent: staffAbsent,
         status: status,
         notes: notes,
@@ -4934,9 +4982,47 @@ app
 
       if (updatedHandover) {
         console.log('Update success');
+        // Activity
+        const newItemActivity = {
+          time: currentTime,
+          by: currentFullName,
+          username: currentUser,
+          type: 'Duty Handover',
+          title:
+            'Submitted a received duty report of ' +
+            shift +
+            ' & status is ' +
+            status,
+          about: notes
+        };
+
+        const newActivity = new Activity({
+          date: currentDate,
+          items: newItemActivity
+        });
+
+        const findDate = await Activity.findOne({ date: currentDate });
+
+        if (findDate) {
+          findDate.items.push(newItemActivity);
+          await findDate.save();
+          console.log('Activity added to existing date');
+        } else {
+          const resultActivity = Activity.create(newActivity);
+
+          if (resultActivity) {
+            console.log('Added new activity');
+          } else {
+            console.log('Something is wrong');
+          }
+        }
+
         res.redirect('/duty-handover/details?id=' + reportId);
+
       } else {
+
         console.log('Report Id are not exist');
+
       }
     } else {
       console.log('Unsuccessful!');
@@ -4945,18 +5031,17 @@ app
         currentUser: checkUser.username,
         currentProfile: checkUser.profile,
         // duty handover details
+        dutyHandover: checkReport,
         reportId: checkReport.reportId,
         giveShift: checkReport.giveShift,
         giveDate: checkReport.giveDate,
         giveHeadShift: checkReport.giveHeadShift,
         giveStaffOnDuty: checkReport.giveStaffOnDuty,
-        giveStaffSickLeave: checkReport.giveStaffSickLeave,
         giveStaffAbsent: checkReport.giveStaffAbsent,
         receiveShift: checkReport.receiveShift,
         receiveDate: checkReport.receiveDate,
         receiveHeadShift: checkReport.receiveHeadShift,
         receiveStaffOnDuty: checkReport.receiveStaffOnDuty,
-        receiveStaffSickLeave: checkReport.receiveStaffSickLeave,
         receiveStaffAbsent: checkReport.receiveStaffAbsent,
         giveLog: checkReport.giveLog,
         receiveLog: checkReport.receiveLog,
@@ -4972,11 +5057,12 @@ app
         validationStaffSickLeave: validationStaffSickLeave,
         validationStaffAbsent: validationStaffAbsent,
         validationNotes: validationNotes,
+        validationSelectedNames : validationSelectedNames,
         //form name
         headShift: headShift,
         staffOnDuty: staffOnDuty,
-        staffSickLeave: staffSickLeave,
         staffAbsent: staffAbsent,
+        selectedNames : selectedNames,
         // tab-pane
         showTabPane1: '',
         showTabPane2: 'active',

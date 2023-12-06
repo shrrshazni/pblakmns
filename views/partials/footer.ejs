@@ -124,40 +124,9 @@
           updateSelectedNamesDisplay();
         });
       });
-    }
 
-    $('#submitReport').click(function () {
-      // Save the selected names and form data to the server when the button is clicked
-      saveFormWithSelectedNames();
-    });
-
-    function saveFormWithSelectedNames() {
-      // Get form data
-      const formData = {
-        reportId: $('#reportIdInput').val(),
-        shift: $('#giveShift').val(),
-        date: $('#giveDate').val(),
-        location: $('#handoverLocation').val(),
-        headShift: $('#giveHeadShift').val(),
-        handoverShift: $('#giveHandoverShift').val(),
-        notes: $('#giveNotes').val(),
-        staffAbsent: $('#giveStaffAbsent').val(),
-        names: selectedNames // Assuming selectedNames is defined in your code
-      };
-
-      // Make a POST request to the server to save the form data
-      $.ajax({
-        url: '/duty-handover/submit',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(formData),
-        success: function (savedItems) {
-          console.log('Form data saved:', savedItems);
-        },
-        error: function (error) {
-          console.error('Error saving form data:', error);
-        }
-      });
+      // Update the hidden input value with selected names
+      $('#selectedNamesInput').val(selectedNames.join(','));
     }
   });
 
