@@ -110,19 +110,20 @@
                             </div>
 
                             <div class="col-sm-12">
-                              <label for="giveStaffOnDutyDisplay" class="form-label text-900">Shift Member</label>
-                              <div id="giveStaffOnDutyDisplay" class="d-flex">
-                                <% if (dutyHandover.giveStaffOnDuty && dutyHandover.giveStaffOnDuty.length> 0) { %>
-                                  <% dutyHandover.giveStaffOnDuty.forEach(staff=> { %>
+                              <label for="giveShiftMemberDisplay" class="form-label text-900">Shift Member</label>
+                              <div id="giveShiftMemberDisplay" class="d-flex">
+                                <% if (dutyHandover.give && dutyHandover.give.shiftMember && dutyHandover.give.shiftMember.length > 0) { %>
+                                  <% dutyHandover.give.shiftMember.forEach(member => { %>
                                     <div class="btn btn-outline-primary">
-                                      <%= staff %>
+                                      <%= member %>
                                     </div>
-                                    <% }); %>
-                                      <% } else { %>div
-                                        <div>No staff on duty</div>
-                                        <% } %>
+                                  <% }); %>
+                                <% } else { %>
+                                  <div>No shift members for this handover</div>
+                                <% } %>
                               </div>
                             </div>
+                            
 
                             <hr />
                             <h4 class="text-1100 mt-2 mb-2">Log Report</h4>
@@ -298,16 +299,16 @@
                           <h3 class="text-1100 mt-2 mb-3">Handover</h3>
                           <div class="col-12 mb-2">
                             <label class="form-label text-primary-300" for="staffonduty">Staff On Duty</label>
-                            <div id="giveStaffOnDutyDisplay" class="d-flex">
-                              <% if (dutyHandover.giveStaffOnDuty && dutyHandover.giveStaffOnDuty.length> 0) { %>
-                                <% dutyHandover.giveStaffOnDuty.forEach(staff=> { %>
+                            <div id="giveShiftMemberDisplay" class="d-flex">
+                              <% if (dutyHandover.give && dutyHandover.give.shiftMember && dutyHandover.give.shiftMember.length > 0) { %>
+                                <% dutyHandover.give.shiftMember.forEach(member => { %>
                                   <div class="btn btn-outline-primary">
-                                    <%= staff %>
+                                    <%= member %>
                                   </div>
-                                  <% }); %>
-                                    <% } else { %>div
-                                      <div>No staff on duty</div>
-                                      <% } %>
+                                <% }); %>
+                              <% } else { %>
+                                <div>No shift members for this handover</div>
+                              <% } %>
                             </div>
                           </div>
                           <div class="col-12 col-xxl-4">
@@ -338,16 +339,16 @@
                           <h3 class="text-1100 mt-2 mb-3">Receive</h3>
                           <div class="col-12 mb-2">
                             <label class="form-label text-primary-300" for="staffonduty">Staff On Duty</label>
-                            <div id="giveStaffOnDutyDisplay" class="d-flex">
-                              <% if (dutyHandover.giveStaffOnDuty && dutyHandover.receiveStaffOnDuty.length> 0) { %>
-                                <% dutyHandover.receiveStaffOnDuty.forEach(staff=> { %>
+                            <div id="giveShiftMemberDisplay" class="d-flex">
+                              <% if (dutyHandover.receive && dutyHandover.receive.shiftMember && dutyHandover.receive.shiftMember.length > 0) { %>
+                                <% dutyHandover.receive.shiftMember.forEach(member => { %>
                                   <div class="btn btn-outline-primary">
-                                    <%= staff %>
+                                    <%= member %>
                                   </div>
-                                  <% }); %>
-                                    <% } else { %>div
-                                      <div>No staff on duty</div>
-                                      <% } %>
+                                <% }); %>
+                              <% } else { %>
+                                <div>No shift members for this handover</div>
+                              <% } %>
                             </div>
                           </div>
                           <div class="col-12 col-xxl-4">

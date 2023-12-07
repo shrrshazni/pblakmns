@@ -452,16 +452,6 @@ app
     }
   });
 
-// // iTEM ACTIVITY SCHEMA
-// const itemActivitySchema = new mongoose.Schema({
-//   time: String,
-//   by: String,
-//   username: String,
-//   type: String,
-//   title: String,
-//   about: String
-// });
-
 // ACTIVITY
 const ActivitySchema = new mongoose.Schema({
   date: String,
@@ -484,18 +474,22 @@ const File = mongoose.model('File', FileSchema);
 
 // PATROL REPORT SECTION
 
+
+
+const shiftMember = {
+  checkPoint : Number,
+  logReport : String
+}
+
 // PATROL SCHEMA
 const patrolReportSchema = new mongoose.Schema({
   reportId: String,
-  username: String,
-  madeBy: String,
   type: String,
-  start: String,
-  end: String,
   date: String,
   summary: String,
   notes: String,
-  location: String
+  location: String,
+  shiftMember : shiftMember,
 });
 
 const PatrolReport = mongoose.model('PatrolReport', patrolReportSchema);
@@ -3933,34 +3927,36 @@ app.post('/social/settings/:customListName', async function (req, res) {
 
 // DUTY HANDOVER
 
-// DUTY HANDOVER SCHEMA/MODEL
+const give = {
+  headShift : String,
+  handoverShift : String,
+  staffAbsent : String,
+  logReport : String,
+  shift : String,
+  shiftMember : [String]
+}
+
+const receive = {
+  headShift : String,
+  handoverShift : String,
+  staffAbsent : String,
+  logReport : String,
+  shift : String,
+  shiftMember : [String]
+}
+
 const dutyHandoverSchema = new mongoose.Schema({
-  reportId: String,
-  giveShift: String,
-  giveDate: String,
-  giveHeadShift: String,
-  giveStaffOnDuty: {
-    type: [String], // Assuming names are strings
-    default: []
-  },
-  giveStaffSickLeave: String,
-  giveStaffAbsent: String,
-  receiveShift: String,
-  receiveDate: String,
-  receiveHeadShift: String,
-  receiveStaffOnDuty: {
-    type: [String], // Assuming names are strings
-    default: []
-  },
-  receiveStaffSickLeave: String,
-  receiveStaffAbsent: String,
-  location: String,
-  notes: String,
-  status: String,
-  handoverShift: String,
-  giveLog: String,
-  receiveLog: String
+ reportId: String,
+ date : String,
+ location: String,
+ notes : String,
+ status : String,
+ give : give,
+ receive : receive,
+ patrolReport : [],
 });
+
+
 
 const DutyHandover = mongoose.model('DutyHandover', dutyHandoverSchema);
 
@@ -3973,6 +3969,7 @@ app.get('/duty-handover/view', async function (req, res) {
 
     if (checkUser) {
       const itemReports = await DutyHandover.find({}).sort({ date: -1 });
+      console.log(itemReports.give);
       const itemBMI = await DutyHandover.find({
         location: 'Baitul Makmur I'
       }).sort({ date: -1 });
@@ -4516,18 +4513,22 @@ app
         ' pada tarikh ' +
         date;
 
+      const giveHandover = {
+        headShift : headShift,
+        handoverShift : handoverShift,
+        staffAbsent : staffAbsent,
+        logReport : giveLog,
+        shift : shift,
+        shiftMember: selectedNames
+      }
+
       const newHandover = new DutyHandover({
         reportId: confirmRid,
-        giveShift: shift,
-        giveDate: date,
-        giveHeadShift: headShift,
+        date: date,
         status: status,
         notes: notes,
         location: location,
-        giveStaffOnDuty: selectedNames,
-        handoverShift: handoverShift,
-        giveStaffAbsent: staffAbsent,
-        giveLog: giveLog
+        give : giveHandover
       });
 
       const existing = await DutyHandover.findOne({
@@ -4768,37 +4769,33 @@ app
             // duty handover details
             dutyHandover: checkReport,
             reportId: checkReport.reportId,
-            giveShift: checkReport.giveShift,
-            giveDate: checkReport.giveDate,
-            giveHeadShift: checkReport.giveHeadShift,
-            giveStaffOnDuty: checkReport.giveStaffOnDuty,
-            giveStaffSickLeave: checkReport.giveStaffSickLeave,
-            giveStaffAbsent: checkReport.giveStaffAbsent,
-            receiveShift: checkReport.receiveShift,
-            receiveDate: checkReport.receiveDate,
-            receiveHeadShift: checkReport.receiveHeadShift,
-            receiveStaffOnDuty: checkReport.receiveStaffOnDuty,
-            receiveStaffSickLeave: checkReport.receiveStaffSickLeave,
-            receiveStaffAbsent: checkReport.receiveStaffAbsent,
-            giveLog: checkReport.giveLog,
-            receiveLog: checkReport.receiveLog,
+            giveShift: checkReport.give.shift,
+            giveDate: checkReport.date,
+            giveHeadShift: checkReport.give.headShift,
+            giveStaffOnDuty: checkReport.give.shiftMember,
+            giveStaffAbsent: checkReport.give.staffAbsent,
+            receiveShift: checkReport.receive.shift,
+            receiveDate: checkReport.date,
+            receiveHeadShift: checkReport.receive.headShift,
+            receiveStaffOnDuty: checkReport.receive.shiftMember,
+            receiveStaffAbsent: checkReport.receive.staffAbsent,
+            giveLog: checkReport.give.logReport,
+            receiveLog: checkReport.receive.logReport,
             location: checkReport.location,
             status: checkReport.status,
             notes: checkReport.notes,
-            date: checkReport.giveDate,
-            handoverShift: checkReport.handoverShift,
-            shift: checkReport.giveShift,
+            date: checkReport.date,
+            handoverShift: checkReport.give.handoverShift,
+            shift: checkReport.give.shift,
             // validation
             validationHeadShift: '',
             validationStaffOnDuty: '',
-            validationStaffSickLeave: '',
             validationStaffAbsent: '',
             validationNotes: '',
             validationSelectedNames: '',
             //form name
             headShift: '',
             staffOnDuty: '',
-            staffSickLeave: '',
             staffAbsent: '',
             selectedNames: '',
             // tab-pane
@@ -4817,37 +4814,33 @@ app
             // duty handover details
             dutyHandover: checkReport,
             reportId: checkReport.reportId,
-            giveShift: checkReport.giveShift,
-            giveDate: checkReport.giveDate,
-            giveHeadShift: checkReport.giveHeadShift,
-            giveStaffOnDuty: checkReport.giveStaffOnDuty,
-            giveStaffSickLeave: checkReport.giveStaffSickLeave,
-            giveStaffAbsent: checkReport.giveStaffAbsent,
-            receiveShift: checkReport.receiveShift,
-            receiveDate: checkReport.receiveDate,
-            receiveHeadShift: checkReport.receiveHeadShift,
-            receiveStaffOnDuty: checkReport.receiveStaffOnDuty,
-            receiveStaffSickLeave: checkReport.receiveStaffSickLeave,
-            receiveStaffAbsent: checkReport.receiveStaffAbsent,
-            giveLog: checkReport.giveLog,
-            receiveLog: checkReport.receiveLog,
+            giveShift: checkReport.give.shift,
+            giveDate: checkReport.date,
+            giveHeadShift: checkReport.give.headShift,
+            giveStaffOnDuty: checkReport.give.shiftMember,
+            giveStaffAbsent: checkReport.give.staffAbsent,
+            receiveShift: checkReport.receive.shift,
+            receiveDate: checkReport.date,
+            receiveHeadShift: checkReport.receive.headShift,
+            receiveStaffOnDuty: checkReport.receive.shiftMember,
+            receiveStaffAbsent: checkReport.receive.staffAbsent,
+            giveLog: checkReport.give.logReport,
+            receiveLog: checkReport.receive.logReport,
             location: checkReport.location,
             status: checkReport.status,
             notes: checkReport.notes,
-            date: checkReport.giveDate,
-            handoverShift: checkReport.handoverShift,
-            shift: checkReport.giveShift,
+            date: checkReport.date,
+            handoverShift: checkReport.give.handoverShift,
+            shift: checkReport.give.shift,
             // validation
             validationHeadShift: '',
             validationStaffOnDuty: '',
-            validationStaffSickLeave: '',
             validationStaffAbsent: '',
             validationNotes: '',
             validationSelectedNames: '',
             //form name
             headShift: '',
             staffOnDuty: '',
-            staffSickLeave: '',
             staffAbsent: '',
             selectedNames: '',
             // tab-pane
@@ -4960,18 +4953,20 @@ app
         ' pada tarikh ' +
         date;
 
+      const receive = {
+        shift : shift,
+        headShift : headShift,
+        staffAbsent : staffAbsent,
+        handoverShift :handoverShift,
+        logReport : receiveLog,
+        shiftMember : selectedNames
+      }
+
       const updatedData = {
-        reportId: reportId,
-        receiveShift: shift,
-        receiveDate: date,
-        receiveHeadShift: headShift,
-        receiveStaffOnDuty: selectedNames,
-        receiveStaffAbsent: staffAbsent,
         status: status,
         notes: notes,
         location: location,
-        handoverShift: handoverShift,
-        receiveLog: receiveLog
+        receive : receive
       };
 
       const updatedHandover = await DutyHandover.findOneAndUpdate(
@@ -4982,6 +4977,7 @@ app
 
       if (updatedHandover) {
         console.log('Update success');
+
         // Activity
         const newItemActivity = {
           time: currentTime,
@@ -5033,24 +5029,24 @@ app
         // duty handover details
         dutyHandover: checkReport,
         reportId: checkReport.reportId,
-        giveShift: checkReport.giveShift,
-        giveDate: checkReport.giveDate,
-        giveHeadShift: checkReport.giveHeadShift,
-        giveStaffOnDuty: checkReport.giveStaffOnDuty,
-        giveStaffAbsent: checkReport.giveStaffAbsent,
-        receiveShift: checkReport.receiveShift,
-        receiveDate: checkReport.receiveDate,
-        receiveHeadShift: checkReport.receiveHeadShift,
-        receiveStaffOnDuty: checkReport.receiveStaffOnDuty,
-        receiveStaffAbsent: checkReport.receiveStaffAbsent,
-        giveLog: checkReport.giveLog,
-        receiveLog: checkReport.receiveLog,
+        giveShift: checkReport.give.shift,
+        giveDate: checkReport.date,
+        giveHeadShift: checkReport.give.headShift,
+        giveStaffOnDuty: checkReport.give.shiftMember,
+        giveStaffAbsent: checkReport.give.staffAbsent,
+        receiveShift: checkReport.receive.shift,
+        receiveDate: checkReport.date,
+        receiveHeadShift: checkReport.receive.headShift,
+        receiveStaffOnDuty: checkReport.receive.shiftMember,
+        receiveStaffAbsent: checkReport.receive.staffAbsent,
+        giveLog: checkReport.give.logReport,
+        receiveLog: checkReport.receive.logReport,
         location: checkReport.location,
         status: checkReport.status,
         notes: checkReport.notes,
-        date: checkReport.giveDate,
-        handoverShift: checkReport.handoverShift,
-        shift: checkReport.giveShift,
+        date: checkReport.date,
+        handoverShift: checkReport.give.handoverShift,
+        shift: checkReport.give.shift,
         // validation
         validationHeadShift: validationHeadShift,
         validationStaffOnDuty: validationStaffOnDuty,

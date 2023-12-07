@@ -8,7 +8,7 @@
       <li class="breadcrumb-item active"><%= topNav %></li>
     </ol>
   </nav>
-
+  
   <div class="mb-9">
     <div
       id="projectSummary"
@@ -165,31 +165,31 @@
 
           <!-- table content -->
           <tbody class="list" id="project-list-table-body">
-            <% if (Array.isArray(itemReports) && itemReports.length > 0) { %>
+            <% if (itemReports && Array.isArray(itemReports)) { %>
             <!-- table item -->
-            <% itemReports.forEach(function (item) { %>
+            <% itemReports.forEach(function(dutyHandover) { %>
             <tr class="position-static">
               <td
                 class="align-middle time white-space-nowrap ps-0 shift py-4"
               >
                 <a
                   class="fw-bold fs-0"
-                  href="/duty-handover/details?id=<%= item.reportId %>"
-                  ><%= item.giveShift %></a
+                  href="/duty-handover/details?id=<%= dutyHandover.reportId %>"
+                  ><%= dutyHandover.give.shift %></a
                 >
               </td>
               <td class="align-middle white-space-nowrap date ps-3 py-4">
-                <p class="mb-0 fs--1 text-900"><%= item.giveDate %></p>
+                <p class="mb-0 fs--1 text-900"><%= dutyHandover.date %></p>
               </td>
               <td class="align-middle white-space-nowrap headshift ps-3 py-4">
-                <p class="mb-0 fs--1 text-900"><%= item.giveHeadShift %></p>
+                <p class="mb-0 fs--1 text-900"><%= dutyHandover.give.headShift %></p>
               </td>
               <td class="align-middle white-space-nowrap staffabsent ps-3 py-4">
-                <p class="mb-0 fs--1 text-900"><%= item.giveStaffAbsent %></p>
+                <p class="mb-0 fs--1 text-900"><%= dutyHandover.give.staffAbsent %></p>
               </td>
               <td class="align-middle white-space-nowrap text-end status">
                 <span class="badge badge-phoenix fs--2 badge-phoenix-success"
-                  ><%= item.status %></span
+                  ><%= dutyHandover.status %></span
                 >
               </td>
               <td class="align-middle text-end white-space-nowrap pe-0 action">
@@ -206,14 +206,14 @@
                     <span class="fas fa-ellipsis-h fs--2"></span>
                   </button>
                   <div class="dropdown-menu dropdown-menu-end py-2">
-                    <a class="dropdown-item" href="/duty-handover/details?id=<%= item.reportId %>">View</a>
+                    <a class="dropdown-item" href="/duty-handover/details?id=<%= dutyHandover.reportId %>">View</a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item text-danger" href="#!">Remove</a>
                   </div>
                 </div>
               </td>
             </tr>
-            <% }) %> <% } else { %>
+            <%  }); %> <% } else { %>
             <tr>
               <td colspan="7">No case reports submitted.</td>
             </tr>
