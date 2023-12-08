@@ -4,7 +4,16 @@
   <!-- Page title -->
   <h2 class="mb-2 lh-sm">Home</h2>
   <p class="text-700 lead mb-2">
-    Welcome and get started, <strong><%= currentFullName %></strong>!
+    Welcome and get started, <strong><%= currentFullName %></strong>
+  </p>
+
+  <div id="video-container">
+    <video id="video-preview" width="640" height="480" autoplay></video>
+  </div>
+
+  <form action="/scan" method="post">
+    <button type="submit">Scan QR Code</button>
+  </form>
 
   <!-- Body -->
   <div class="mt-4">

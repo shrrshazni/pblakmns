@@ -1,20 +1,16 @@
 <footer class="footer position-absolute d-print-none">
-  <div class="row g-0 justify-content-between align-items-center h-100">
-    <div class="col-12 col-sm-auto text-center">
-      <p class="mb-0 mt-2 mt-sm-0 text-900">
-        Auxiliary Police of LAKMNS<span class="d-none d-sm-inline-block"></span
-        ><span class="d-none d-sm-inline-block mx-1">|</span
-        ><br class="d-sm-none" />2023 &copy;<a
-          class="mx-1"
-          href="https://lakmns.org.my/ms/"
-          >LAKMNS</a
-        >
-      </p>
+    <div class="row g-0 justify-content-between align-items-center h-100">
+        <div class="col-12 col-sm-auto text-center">
+            <p class="mb-0 mt-2 mt-sm-0 text-900">
+                Auxiliary Police of LAKMNS<span class="d-none d-sm-inline-block"></span><span
+                    class="d-none d-sm-inline-block mx-1">|</span><br class="d-sm-none" />2023 &copy;<a class="mx-1"
+                    href="https://lakmns.org.my/ms/">LAKMNS</a>
+            </p>
+        </div>
+        <div class="col-12 col-sm-auto text-center">
+            <p class="mb-0 text-600">V1.1.0</p>
+        </div>
     </div>
-    <div class="col-12 col-sm-auto text-center">
-      <p class="mb-0 text-600">V1.1.0</p>
-    </div>
-  </div>
 </footer>
 <!-- ===============================================-->
 <!--    JavaScripts-->
@@ -36,239 +32,252 @@
 <script src="/vendors/leaflet.tilelayer.colorfilter/leaflet-tilelayer-colorfilter.min.js"></script>
 <script src="/assets/js/ecommerce-dashboard.js"></script>
 <!-- jquery -->
-<script
-  src="https://code.jquery.com/jquery-3.7.1.min.js"
-  integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-  crossorigin="anonymous"
-></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <!-- file uploader -->
 <script src="/vendors/dropzone/dropzone.js"></script>
 <!-- datepicker -->
 <script src="/assets/js/flatpickr.js"></script>
 
 <script>
-  // search function
-  $(document).ready(function () {
-    const queryInput = $('#queryInput');
-    const selectedNamesDiv = $('#selectedNames');
-    const reportIdInput = $('#reportIdInput');
-    const displayNamesContainer = $('#displayNamesContainer');
-    const selectedNames = [];
+    // qr scanner webcam
+    // Function to start the webcam using jQuery
+    function startWebcam() {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                $('#video-preview').prop('srcObject', stream);
+            })
+            .catch((error) => {
+                console.error('Error accessing webcam:', error);
+            });
+    }
 
-    $('#reportForm input[name="query"]').on('input', function () {
-      const query = $(this).val();
-      if (query.trim() !== '') {
-        $.ajax({
-          url: `/search?query=${query}`,
-          method: 'GET',
-          success: function (results) {
-            displayResults(results);
-          },
-          error: function (error) {
-            console.error(error);
-          }
-        });
-      } else {
-        // Clear results if the search query is empty
-        displayResults([]);
-      }
+    // Call the function to start the webcam when the DOM content is loaded
+    $(document).ready(function () {
+        startWebcam();
     });
+    // search function
+    $(document).ready(function () {
+        const queryInput = $('#queryInput');
+        const selectedNamesDiv = $('#selectedNames');
+        const reportIdInput = $('#reportIdInput');
+        const displayNamesContainer = $('#displayNamesContainer');
+        const selectedNames = [];
 
-    function displayResults(results) {
-      const resultsDiv = $('#results');
-      resultsDiv.empty();
-
-      if (results.length === 0) {
-        resultsDiv.append('<p class="text-muted">No results found</p>');
-      } else {
-        results.forEach(result => {
-          const resultDiv = $(
-            '<div class="result btn btn-outline-primary mr-2 mb-2"></div>'
-          ).text(result.fullname);
-          resultsDiv.append(resultDiv);
-
-          // Add click event to handle adding and removing names
-          resultDiv.click(function () {
-            const clickedName = result.fullname;
-
-            // Check if the name is already selected
-            const index = selectedNames.indexOf(clickedName);
-            if (index === -1) {
-              // If not selected, add it to the array and update the display
-              selectedNames.push(clickedName);
-              updateSelectedNamesDisplay();
+        $('#reportForm input[name="query"]').on('input', function () {
+            const query = $(this).val();
+            if (query.trim() !== '') {
+                $.ajax({
+                    url: `/search?query=${query}`,
+                    method: 'GET',
+                    success: function (results) {
+                        displayResults(results);
+                    },
+                    error: function (error) {
+                        console.error(error);
+                    }
+                });
             } else {
-              // If already selected, remove it from the array and update the display
-              selectedNames.splice(index, 1);
-              updateSelectedNamesDisplay();
+                // Clear results if the search query is empty
+                displayResults([]);
             }
-          });
         });
-      }
-    }
 
-    function updateSelectedNamesDisplay() {
-      // Update the display with the selected names
-      selectedNamesDiv.empty();
-      selectedNames.forEach(name => {
-        const nameDiv = $(
-          '<div class="selectedName btn btn-outline-secondary mr-2 mb-1 mt-1"></div>'
-        ).text(name);
-        selectedNamesDiv.append(nameDiv);
+        function displayResults(results) {
+            const resultsDiv = $('#results');
+            resultsDiv.empty();
 
-        // Add click event to remove the name
-        nameDiv.click(function () {
-          const removedName = $(this).text();
-          const index = selectedNames.indexOf(removedName);
-          selectedNames.splice(index, 1);
-          updateSelectedNamesDisplay();
-        });
-      });
+            if (results.length === 0) {
+                resultsDiv.append('<p class="text-muted">No results found</p>');
+            } else {
+                results.forEach(result => {
+                    const resultDiv = $(
+                        '<div class="result btn btn-outline-primary mr-2 mb-2"></div>'
+                    ).text(result.fullname);
+                    resultsDiv.append(resultDiv);
 
-      // Update the hidden input value with selected names
-      $('#selectedNamesInput').val(selectedNames.join(','));
-    }
-  });
+                    // Add click event to handle adding and removing names
+                    resultDiv.click(function () {
+                        const clickedName = result.fullname;
 
-  // print
-  $(document).ready(function () {
-    $('#printLink').on('click', function () {
-      window.print();
-      return false; // Prevent the default behavior of the link
-    });
-  });
-
-  // button loading function
-  $(document).ready(function () {
-    $('.myButton').on('click', function () {
-      $('.myButton').addClass('loading');
-      $('.btn-content').addClass('noshow');
-
-      setTimeout(function () {
-        $('.myButton').removeClass('loading');
-        $('.btn-content').removeClass('noshow');
-      }, 2500);
-    });
-  });
-
-  //update notes
-  $(document).ready(function () {
-    // Function to show the toast
-    function showNotesUpdateToast(content) {
-      $('#notesAlertContent').text(content);
-
-      var toast = new bootstrap.Toast(
-        document.getElementById('alertUpdateToast')
-      );
-      toast.show();
-    }
-
-    $('#updateNotes').on('click', function () {
-      setTimeout(function () {
-        var notes = $('#notesInput').val();
-        // Check if the fields are not empty
-        if (notes === '') {
-          showNotesUpdateToast('Please fill in notes field.');
-        } else {
-          // Perform your update logic here
-          showNotesUpdateToast('Form submitted successfully!');
-        }
-      }, 2000);
-    });
-  });
-
-  // upload files for report
-  $(document).ready(function () {
-    // Function to show the toast
-    function showDropzoneFilesToast(content) {
-      $('#dropzoneAlertContent').text(content);
-
-      var toast = new bootstrap.Toast(
-        document.getElementById('alertUploadToast')
-      );
-      toast.show();
-    }
-
-    var myDropzone = Dropzone.forElement('#myDropzone');
-
-    $('#uploadButton').on('click', function () {
-      setTimeout(function () {
-        // files upload process queue
-
-        if (myDropzone.getQueuedFiles().length > 0) {
-          // If files are present, show the toast with appropriate content
-          showDropzoneFilesToast('Files has been uploaded');
-          // Process the Dropzone queue
-          myDropzone.processQueue();
-        } else {
-          // If no files are present, show the toast with different content
-          showDropzoneFilesToast('No files selected');
+                        // Check if the name is already selected
+                        const index = selectedNames.indexOf(clickedName);
+                        if (index === -1) {
+                            // If not selected, add it to the array and update the display
+                            selectedNames.push(clickedName);
+                            updateSelectedNamesDisplay();
+                        } else {
+                            // If already selected, remove it from the array and update the display
+                            selectedNames.splice(index, 1);
+                            updateSelectedNamesDisplay();
+                        }
+                    });
+                });
+            }
         }
 
-        button.prop('type', 'submit');
-      }, 2000);
+        function updateSelectedNamesDisplay() {
+            // Update the display with the selected names
+            selectedNamesDiv.empty();
+            selectedNames.forEach(name => {
+                const nameDiv = $(
+                    '<div class="selectedName btn btn-outline-secondary mr-2 mb-1 mt-1"></div>'
+                ).text(name);
+                selectedNamesDiv.append(nameDiv);
+
+                // Add click event to remove the name
+                nameDiv.click(function () {
+                    const removedName = $(this).text();
+                    const index = selectedNames.indexOf(removedName);
+                    selectedNames.splice(index, 1);
+                    updateSelectedNamesDisplay();
+                });
+            });
+
+            // Update the hidden input value with selected names
+            $('#selectedNamesInput').val(selectedNames.join(','));
+        }
     });
-  });
 
-  // profile image preview
-  $(document).ready(function () {
-    $(document).on('click', function () {
-      $('#upload-profile-picture').click();
+    // print
+    $(document).ready(function () {
+        $('#printLink').on('click', function () {
+            window.print();
+            return false; // Prevent the default behavior of the link
+        });
     });
 
-    $('#upload-profile-picture').on('change', function () {
-      previewImage(this);
+    // button loading function
+    $(document).ready(function () {
+        $('.myButton').on('click', function () {
+            $('.myButton').addClass('loading');
+            $('.btn-content').addClass('noshow');
+
+            setTimeout(function () {
+                $('.myButton').removeClass('loading');
+                $('.btn-content').removeClass('noshow');
+            }, 2500);
+        });
     });
 
-    function previewImage(input) {
-      const previewImage = $('#preview-image')[0];
+    //update notes
+    $(document).ready(function () {
+        // Function to show the toast
+        function showNotesUpdateToast(content) {
+            $('#notesAlertContent').text(content);
 
-      if (input.files && input.files[0]) {
-        const reader = new FileReader();
+            var toast = new bootstrap.Toast(
+                document.getElementById('alertUpdateToast')
+            );
+            toast.show();
+        }
 
-        reader.onload = function (e) {
-          previewImage.src = e.target.result;
-        };
-
-        reader.readAsDataURL(input.files[0]);
-      }
-    }
-  });
-
-  // profile upload submit
-  $(document).ready(function () {
-    function showProfileToast(content) {
-      $('#profileAlertContent').text(content);
-
-      var toast = new bootstrap.Toast(
-        document.getElementById('alertUploadProfileToast')
-      );
-      toast.show();
-    }
-
-    $('#uploadProfile').on('click', function () {
-      var button = $(this);
-
-      event.preventDefault();
-
-      var fileInput = document.getElementById('upload-profile-picture');
-      // Access the files property to get an array of File objects
-      var files = fileInput.files;
-
-      var form = $(this).closest('form');
-      // Check if there are files selected
-      if (files.length > 0) {
-        // Log or process the first file in the array
-        showProfileToast('Queued file submitted');
-      } else {
-        showProfileToast('No file selected.');
-      }
-
-      setTimeout(function () {
-        form.submit();
-      }, 2000);
+        $('#updateNotes').on('click', function () {
+            setTimeout(function () {
+                var notes = $('#notesInput').val();
+                // Check if the fields are not empty
+                if (notes === '') {
+                    showNotesUpdateToast('Please fill in notes field.');
+                } else {
+                    // Perform your update logic here
+                    showNotesUpdateToast('Form submitted successfully!');
+                }
+            }, 2000);
+        });
     });
-  });
+
+    // upload files for report
+    $(document).ready(function () {
+        // Function to show the toast
+        function showDropzoneFilesToast(content) {
+            $('#dropzoneAlertContent').text(content);
+
+            var toast = new bootstrap.Toast(
+                document.getElementById('alertUploadToast')
+            );
+            toast.show();
+        }
+
+        var myDropzone = Dropzone.forElement('#myDropzone');
+
+        $('#uploadButton').on('click', function () {
+            setTimeout(function () {
+                // files upload process queue
+
+                if (myDropzone.getQueuedFiles().length > 0) {
+                    // If files are present, show the toast with appropriate content
+                    showDropzoneFilesToast('Files has been uploaded');
+                    // Process the Dropzone queue
+                    myDropzone.processQueue();
+                } else {
+                    // If no files are present, show the toast with different content
+                    showDropzoneFilesToast('No files selected');
+                }
+
+                button.prop('type', 'submit');
+            }, 2000);
+        });
+    });
+
+    // profile image preview
+    $(document).ready(function () {
+        $(document).on('click', function () {
+            $('#upload-profile-picture').click();
+        });
+
+        $('#upload-profile-picture').on('change', function () {
+            previewImage(this);
+        });
+
+        function previewImage(input) {
+            const previewImage = $('#preview-image')[0];
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    });
+
+    // profile upload submit
+    $(document).ready(function () {
+        function showProfileToast(content) {
+            $('#profileAlertContent').text(content);
+
+            var toast = new bootstrap.Toast(
+                document.getElementById('alertUploadProfileToast')
+            );
+            toast.show();
+        }
+
+        $('#uploadProfile').on('click', function () {
+            var button = $(this);
+
+            event.preventDefault();
+
+            var fileInput = document.getElementById('upload-profile-picture');
+            // Access the files property to get an array of File objects
+            var files = fileInput.files;
+
+            var form = $(this).closest('form');
+            // Check if there are files selected
+            if (files.length > 0) {
+                // Log or process the first file in the array
+                showProfileToast('Queued file submitted');
+            } else {
+                showProfileToast('No file selected.');
+            }
+
+            setTimeout(function () {
+                form.submit();
+            }, 2000);
+        });
+    });
 </script>
 
 <!-- to be added later close tag for body and html -->

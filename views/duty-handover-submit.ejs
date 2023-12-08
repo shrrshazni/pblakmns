@@ -38,7 +38,9 @@
                       <!-- form title report -->
                       <div class="col-md-4">
                         <label class="form-label" for="giveShift">Shift</label>
-
+                        <% if(shift === ''){
+                            shift = 'Choose a shift'
+                        } %>
                         <select class="form-select <%= validationShift %>" id="giveShift" name="shift">
                           <option selected="" value="<%= shift %>">
                             <%= shift %>
@@ -66,7 +68,9 @@
 
                       <div class="col-md-4">
                         <label class="form-label" for="handoverLocation">Location</label>
-
+                        <% if(location === ''){
+                            location = 'Choose a location'
+                        } %>
                         <select class="form-select <%= validationLocation %>" id="handoverLocation" name="location">
                           <option selected="" value="<%= location %>">
                             <%= location %>
@@ -97,6 +101,9 @@
 
                       <div class="col-md-4">
                         <label class="form-label" for="giveHandoverShift">Handover shift to be received</label>
+                        <% if(handoverShift === ''){
+                            handoverShift = 'Choose a handover shift'
+                        } %>
                         <select class="form-select <%= validationHandoverShift %>" id="giveHandoverShift"
                           name="handoverShift">
                           <option selected="" value="<%= handoverShift %>">

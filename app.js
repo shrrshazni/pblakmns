@@ -14,6 +14,8 @@ const fs = require('fs');
 const path = require('path');
 const fileUpload = require('express-fileupload');
 const nodemailer = require('nodemailer');
+const jsQR = require('jsqr');
+const NodeWebcam = require('node-webcam');
 // getdate
 const dateLocal = require('./public/assets/js/date');
 // const { string, check } = require('yargs');
@@ -473,13 +475,15 @@ const FileSchema = new mongoose.Schema({
 const File = mongoose.model('File', FileSchema);
 
 // PATROL REPORT SECTION
-
-
-
+const checkpoint = {
+  checkpointName: String,
+  time: String,
+  logReport: String
+};
 const shiftMember = {
-  checkPoint : Number,
-  logReport : String
-}
+  fullName: String,
+  checkPoint: [checkpoint]
+};
 
 // PATROL SCHEMA
 const patrolReportSchema = new mongoose.Schema({
@@ -489,94 +493,180 @@ const patrolReportSchema = new mongoose.Schema({
   summary: String,
   notes: String,
   location: String,
-  shiftMember : shiftMember,
+  status: String,
+  shiftMember: [shiftMember]
 });
 
 const PatrolReport = mongoose.model('PatrolReport', patrolReportSchema);
 
 // UPLOAD FILES PATROL REPORT
-app.post('/upload-patrol', async (req, res) => {
-  if (!req.files || Object.keys(req.files).length === 0) {
-    console.log('There is no files selected');
-  } else {
-    // find user full name
-    const currentUsername = req.session.user.username;
+// app.post('/upload-patrol', async (req, res) => {
+//   if (!req.files || Object.keys(req.files).length === 0) {
+//     console.log('There is no files selected');
+//   } else {
+//     // find user full name
+//     const currentUsername = req.session.user.username;
+//     const checkUser = await User.findOne({ username: currentUsername });
+
+//     // find rid
+//     const confirmRid = req.body.fileReportId;
+
+//     // date for upload
+//     var uploadDate = dateLocal.getDateYear();
+//     var uploadTime = dateLocal.getCurrentTime();
+
+//     // Activity
+//     const newItemActivity = {
+//       time: uploadTime,
+//       by: checkUser.fullname,
+//       username: checkUser.username,
+//       type: 'Upload Files',
+//       title: 'Addes & uploaded ' + Object.keys(req.files).length + ' files',
+//       about: 'Files added for attachment in patrol report'
+//     };
+
+//     const newActivity = new Activity({
+//       date: uploadTime,
+//       items: newItemActivity
+//     });
+
+//     const findDate = await Activity.findOne({ date: uploadDate });
+
+//     if (findDate) {
+//       findDate.items.push(newItemActivity);
+//       await findDate.save();
+//       console.log('Activity was added to existing date');
+//     } else {
+//       const resultActivity = Activity.create(newActivity);
+
+//       if (resultActivity) {
+//         console.log('Added new activity');
+//       } else {
+//         console.log('Something is wrong');
+//       }
+//     }
+
+//     // Check if the report ID exists in the database
+//     const existingFile = await File.findOne({ reportId: confirmRid });
+
+//     if (!existingFile) {
+//       // No file with the report ID found, proceed with file upload
+//       for (const file of Object.values(req.files)) {
+//         const uploadPath = __dirname + '/public/uploads/' + file.name;
+//         const pathFile = 'uploads/' + file.name;
+//         const todayDate = dateLocal.getDate();
+//         const fileType = path.extname(file.name);
+
+//         file.mv(uploadPath, err => {
+//           if (err) {
+//             console.log(err);
+//           }
+
+//           // Save file information to the MongoDB
+//           const newFile = new File({
+//             reportId: confirmRid,
+//             by: checkUser.fullname,
+//             filename: file.name,
+//             path: pathFile,
+//             date: todayDate,
+//             fileType: fileType
+//           });
+
+//           newFile.save();
+//         });
+//       }
+//       console.log('Files uploaded');
+//     } else {
+//       // File with the report ID already exists
+//       console.log('Files already uploaded');
+//     }
+//   }
+// });
+
+// SHIFT MEMBER
+
+app.get('/shift-member/view', async function (req, res) {
+  if (req.isAuthenticated()) {
+    var currentUsername = req.session.user.username;
+
     const checkUser = await User.findOne({ username: currentUsername });
 
-    // find rid
-    const confirmRid = req.body.fileReportId;
+    if (checkUser) {
+      const itemReports = await PatrolReport.find({}).sort({ date: -1 });
+      const itemBMI = await PatrolReport.find({
+        location: 'Baitul Makmur I'
+      }).sort({ date: -1 });
+      const itemBMII = await PatrolReport.find({
+        location: 'Baitul Makmur II'
+      }).sort({ date: -1 });
+      const itemJM = await PatrolReport.find({ location: 'Jamek Mosque' }).sort(
+        { date: -1 }
+      );
+      const itemCM = await PatrolReport.find({ location: 'City Mosque' }).sort({
+        date: -1
+      });
+      const itemRS = await PatrolReport.find({
+        location: 'Raudhatul Sakinah'
+      }).sort({ date: -1 });
 
-    // date for upload
-    var uploadDate = dateLocal.getDateYear();
-    var uploadTime = dateLocal.getCurrentTime();
-
-    // Activity
-    const newItemActivity = {
-      time: uploadTime,
-      by: checkUser.fullname,
-      username: checkUser.username,
-      type: 'Upload Files',
-      title: 'Addes & uploaded ' + Object.keys(req.files).length + ' files',
-      about: 'Files added for attachment in patrol report'
-    };
-
-    const newActivity = new Activity({
-      date: uploadTime,
-      items: newItemActivity
-    });
-
-    const findDate = await Activity.findOne({ date: uploadDate });
-
-    if (findDate) {
-      findDate.items.push(newItemActivity);
-      await findDate.save();
-      console.log('Activity was added to existing date');
-    } else {
-      const resultActivity = Activity.create(newActivity);
-
-      if (resultActivity) {
-        console.log('Added new activity');
+      if (itemReports.length > 0) {
+        res.render('shift-member-view', {
+          currentFullName: checkUser.fullname,
+          currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
+          itemReports: itemReports,
+          totalReports: itemReports.length,
+          amountBMI: itemBMI.length,
+          amountBMII: itemBMII.length,
+          amountJM: itemJM.length,
+          amountCM: itemCM.length,
+          amountRS: itemRS.length,
+          topNav: 'All',
+          classActive1: 'active',
+          classActive2: '',
+          classActive3: '',
+          classActive4: '',
+          classActive5: '',
+          classActive6: '',
+          // generated random id
+          rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+          // toast alert
+          toastShow: '',
+          toastMsg: ''
+        });
       } else {
-        console.log('Something is wrong');
-      }
-    }
-
-    // Check if the report ID exists in the database
-    const existingFile = await File.findOne({ reportId: confirmRid });
-
-    if (!existingFile) {
-      // No file with the report ID found, proceed with file upload
-      for (const file of Object.values(req.files)) {
-        const uploadPath = __dirname + '/public/uploads/' + file.name;
-        const pathFile = 'uploads/' + file.name;
-        const todayDate = dateLocal.getDate();
-        const fileType = path.extname(file.name);
-
-        file.mv(uploadPath, err => {
-          if (err) {
-            console.log(err);
-          }
-
-          // Save file information to the MongoDB
-          const newFile = new File({
-            reportId: confirmRid,
-            by: checkUser.fullname,
-            filename: file.name,
-            path: pathFile,
-            date: todayDate,
-            fileType: fileType
-          });
-
-          newFile.save();
+        res.render('shift-member-view', {
+          currentFullName: checkUser.fullname,
+          currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
+          itemReports: 'There is no patrol report submitted yet.',
+          totalReports: '0',
+          amountBMI: '0',
+          amountBMII: '0',
+          amountJM: '0',
+          amountCM: '0',
+          amountRS: '0',
+          topNav: 'All',
+          classActive1: 'active',
+          classActive2: '',
+          classActive3: '',
+          classActive4: '',
+          classActive5: '',
+          classActive6: '',
+          // generated random id
+          rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+          // toast alert
+          toastShow: '',
+          toastMsg: ''
         });
       }
-      console.log('Files uploaded');
-    } else {
-      // File with the report ID already exists
-      console.log('Files already uploaded');
     }
+  } else {
+    res.redirect('/sign-in');
   }
 });
+
+app.get('/shift-member/view/:customNameList', async function (req, res) {});
 
 // VIEW
 app.get('/patrol-report/view', async function (req, res) {
@@ -3928,35 +4018,33 @@ app.post('/social/settings/:customListName', async function (req, res) {
 // DUTY HANDOVER
 
 const give = {
-  headShift : String,
-  handoverShift : String,
-  staffAbsent : String,
-  logReport : String,
-  shift : String,
-  shiftMember : [String]
-}
+  headShift: String,
+  handoverShift: String,
+  staffAbsent: String,
+  logReport: String,
+  shift: String,
+  shiftMember: [String]
+};
 
 const receive = {
-  headShift : String,
-  handoverShift : String,
-  staffAbsent : String,
-  logReport : String,
-  shift : String,
-  shiftMember : [String]
-}
+  headShift: String,
+  handoverShift: String,
+  staffAbsent: String,
+  logReport: String,
+  shift: String,
+  shiftMember: [String]
+};
 
 const dutyHandoverSchema = new mongoose.Schema({
- reportId: String,
- date : String,
- location: String,
- notes : String,
- status : String,
- give : give,
- receive : receive,
- patrolReport : [],
+  reportId: String,
+  date: String,
+  location: String,
+  notes: String,
+  status: String,
+  give: give,
+  receive: receive,
+  patrolReport: []
 });
-
-
 
 const DutyHandover = mongoose.model('DutyHandover', dutyHandoverSchema);
 
@@ -4424,7 +4512,7 @@ app
     const checkUser = await User.findOne({ username: currentUsername });
 
     // Validate the reportType
-    if (!shift || shift === '') {
+    if (!shift || shift === '' || shift === 'Choose a shift') {
       validationShift = 'is-invalid';
     } else {
       validationShift = 'is-valid';
@@ -4438,7 +4526,7 @@ app
     }
 
     // Validate the location
-    if (!location || location === '') {
+    if (!location || location === '' || location === 'Choose a location') {
       validationLocation = 'is-invalid';
     } else {
       validationLocation = 'is-valid';
@@ -4459,14 +4547,11 @@ app
     }
 
     // Validate the handoverShift
-    if (!handoverShift || handoverShift === '') {
-      validationHandoverShift = 'is-invalid';
-    } else {
-      validationHandoverShift = 'is-valid';
-    }
-
-    // Validate the handoverShift
-    if (!handoverShift || handoverShift === '') {
+    if (
+      !handoverShift ||
+      handoverShift === '' ||
+      handoverShift === 'Choose a handover shift'
+    ) {
       validationHandoverShift = 'is-invalid';
     } else {
       validationHandoverShift = 'is-valid';
@@ -4513,14 +4598,80 @@ app
         ' pada tarikh ' +
         date;
 
-      const giveHandover = {
-        headShift : headShift,
-        handoverShift : handoverShift,
-        staffAbsent : staffAbsent,
-        logReport : giveLog,
-        shift : shift,
-        shiftMember: selectedNames
+      // check location
+
+      var confirmLocation = [];
+
+      const locationMappings = {
+        'Baitul Makmur I': [
+          { checkpointName: 'ValueX1', time: '', logReport: '' },
+          { checkpointName: 'ValueX2', time: '', logReport: '' },
+          { checkpointName: 'ValueX3', time: '', logReport: '' },
+          { checkpointName: 'ValueX4', time: '', logReport: '' },
+          { checkpointName: 'ValueX5', time: '', logReport: '' }
+        ],
+        'Baitul Makmur II': [
+          { checkpointName: 'ValueX1', time: '', logReport: '' },
+          { checkpointName: 'ValueX2', time: '', logReport: '' },
+          { checkpointName: 'ValueX3', time: '', logReport: '' },
+          { checkpointName: 'ValueX4', time: '', logReport: '' },
+          { checkpointName: 'ValueX5', time: '', logReport: '' }
+        ],
+        'Jamek Mosque': [
+          { checkpointName: 'ValueX1', time: '', logReport: '' },
+          { checkpointName: 'ValueX2', time: '', logReport: '' },
+          { checkpointName: 'ValueX3', time: '', logReport: '' },
+          { checkpointName: 'ValueX4', time: '', logReport: '' },
+          { checkpointName: 'ValueX5', time: '', logReport: '' }
+        ],
+        'City Mosque': [
+          { checkpointName: 'ValueX1', time: '', logReport: '' },
+          { checkpointName: 'ValueX2', time: '', logReport: '' },
+          { checkpointName: 'ValueX3', time: '', logReport: '' },
+          { checkpointName: 'ValueX4', time: '', logReport: '' },
+          { checkpointName: 'ValueX5', time: '', logReport: '' }
+        ],
+        'Raudhatul Sakinah': [
+          { checkpointName: 'ValueX1', time: '', logReport: '' },
+          { checkpointName: 'ValueX2', time: '', logReport: '' },
+          { checkpointName: 'ValueX3', time: '', logReport: '' },
+          { checkpointName: 'ValueX4', time: '', logReport: '' },
+          { checkpointName: 'ValueX5', time: '', logReport: '' }
+        ]
+        // Define mappings for other locations
+      };
+
+      if (locationMappings.hasOwnProperty(location)) {
+        confirmLocation = locationMappings[location];
       }
+
+      // Access confirmLocation array and its sets of properties
+      confirmLocation.forEach((set, index) => {
+        console.log(`Set ${index + 1}:`);
+        console.log(set.checkpointName); // Access locationName for the set
+        console.log(set.time); // Access time for the set
+        console.log(set.logReport); // Access logReport for the set
+      });
+
+      // patrol report register
+      const newPatrolReport = new PatrolReport({
+        reportId: confirmRid,
+        date: date,
+        location: location,
+        shiftMember: selectedNames.map(name => ({
+          fullName: name,
+          checkPoint: confirmLocation
+        }))
+      });
+
+      const giveHandover = {
+        headShift: headShift,
+        handoverShift: handoverShift,
+        staffAbsent: staffAbsent,
+        logReport: giveLog,
+        shift: shift,
+        shiftMember: selectedNames
+      };
 
       const newHandover = new DutyHandover({
         reportId: confirmRid,
@@ -4528,7 +4679,7 @@ app
         status: status,
         notes: notes,
         location: location,
-        give : giveHandover
+        give: giveHandover
       });
 
       const existing = await DutyHandover.findOne({
@@ -4573,7 +4724,9 @@ app
 
         const result = await newHandover.save();
 
-        if (result) {
+        const resultPatrolReport = await newPatrolReport.save();
+
+        if (result && resultPatrolReport) {
           console.log('Successfully added report.');
         }
 
@@ -4954,19 +5107,19 @@ app
         date;
 
       const receive = {
-        shift : shift,
-        headShift : headShift,
-        staffAbsent : staffAbsent,
-        handoverShift :handoverShift,
-        logReport : receiveLog,
-        shiftMember : selectedNames
-      }
+        shift: shift,
+        headShift: headShift,
+        staffAbsent: staffAbsent,
+        handoverShift: handoverShift,
+        logReport: receiveLog,
+        shiftMember: selectedNames
+      };
 
       const updatedData = {
         status: status,
         notes: notes,
         location: location,
-        receive : receive
+        receive: receive
       };
 
       const updatedHandover = await DutyHandover.findOneAndUpdate(
@@ -5014,11 +5167,8 @@ app
         }
 
         res.redirect('/duty-handover/details?id=' + reportId);
-
       } else {
-
         console.log('Report Id are not exist');
-
       }
     } else {
       console.log('Unsuccessful!');
@@ -5053,12 +5203,12 @@ app
         validationStaffSickLeave: validationStaffSickLeave,
         validationStaffAbsent: validationStaffAbsent,
         validationNotes: validationNotes,
-        validationSelectedNames : validationSelectedNames,
+        validationSelectedNames: validationSelectedNames,
         //form name
         headShift: headShift,
         staffOnDuty: staffOnDuty,
         staffAbsent: staffAbsent,
-        selectedNames : selectedNames,
+        selectedNames: selectedNames,
         // tab-pane
         showTabPane1: '',
         showTabPane2: 'active',
@@ -5250,6 +5400,113 @@ app.post('/save', async (req, res) => {
     res.json(result);
   } catch (err) {
     console.error(err);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// QR SCANNER
+
+// Decode QR code from an image
+const webcamOptions = {
+  width: 1280,
+  height: 720,
+  quality: 100,
+  delay: 0,
+  saveShots: false,
+  output: 'jpeg',
+  device: false,
+  callbackReturn: 'location',
+  verbose: false
+};
+
+// Create webcam instance
+const Webcam = NodeWebcam.create(webcamOptions);
+
+// Function to capture an image from the webcam
+// Capture image using getUserMedia API
+const captureImage = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const video = document.createElement('video');
+      document.body.appendChild(video);
+      video.srcObject = stream;
+
+      video.onloadedmetadata = () => {
+        video.play();
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataURL = canvas.toDataURL('image/jpeg');
+        document.body.removeChild(video);
+        resolve(dataURL);
+      };
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+// Decode QR code from an image
+const decodeQRCode = imageData => {
+  if (
+    !imageData ||
+    typeof imageData.data === 'undefined' ||
+    typeof imageData.width === 'undefined' ||
+    typeof imageData.height === 'undefined'
+  ) {
+    console.error('Invalid imageData:', imageData);
+    return null;
+  }
+
+  const { data, width, height } = imageData;
+  const code = jsQR(data, width, height);
+  return code ? code.data : null;
+};
+
+// Extract and format date from QR code data
+const extractAndFormatDate = qrCodeData => {
+  // Assuming the date is in YYYY-MM-DD format
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+  if (dateRegex.test(qrCodeData)) {
+    return qrCodeData;
+  } else {
+    return null;
+  }
+};
+
+// Serve the index.ejs page
+app.get('/', (req, res) => {
+  res.render('index');
+});
+
+// Route for QR code scanning (GET request for rendering the form)
+app.get('/scan', (req, res) => {
+  res.render('index');
+});
+
+// Route for handling QR code scanning (POST request)
+app.post('/scan', async (req, res) => {
+  try {
+    const imageData = await captureImage();
+    const qrCodeData = decodeQRCode(imageData);
+
+    if (qrCodeData) {
+      const extractedDate = extractAndFormatDate(qrCodeData);
+
+      if (extractedDate) {
+        res.send(`Date extracted from QR Code: ${extractedDate}`);
+      } else {
+        res.send('No valid date found in the QR Code data.');
+      }
+    } else {
+      res.send('No QR Code found in the image.');
+    }
+  } catch (error) {
+    console.error('Error capturing image:', error);
     res.status(500).send('Internal Server Error');
   }
 });
