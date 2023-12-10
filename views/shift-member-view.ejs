@@ -10,6 +10,21 @@
     </ol>
   </nav>
 
+  <div id="shift-members">
+    <h2>Shift Members</h2>
+    <% if (shiftMembers.length > 0) { %>
+      <ul>
+        <% shiftMembers.forEach((shiftMember) => { %>
+          <li>
+            <strong><%= shiftMember.fullName %></strong>
+          </li>
+        <% }); %>
+      </ul>
+    <% } else { %>
+      <p>No shift members available.</p>
+    <% } %>
+  </div>
+
   <div class="mb-9">
     <div
       id="projectSummary"
