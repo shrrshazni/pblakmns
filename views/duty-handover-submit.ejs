@@ -89,6 +89,46 @@
                         </div>
                       </div>
 
+                      <div class="col-md-6">
+                        <label class="form-label" for="timepicker1"
+                          >Start Shift</label
+                        >
+    
+                        <input
+                          class="form-control <%= validationStartTime %> datetimepicker flatpickr-input"
+                          id="timepicker1"
+                          type="text"
+                          placeholder="hour : minute"
+                          data-options='{"enableTime":true,"noCalendar":true,"dateFormat":"H:i","disableMobile":true,"allowInput":true}'
+                          name="startTime"
+                          value="<%= startTime %>"
+                        />
+                        <div class="valid-feedback">Looks good!</div>
+                        <div class="invalid-feedback">
+                          Please select a time here.
+                        </div>
+                      </div>
+    
+                      <div class="col-md-6">
+                        <label class="form-label" for="timepicker2"
+                          >End Shift</label
+                        >
+    
+                        <input
+                          class="form-control <%= validationEndTime %> datetimepicker flatpickr-input"
+                          id="timepicker2"
+                          type="text"
+                          placeholder="hour : minute"
+                          data-options='{"enableTime":true,"noCalendar":true,"dateFormat":"H:i","disableMobile":true,"allowInput":true}'
+                          name="endTime"
+                          value="<%= endTime %>"
+                        />
+                        <div class="valid-feedback">Looks good!</div>
+                        <div class="invalid-feedback">
+                          Please select a time here.
+                        </div>
+                      </div>
+
                       <div class="col-md-4">
                         <label class="form-label" for="giveHeadShift">Head of Shift</label>
 

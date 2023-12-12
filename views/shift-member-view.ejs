@@ -10,50 +10,28 @@
     </ol>
   </nav>
 
-  <div id="shift-members">
-    <h2>Shift Members</h2>
-    <% if (shiftMembers.length > 0) { %>
-      <ul>
-        <% shiftMembers.forEach((shiftMember) => { %>
-          <li>
-            <strong><%= shiftMember.fullName %></strong>
-          </li>
-        <% }); %>
-      </ul>
-    <% } else { %>
-      <p>No shift members available.</p>
-    <% } %>
-  </div>
-
   <div class="mb-9">
     <div
       id="projectSummary"
-      data-list='{"valueNames":["reportType","madeBy","date","startPatrol","endPatrol","pbNumber"],"page":6,"pagination":true}'
+      data-list='{"valueNames":["shift","date","shiftMember","startShift","endShift","status"],"page":6,"pagination":true}'
     >
       <div class="row mb-4 gx-6 gy-3 align-items-center">
         <div class="col-auto">
           <h2 class="mb-0">
-            Patrol Report<span class="fw-normal text-700 ms-3"
+            Shift Member Patrol Report<span class="fw-normal text-700 ms-3"
               >(<%= totalReports %>)</span
             >
           </h2>
-        </div>
-        <div class="col-auto">
-          <a
-            class="btn btn-primary px-5"
-            href="/patrol-report/submit?rid=<%= rid %>"
-            ><i class="fa-solid fa-plus me-2"></i>Add new report</a
-          >
         </div>
       </div>
       <div class="row g-3 justify-content-between align-items-end mb-4">
         <div class="col-12 col-sm-auto">
           <ul class="nav nav-links mx-n2">
-            <li class="nav-item">
+            <li class="nav-item"shift-member>
               <a
                 class="nav-link px-2 py-1 <%= classActive1 %>"
                 aria-current="page"
-                href="/patrol-report/view"
+                href="/shift-member/view"
                 ><span>All</span
                 ><span class="text-700 fw-semi-bold"
                   >(<%= totalReports %>)</span
@@ -63,7 +41,7 @@
             <li class="nav-item">
               <a
                 class="nav-link px-2 py-1 <%= classActive2 %>"
-                href="/patrol-report/view/bmi"
+                href="/shift-member/view/bmi"
                 ><span>Baitul Makmur I</span
                 ><span class="text-700 fw-semi-bold"
                   >(<%= amountBMI %>)</span
@@ -73,7 +51,7 @@
             <li class="nav-item">
               <a
                 class="nav-link px-2 py-1 <%= classActive3 %>"
-                href="/patrol-report/view/bmii"
+                href="/shift-member/view/bmii"
                 ><span>Baitul Makmur II</span
                 ><span class="text-700 fw-semi-bold"
                   >(<%= amountBMII %>)</span
@@ -83,7 +61,7 @@
             <li class="nav-item">
               <a
                 class="nav-link px-2 py-1 <%= classActive4 %>"
-                href="/patrol-report/view/jm"
+                href="/shift-member/view/jm"
                 ><span>Jamek Mosque</span
                 ><span class="text-700 fw-semi-bold">(<%= amountJM %>)</span></a
               >
@@ -91,7 +69,7 @@
             <li class="nav-item">
               <a
                 class="nav-link px-2 py-1 <%= classActive5 %>"
-                href="/patrol-report/view/cm"
+                href="/shift-member/view/cm"
                 ><span>City Mosque</span
                 ><span class="text-700 fw-semi-bold">(<%= amountCM %>)</span></a
               >
@@ -99,7 +77,7 @@
             <li class="nav-item">
               <a
                 class="nav-link px-2 py-1 <%= classActive6 %>"
-                href="/patrol-report/view/rs"
+                href="/shift-member/view/rs"
                 ><span>Raudhatul Sakinah</span
                 ><span class="text-700 fw-semi-bold">(<%= amountRS %>)</span></a
               >
@@ -134,50 +112,50 @@
               <th
                 class="sort white-space-nowrap align-middle ps-0"
                 scope="col"
-                data-sort="reportType"
-                style="width: 30%"
+                data-sort="shift"
+                style="width: 20%"
               >
-                REPORT TYPE
-              </th>
-              <th
-                class="sort align-middle ps-3"
-                scope="col"
-                data-sort="madeBy"
-                style="width: 10%"
-              >
-                MADE BY
+                SHIFT
               </th>
               <th
                 class="sort align-middle ps-3"
                 scope="col"
                 data-sort="date"
-                style="width: 10%"
+                style="width: 20%"
               >
                 DATE
               </th>
               <th
                 class="sort align-middle ps-3"
                 scope="col"
-                data-sort="startPatrol"
-                style="width: 15%"
+                data-sort="shiftMember"
+                style="width: 20%"
               >
-                START PATROL
+                SHIFT MEMBER
               </th>
               <th
                 class="sort align-middle ps-3"
                 scope="col"
-                data-sort="endPatrol"
+                data-sort="startShift"
+                style="width: 20%"
+              >
+                START SHIFT
+              </th>
+              <th
+                class="sort align-middle ps-3"
+                scope="col"
+                data-sort="endShift"
                 style="width: 12%"
               >
-                END PATROL
+                END SHIFT
               </th>
               <th
                 class="sort align-middle text-end"
                 scope="col"
-                data-sort="pbNumber"
-                style="width: 10%"
+                data-sort="status"
+                style="width: 20%"
               >
-                PB NUMBER
+                STATUS
               </th>
               <th
                 class="sort align-middle text-end"
@@ -194,29 +172,29 @@
             <% itemReports.forEach(function (item) { %>
             <tr class="position-static">
               <td
-                class="align-middle time white-space-nowrap ps-0 reportType py-4"
+                class="align-middle time white-space-nowrap ps-0 shift py-4"
               >
                 <a
                   class="fw-bold fs-0"
-                  href="/patrol-report/details?id=<%= item.reportId %>"
-                  ><%= item.type %></a
+                  href="/shift-member/details?id=<%= item.reportId %>"
+                  ><%= item.shift %></a
                 >
-              </td>
-              <td class="align-middle white-space-nowrap madeBy ps-3 py-4">
-                <p class="mb-0 fs--1 text-900"><%= item.madeBy %></p>
               </td>
               <td class="align-middle white-space-nowrap date ps-3 py-4">
                 <p class="mb-0 fs--1 text-900"><%= item.date %></p>
               </td>
-              <td class="align-middle white-space-nowrap startPatrol ps-3 py-4">
-                <p class="mb-0 fs--1 text-900"><%= item.start %></p>
+              <td class="align-middle white-space-nowrap shiftMember ps-3 py-4">
+                <p class="mb-0 fs--1 text-900"><%= item.shiftMember.length %></p>
               </td>
-              <td class="align-middle white-space-nowrap endPatrol ps-3 py-4">
-                <p class="fw-bo text-900 fs--1 mb-0"><%= item.end %></p>
+              <td class="align-middle white-space-nowrap startShift ps-3 py-4">
+                <p class="mb-0 fs--1 text-900"><%= item.startShift %></p>
               </td>
-              <td class="align-middle white-space-nowrap text-end pbNumber">
-                <span class="badge badge-phoenix fs--2 badge-phoenix-primary"
-                  >PB<%= item.username %></span
+              <td class="align-middle white-space-nowrap endShift ps-3 py-4">
+                <p class="fw-bo text-900 fs--1 mb-0"><%= item.endShift %></p>
+              </td>
+              <td class="align-middle white-space-nowrap text-end status">
+                <span class="badge badge-phoenix badge-phoenix-primary fs--1"
+                  ><%= item.status %></span
                 >
               </td>
               <td class="align-middle text-end white-space-nowrap pe-0 action">
@@ -233,9 +211,7 @@
                     <span class="fas fa-ellipsis-h fs--2"></span>
                   </button>
                   <div class="dropdown-menu dropdown-menu-end py-2">
-                    <a class="dropdown-item" href="/patrol-report/details?id=<%= item.reportId %>">View</a>
-                    <!-- <div class="dropdown-divider"></div>
-                    <a class="dropdown-item text-danger" href="#!">Remove</a> -->
+                    <a class="dropdown-item" href="/shift-member/details?id=<%= item.reportId %>">View</a>
                   </div>
                 </div>
               </td>

@@ -14,6 +14,7 @@ const crypto = require("crypto");
 const path = require("path");
 const fileUpload = require("express-fileupload");
 const nodemailer = require("nodemailer");
+const cron = require("node-cron");
 const jsQR = require("jsqr");
 const NodeWebcam = require("node-webcam");
 // getdate
@@ -468,103 +469,109 @@ const shiftMember = {
 // PATROL SCHEMA
 const patrolReportSchema = new mongoose.Schema({
     reportId: String,
+    shift: String,
     type: String,
     date: String,
-    summary: String,
-    notes: String,
     location: String,
     status: String,
+    startShift: String,
+    endShift: String,
+    summary: String,
+    notes: String,
     shiftMember: [shiftMember],
+    patrolUnit: [checkpoint],
 });
 
 const PatrolReport = mongoose.model("PatrolReport", patrolReportSchema);
 
 // UPLOAD FILES PATROL REPORT
-// app.post('/upload-patrol', async (req, res) => {
-//   if (!req.files || Object.keys(req.files).length === 0) {
-//     console.log('There is no files selected');
-//   } else {
-//     // find user full name
-//     const currentUsername = req.session.user.username;
-//     const checkUser = await User.findOne({ username: currentUsername });
+app.post("/upload-patrol", async (req, res) => {
+    if (!req.files || Object.keys(req.files).length === 0) {
+        console.log("There is no files selected");
+    } else {
+        // find user full name
+        const currentUsername = req.session.user.username;
+        const checkUser = await User.findOne({ username: currentUsername });
 
-//     // find rid
-//     const confirmRid = req.body.fileReportId;
+        // find rid
+        const confirmRid = req.body.fileReportId;
 
-//     // date for upload
-//     var uploadDate = dateLocal.getDateYear();
-//     var uploadTime = dateLocal.getCurrentTime();
+        // date for upload
+        var uploadDate = dateLocal.getDateYear();
+        var uploadTime = dateLocal.getCurrentTime();
 
-//     // Activity
-//     const newItemActivity = {
-//       time: uploadTime,
-//       by: checkUser.fullname,
-//       username: checkUser.username,
-//       type: 'Upload Files',
-//       title: 'Addes & uploaded ' + Object.keys(req.files).length + ' files',
-//       about: 'Files added for attachment in patrol report'
-//     };
+        // Activity
+        const newItemActivity = {
+            time: uploadTime,
+            by: checkUser.fullname,
+            username: checkUser.username,
+            type: "Upload Files",
+            title:
+                "Addes & uploaded " + Object.keys(req.files).length + " files",
+            about: "Files added for attachment in patrol report",
+        };
 
-//     const newActivity = new Activity({
-//       date: uploadTime,
-//       items: newItemActivity
-//     });
+        const newActivity = new Activity({
+            date: uploadTime,
+            items: newItemActivity,
+        });
 
-//     const findDate = await Activity.findOne({ date: uploadDate });
+        const findDate = await Activity.findOne({ date: uploadDate });
 
-//     if (findDate) {
-//       findDate.items.push(newItemActivity);
-//       await findDate.save();
-//       console.log('Activity was added to existing date');
-//     } else {
-//       const resultActivity = Activity.create(newActivity);
+        if (findDate) {
+            findDate.items.push(newItemActivity);
+            await findDate.save();
+            console.log("Activity was added to existing date");
+        } else {
+            const resultActivity = Activity.create(newActivity);
 
-//       if (resultActivity) {
-//         console.log('Added new activity');
-//       } else {
-//         console.log('Something is wrong');
-//       }
-//     }
+            if (resultActivity) {
+                console.log("Added new activity");
+            } else {
+                console.log("Something is wrong");
+            }
+        }
 
-//     // Check if the report ID exists in the database
-//     const existingFile = await File.findOne({ reportId: confirmRid });
+        // Check if the report ID exists in the database
+        const existingFile = await File.findOne({ reportId: confirmRid });
 
-//     if (!existingFile) {
-//       // No file with the report ID found, proceed with file upload
-//       for (const file of Object.values(req.files)) {
-//         const uploadPath = __dirname + '/public/uploads/' + file.name;
-//         const pathFile = 'uploads/' + file.name;
-//         const todayDate = dateLocal.getDate();
-//         const fileType = path.extname(file.name);
+        if (!existingFile) {
+            // No file with the report ID found, proceed with file upload
+            for (const file of Object.values(req.files)) {
+                const uploadPath = __dirname + "/public/uploads/" + file.name;
+                const pathFile = "uploads/" + file.name;
+                const todayDate = dateLocal.getDate();
+                const fileType = path.extname(file.name);
 
-//         file.mv(uploadPath, err => {
-//           if (err) {
-//             console.log(err);
-//           }
+                file.mv(uploadPath, (err) => {
+                    if (err) {
+                        console.log(err);
+                    }
 
-//           // Save file information to the MongoDB
-//           const newFile = new File({
-//             reportId: confirmRid,
-//             by: checkUser.fullname,
-//             filename: file.name,
-//             path: pathFile,
-//             date: todayDate,
-//             fileType: fileType
-//           });
+                    // Save file information to the MongoDB
+                    const newFile = new File({
+                        reportId: confirmRid,
+                        by: checkUser.fullname,
+                        filename: file.name,
+                        path: pathFile,
+                        date: todayDate,
+                        fileType: fileType,
+                    });
 
-//           newFile.save();
-//         });
-//       }
-//       console.log('Files uploaded');
-//     } else {
-//       // File with the report ID already exists
-//       console.log('Files already uploaded');
-//     }
-//   }
-// });
+                    newFile.save();
+                });
+            }
+            console.log("Files uploaded");
+        } else {
+            // File with the report ID already exists
+            console.log("Files already uploaded");
+        }
+    }
+});
 
 // SHIFT MEMBER
 
+// VIEW
 app.get("/shift-member/view", async function (req, res) {
     if (req.isAuthenticated()) {
         var currentUsername = req.session.user.username;
@@ -657,94 +664,7 @@ app.get("/shift-member/view", async function (req, res) {
     }
 });
 
-app.get("/shift-member/view/:customNameList", async function (req, res) {});
-
-// VIEW
-app.get("/patrol-report/view", async function (req, res) {
-    if (req.isAuthenticated()) {
-        var currentUsername = req.session.user.username;
-
-        const checkUser = await User.findOne({ username: currentUsername });
-
-        if (checkUser) {
-            const itemReports = await PatrolReport.find({}).sort({ date: -1 });
-            const itemBMI = await PatrolReport.find({
-                location: "Baitul Makmur I",
-            }).sort({ date: -1 });
-            const itemBMII = await PatrolReport.find({
-                location: "Baitul Makmur II",
-            }).sort({ date: -1 });
-            const itemJM = await PatrolReport.find({
-                location: "Jamek Mosque",
-            }).sort({ date: -1 });
-            const itemCM = await PatrolReport.find({
-                location: "City Mosque",
-            }).sort({
-                date: -1,
-            });
-            const itemRS = await PatrolReport.find({
-                location: "Raudhatul Sakinah",
-            }).sort({ date: -1 });
-
-            if (itemReports.length > 0) {
-                res.render("patrol-report-view", {
-                    currentFullName: checkUser.fullname,
-                    currentUser: checkUser.username,
-                    currentProfile: checkUser.profile,
-                    itemReports: itemReports,
-                    totalReports: itemReports.length,
-                    amountBMI: itemBMI.length,
-                    amountBMII: itemBMII.length,
-                    amountJM: itemJM.length,
-                    amountCM: itemCM.length,
-                    amountRS: itemRS.length,
-                    topNav: "All",
-                    classActive1: "active",
-                    classActive2: "",
-                    classActive3: "",
-                    classActive4: "",
-                    classActive5: "",
-                    classActive6: "",
-                    // generated random id
-                    rid: crypto.randomBytes(6).toString("hex").toUpperCase(),
-                    // toast alert
-                    toastShow: "",
-                    toastMsg: "",
-                });
-            } else {
-                res.render("patrol-report-view", {
-                    currentFullName: checkUser.fullname,
-                    currentUser: checkUser.username,
-                    currentProfile: checkUser.profile,
-                    itemReports: "There is no patrol report submitted yet.",
-                    totalReports: "0",
-                    amountBMI: "0",
-                    amountBMII: "0",
-                    amountJM: "0",
-                    amountCM: "0",
-                    amountRS: "0",
-                    topNav: "All",
-                    classActive1: "active",
-                    classActive2: "",
-                    classActive3: "",
-                    classActive4: "",
-                    classActive5: "",
-                    classActive6: "",
-                    // generated random id
-                    rid: crypto.randomBytes(6).toString("hex").toUpperCase(),
-                    // toast alert
-                    toastShow: "",
-                    toastMsg: "",
-                });
-            }
-        }
-    } else {
-        res.redirect("/sign-in");
-    }
-});
-
-// VIEW CUSTOM NAME LIST BASED ON LOCATION
-app.get("/patrol-report/view/:customListName", async function (req, res) {
+app.get("/shift-member/view/:customListName", async function (req, res) {
     if (req.isAuthenticated()) {
         var currentUsername = req.session.user.username;
         const checkUser = await User.findOne({ username: currentUsername });
@@ -775,7 +695,7 @@ app.get("/patrol-report/view/:customListName", async function (req, res) {
             if (customListName === "BMI") {
                 // view for baitul makmur 1
                 if (itemReports.length > 0) {
-                    res.render("patrol-report-view", {
+                    res.render("shift-member-view", {
                         currentFullName: checkUser.fullname,
                         currentUser: checkUser.username,
                         currentProfile: checkUser.profile,
@@ -803,7 +723,7 @@ app.get("/patrol-report/view/:customListName", async function (req, res) {
                         toastMsg: "",
                     });
                 } else {
-                    res.render("patrol-report-view", {
+                    res.render("shift-member-view", {
                         currentFullName: checkUser.fullname,
                         currentUser: checkUser.username,
                         currentProfile: checkUser.profile,
@@ -834,7 +754,7 @@ app.get("/patrol-report/view/:customListName", async function (req, res) {
             } else if (customListName === "BMII") {
                 // view for baitul makmur 2
                 if (itemReports.length > 0) {
-                    res.render("patrol-report-view", {
+                    res.render("shift-member-view", {
                         currentFullName: checkUser.fullname,
                         currentUser: checkUser.username,
                         currentProfile: checkUser.profile,
@@ -862,7 +782,7 @@ app.get("/patrol-report/view/:customListName", async function (req, res) {
                         toastMsg: "",
                     });
                 } else {
-                    res.render("patrol-report-view", {
+                    res.render("shift-member-view", {
                         currentFullName: checkUser.fullname,
                         currentUser: checkUser.username,
                         currentProfile: checkUser.profile,
@@ -893,7 +813,7 @@ app.get("/patrol-report/view/:customListName", async function (req, res) {
             } else if (customListName === "JM") {
                 // view for jamek mosque
                 if (itemReports.length > 0) {
-                    res.render("patrol-report-view", {
+                    res.render("shift-member-view", {
                         currentFullName: checkUser.fullname,
                         currentUser: checkUser.username,
                         currentProfile: checkUser.profile,
@@ -921,7 +841,7 @@ app.get("/patrol-report/view/:customListName", async function (req, res) {
                         toastMsg: "",
                     });
                 } else {
-                    res.render("patrol-report-view", {
+                    res.render("shift-member-view", {
                         currentFullName: checkUser.fullname,
                         currentUser: checkUser.username,
                         currentProfile: checkUser.profile,
@@ -952,7 +872,7 @@ app.get("/patrol-report/view/:customListName", async function (req, res) {
             } else if (customListName === "CM") {
                 // view for city mosque
                 if (itemReports.length > 0) {
-                    res.render("patrol-report-view", {
+                    res.render("shift-member-view", {
                         currentFullName: checkUser.fullname,
                         currentUser: checkUser.username,
                         currentProfile: checkUser.profile,
@@ -980,7 +900,7 @@ app.get("/patrol-report/view/:customListName", async function (req, res) {
                         toastMsg: "",
                     });
                 } else {
-                    res.render("patrol-report-view", {
+                    res.render("shift-member-view", {
                         currentFullName: checkUser.fullname,
                         currentUser: checkUser.username,
                         currentProfile: checkUser.profile,
@@ -1011,7 +931,7 @@ app.get("/patrol-report/view/:customListName", async function (req, res) {
             } else if (customListName === "RS") {
                 // view for raudhatul sakinah
                 if (itemReports.length > 0) {
-                    res.render("patrol-report-view", {
+                    res.render("shift-member-view", {
                         currentFullName: checkUser.fullname,
                         currentUser: checkUser.username,
                         currentProfile: checkUser.profile,
@@ -1039,7 +959,7 @@ app.get("/patrol-report/view/:customListName", async function (req, res) {
                         toastMsg: "",
                     });
                 } else {
-                    res.render("patrol-report-view", {
+                    res.render("shift-member-view", {
                         currentFullName: checkUser.fullname,
                         currentUser: checkUser.username,
                         currentProfile: checkUser.profile,
@@ -1076,472 +996,8 @@ app.get("/patrol-report/view/:customListName", async function (req, res) {
     }
 });
 
-// SUBMIT REPORT FORM
-app.get("/patrol-report/submit", async function (req, res) {
-    if (req.isAuthenticated()) {
-        const currentUsername = req.session.user.username;
-
-        const checkUser = await User.findOne({ username: currentUsername });
-
-        const confirmRid = req.query.rid;
-
-        if (checkUser) {
-            res.render("patrol-report-submit", {
-                currentFullName: checkUser.fullname,
-                currentUser: checkUser.username,
-                currentProfile: checkUser.profile,
-                reportId: confirmRid,
-                //validation
-                validationReportType: "",
-                validationStartTime: "",
-                validationEndTime: "",
-                validationDate: "",
-                validationLocation: "",
-                validationReportSummary: "",
-                validationNotes: "",
-                //form name
-                reportType: "",
-                startTime: "",
-                endTime: "",
-                date: "",
-                location: "",
-                reportSummary: "",
-                notes: "",
-                //toast alert
-                toastShow: "",
-                toastMsg: "",
-            });
-        }
-    } else {
-        res.redirect("/sign-in");
-    }
-}).post("/patrol-report/submit", async function (req, res) {
-    var validationReportType = "";
-    var validationStartTime = "";
-    var validationEndTime = "";
-    var validationDate = "";
-    var validationLocation = "";
-    var validationReportSummary = "";
-    var validationNotes = "";
-
-    // current date time
-    var currentTime = dateLocal.getCurrentTime();
-    var currentDate = dateLocal.getDateYear();
-
-    const reportType = req.body.reportType;
-    const startTime = req.body.startTime;
-    const endTime = req.body.endTime;
-    const location = req.body.location;
-    const date = req.body.date;
-    const reportSummary = req.body.reportSummary;
-    const notes = req.body.notes;
-
-    // generated rid
-    const confirmRid = req.body.confirmRid;
-
-    const currentUsername = req.session.user.username;
-
-    const checkUser = await User.findOne({ username: currentUsername });
-
-    // Validate the reportType
-    if (!reportType || reportType === "") {
-        validationReportType = "is-invalid";
-    } else {
-        validationReportType = "is-valid";
-    }
-
-    // Validate the startTime
-    if (!startTime || startTime === "") {
-        validationStartTime = "is-invalid";
-    } else {
-        validationStartTime = "is-valid";
-    }
-
-    // Validate the endTime
-    if (!endTime || endTime === "") {
-        validationEndTime = "is-invalid";
-    } else {
-        validationEndTime = "is-valid";
-    }
-
-    // Validate the date
-    if (!date || date === "") {
-        validationDate = "is-invalid";
-    } else {
-        validationDate = "is-valid";
-    }
-
-    // Validate the location
-    if (!location || location === "") {
-        validationLocation = "is-invalid";
-    } else {
-        validationLocation = "is-valid";
-    }
-
-    // Validate the reportSummary
-    if (!reportSummary || reportSummary === "") {
-        validationReportSummary = "is-invalid";
-    } else {
-        validationReportSummary = "is-valid";
-    }
-
-    // Validate the notes
-    if (!notes || notes === "") {
-        validationNotes = "is-invalid";
-    } else {
-        validationNotes = "is-valid";
-    }
-
-    if (
-        validationReportType === "is-valid" &&
-        validationStartTime === "is-valid" &&
-        validationEndTime === "is-valid" &&
-        validationDate === "is-valid" &&
-        validationLocation === "is-valid" &&
-        validationReportSummary === "is-valid" &&
-        validationNotes === "is-valid"
-    ) {
-        const currentFullName = checkUser.fullname;
-        const currentUser = checkUser.username;
-
-        // Activity
-        const newItemActivity = {
-            time: currentTime,
-            by: currentFullName,
-            username: currentUser,
-            type: "Patrol Report",
-            title: "Submitted a patrol report of " + _.lowerCase(reportType),
-            about: reportSummary,
-        };
-
-        const newActivity = new Activity({
-            date: currentDate,
-            items: newItemActivity,
-        });
-
-        const findDate = await Activity.findOne({ date: currentDate });
-
-        if (findDate) {
-            findDate.items.push(newItemActivity);
-            await findDate.save();
-            console.log("Activity was added to existing date");
-        } else {
-            const resultActivity = Activity.create(newActivity);
-
-            if (resultActivity) {
-                console.log("Added new activity");
-            } else {
-                console.log("Something is wrong");
-            }
-        }
-
-        // Patrol Report
-
-        const newReport = new PatrolReport({
-            reportId: confirmRid,
-            username: currentUser,
-            madeBy: currentFullName,
-            type: reportType,
-            start: startTime,
-            end: endTime,
-            date: date,
-            summary: reportSummary,
-            notes: notes,
-            location: location,
-        });
-
-        const existing = await PatrolReport.findOne({ reportId: confirmRid });
-
-        if (!existing) {
-            const result = PatrolReport.create(newReport);
-
-            if (result) {
-                console.log("Successfully added report.");
-
-                const checkUser = await User.findOne({
-                    username: currentUsername,
-                });
-
-                if (checkUser) {
-                    const itemReports = await PatrolReport.find({}).sort({
-                        date: -1,
-                    });
-                    const itemBMI = await PatrolReport.find({
-                        location: "Baitul Makmur I",
-                    }).sort({ date: -1 });
-                    const itemBMII = await PatrolReport.find({
-                        location: "Baitul Makmur II",
-                    }).sort({ date: -1 });
-                    const itemJM = await PatrolReport.find({
-                        location: "Jamek Mosque",
-                    }).sort({ date: -1 });
-                    const itemCM = await PatrolReport.find({
-                        location: "City Mosque",
-                    }).sort({ date: -1 });
-                    const itemRS = await PatrolReport.find({
-                        location: "Raudhatul Sakinah",
-                    }).sort({ date: -1 });
-
-                    if (itemReports.length > 0) {
-                        res.render("patrol-report-view", {
-                            currentFullName: checkUser.fullname,
-                            currentUser: checkUser.username,
-                            currentProfile: checkUser.profile,
-                            itemReports: itemReports,
-                            totalReports: itemReports.length,
-                            amountBMI: itemBMI.length,
-                            amountBMII: itemBMII.length,
-                            amountJM: itemJM.length,
-                            amountCM: itemCM.length,
-                            amountRS: itemRS.length,
-                            topNav: "All",
-                            classActive1: "active",
-                            classActive2: "",
-                            classActive3: "",
-                            classActive4: "",
-                            classActive5: "",
-                            classActive6: "",
-                            // generated random id
-                            rid: crypto
-                                .randomBytes(6)
-                                .toString("hex")
-                                .toUpperCase(),
-                            // toast alert
-                            toastShow: "show",
-                            toastMsg: "Submit report successful!",
-                        });
-                    } else {
-                        res.render("patrol-report-view", {
-                            currentFullName: checkUser.fullname,
-                            currentUser: checkUser.username,
-                            currentProfile: checkUser.profile,
-                            itemReports:
-                                "There is no patrol report submitted yet.",
-                            totalReports: "0",
-                            amountBMI: "0",
-                            amountBMII: "0",
-                            amountJM: "0",
-                            amountCM: "0",
-                            amountRS: "0",
-                            topNav: "All",
-                            classActive1: "active",
-                            classActive2: "",
-                            classActive3: "",
-                            classActive4: "",
-                            classActive5: "",
-                            classActive6: "",
-                            // generated random id
-                            rid: crypto
-                                .randomBytes(6)
-                                .toString("hex")
-                                .toUpperCase(),
-                            // toast alert
-                            toastShow: "show",
-                            toastMsg: "Submit report successful!",
-                        });
-                    }
-                }
-            } else {
-                console.log("Add report failed");
-
-                const checkUser = await User.findOne({
-                    username: currentUsername,
-                });
-
-                if (checkUser) {
-                    const itemReports = await PatrolReport.find({}).sort({
-                        date: -1,
-                    });
-                    const itemBMI = await PatrolReport.find({
-                        location: "Baitul Makmur I",
-                    }).sort({ date: -1 });
-                    const itemBMII = await PatrolReport.find({
-                        location: "Baitul Makmur II",
-                    }).sort({ date: -1 });
-                    const itemJM = await PatrolReport.find({
-                        location: "Jamek Mosque",
-                    }).sort({ date: -1 });
-                    const itemCM = await PatrolReport.find({
-                        location: "City Mosque",
-                    }).sort({ date: -1 });
-                    const itemRS = await PatrolReport.find({
-                        location: "Raudhatul Sakinah",
-                    }).sort({ date: -1 });
-
-                    if (itemReports.length > 0) {
-                        res.render("patrol-report-view", {
-                            currentFullName: checkUser.fullname,
-                            currentUser: checkUser.username,
-                            currentProfile: checkUser.profile,
-                            itemReports: itemReports,
-                            totalReports: itemReports.length,
-                            amountBMI: itemBMI.length,
-                            amountBMII: itemBMII.length,
-                            amountJM: itemJM.length,
-                            amountCM: itemCM.length,
-                            amountRS: itemRS.length,
-                            topNav: "All",
-                            classActive1: "active",
-                            classActive2: "",
-                            classActive3: "",
-                            classActive4: "",
-                            classActive5: "",
-                            classActive6: "",
-                            // generated random id
-                            rid: crypto
-                                .randomBytes(6)
-                                .toString("hex")
-                                .toUpperCase(),
-                            // toast alert
-                            toastShow: "show",
-                            toastMsg: "Add report failed!",
-                        });
-                    } else {
-                        res.render("patrol-report-view", {
-                            currentFullName: checkUser.fullname,
-                            currentUser: checkUser.username,
-                            currentProfile: checkUser.profile,
-                            itemReports:
-                                "There is no patrol report submitted yet.",
-                            totalReports: "0",
-                            amountBMI: "0",
-                            amountBMII: "0",
-                            amountJM: "0",
-                            amountCM: "0",
-                            amountRS: "0",
-                            topNav: "All",
-                            classActive1: "active",
-                            classActive2: "",
-                            classActive3: "",
-                            classActive4: "",
-                            classActive5: "",
-                            classActive6: "",
-                            // generated random id
-                            rid: crypto
-                                .randomBytes(6)
-                                .toString("hex")
-                                .toUpperCase(),
-                            // toast alert
-                            toastShow: "show",
-                            toastMsg: "Add report failed!",
-                        });
-                    }
-                }
-            }
-        } else {
-            console.log("There is existing report!");
-
-            const checkUser = await User.findOne({ username: currentUsername });
-
-            if (checkUser) {
-                const itemReports = await PatrolReport.find({});
-                const itemBMI = await PatrolReport.find({
-                    location: "Baitul Makmur I",
-                });
-                const itemBMII = await PatrolReport.find({
-                    location: "Baitul Makmur II",
-                });
-                const itemJM = await PatrolReport.find({
-                    location: "Jamek Mosque",
-                });
-                const itemCM = await PatrolReport.find({
-                    location: "City Mosque",
-                });
-                const itemRS = await PatrolReport.find({
-                    location: "Raudhatul Sakinah",
-                });
-
-                if (itemReports.length > 0) {
-                    res.render("patrol-report-view", {
-                        currentFullName: checkUser.fullname,
-                        currentUser: checkUser.username,
-                        currentProfile: checkUser.profile,
-                        itemReports: itemReports,
-                        totalReports: itemReports.length,
-                        amountBMI: itemBMI.length,
-                        amountBMII: itemBMII.length,
-                        amountJM: itemJM.length,
-                        amountCM: itemCM.length,
-                        amountRS: itemRS.length,
-                        topNav: "All",
-                        classActive1: "active",
-                        classActive2: "",
-                        classActive3: "",
-                        classActive4: "",
-                        classActive5: "",
-                        classActive6: "",
-                        // generated random id
-                        rid: crypto
-                            .randomBytes(6)
-                            .toString("hex")
-                            .toUpperCase(),
-                        // toast alert
-                        toastShow: "show",
-                        toastMsg: "There is an exisitng report!",
-                    });
-                } else {
-                    res.render("patrol-report-view", {
-                        currentFullName: checkUser.fullname,
-                        currentUser: checkUser.username,
-                        currentProfile: checkUser.profile,
-                        itemReports: "There is no patrol report submitted yet.",
-                        totalReports: "0",
-                        amountBMI: "0",
-                        amountBMII: "0",
-                        amountJM: "0",
-                        amountCM: "0",
-                        amountRS: "0",
-                        topNav: "All",
-                        classActive1: "active",
-                        classActive2: "",
-                        classActive3: "",
-                        classActive4: "",
-                        classActive5: "",
-                        classActive6: "",
-                        // generated random id
-                        rid: crypto
-                            .randomBytes(6)
-                            .toString("hex")
-                            .toUpperCase(),
-                        // toast alert
-                        toastShow: "show",
-                        toastMsg: "There is an existing report!",
-                    });
-                }
-            }
-        }
-    } else {
-        // Render the response after the delay
-        res.render("patrol-report-submit", {
-            currentFullName: checkUser.fullname,
-            currentUser: checkUser.username,
-            currentProfile: checkUser.profile,
-            //validation
-            validationReportType: validationReportType,
-            validationDate: validationDate,
-            validationStartTime: validationStartTime,
-            validationEndTime: validationEndTime,
-            validationLocation: validationLocation,
-            validationReportSummary: validationReportSummary,
-            validationNotes: validationNotes,
-            //form
-            reportId: confirmRid,
-            reportType: reportType,
-            startTime: startTime,
-            endTime: endTime,
-            date: date,
-            location: location,
-            reportSummary: reportSummary,
-            notes: notes,
-            //toast alert
-            toastShow: "show",
-            toastMsg: "There is error in your input!",
-        });
-    }
-});
-
-// REPORT DETAILS
-app.get("/patrol-report/details", async function (req, res) {
+// DETAILS
+app.get("/shift-member/details", async function (req, res) {
     if (req.isAuthenticated()) {
         var currentUsername = req.session.user.username;
         const checkUser = await User.findOne({ username: currentUsername });
@@ -1557,54 +1013,166 @@ app.get("/patrol-report/details", async function (req, res) {
                 const checkFiles = await File.find({ reportId: reportId });
 
                 if (checkFiles.length > 0) {
-                    res.render("patrol-report-details", {
+                    res.render("shift-member-details", {
                         currentFullName: checkUser.fullname,
                         currentUser: checkUser.username,
                         currentProfile: checkUser.profile,
                         // patrol report
-                        reportType: checkReport.type,
-                        madeBy: checkReport.madeBy,
-                        pbNumber: checkReport.username,
-                        startTime: checkReport.start,
-                        endTime: checkReport.end,
-                        reportSummary: checkReport.summary,
-                        notes: checkReport.notes,
+                        patrolReport: checkReport,
                         reportId: reportId,
                         // files
                         files: checkFiles,
                     });
                 } else {
-                    res.render("patrol-report-details", {
+                    res.render("shift-member-details", {
                         currentFullName: checkUser.fullname,
                         currentUser: checkUser.username,
                         currentProfile: checkUser.profile,
                         // patrol report
-                        reportType: checkReport.type,
-                        madeBy: checkReport.madeBy,
-                        pbNumber: checkReport.username,
-                        startTime: checkReport.start,
-                        endTime: checkReport.end,
-                        reportSummary: checkReport.summary,
-                        notes: checkReport.notes,
+                        patrolReport: checkReport,
                         reportId: reportId,
                         // files
-                        files: checkFiles,
+                        files: "",
                     });
                 }
             } else {
-                res.render("patrol-report-details", {
+                res.render("shift-member-details", {
                     currentFullName: checkUser.fullname,
                     currentUser: checkUser.username,
                     currentProfile: checkUser.profile,
-                    reportType: "",
-                    madeBy: "",
-                    pbNumber: "",
-                    startTime: "",
-                    endTime: "",
-                    reportSummary: "",
-                    notes: "",
+                    // patrol report
+                    patrolReport: "",
+                    reportId: reportId,
+                    // files
                     files: "",
-                    reportId: "",
+                });
+            }
+        }
+    } else {
+        res.redirect("/sign-in");
+    }
+});
+
+// Define Mongoose model
+const dataSchema = new mongoose.Schema({
+    key: String,
+    value: String,
+    timestamp: {
+        type: Date,
+        default: Date.now,
+    },
+});
+
+const DataModel = mongoose.model("Data", dataSchema);
+
+// Function to submit data to MongoDB using Mongoose
+const submitData = async (data) => {
+    try {
+        const result = await DataModel.create(data);
+        console.log(`Data submitted with ID: ${result._id}`);
+    } catch (error) {
+        console.error("Error submitting data:", error.message);
+    }
+};
+
+// Schedule the script to run every minute for testing purposes
+cron.schedule('0 9 * * *', () => {
+    
+    const sampleData = { key: 'exampleKey', value: 'exampleValue' };
+    submitData(sampleData);
+}, {
+    scheduled: true,
+    timezone: "Asia/Kuala_Lumpur" // Set the timezone to Malaysia
+});
+
+// PATROL UNIT
+
+// VIEW
+
+app.get("/patrol-unit/view", async function (req, res) {
+    if (req.isAuthenticated()) {
+        var currentUsername = req.session.user.username;
+
+        const checkUser = await User.findOne({ username: currentUsername });
+
+        if (checkUser) {
+            const itemReports = await PatrolReport.find({}).sort({ date: -1 });
+            const itemBMI = await PatrolReport.find({
+                location: "Baitul Makmur I",
+            }).sort({ date: -1 });
+            const itemBMII = await PatrolReport.find({
+                location: "Baitul Makmur II",
+            }).sort({ date: -1 });
+            const itemJM = await PatrolReport.find({
+                location: "Jamek Mosque",
+            }).sort({ date: -1 });
+            const itemCM = await PatrolReport.find({
+                location: "City Mosque",
+            }).sort({
+                date: -1,
+            });
+            const itemRS = await PatrolReport.find({
+                location: "Raudhatul Sakinah",
+            }).sort({ date: -1 });
+
+            // Extract shift members from the result
+            const allShiftMembers = itemReports.reduce((members, report) => {
+                if (report.shiftMember && report.shiftMember.length > 0) {
+                    members.push(...report.shiftMember);
+                }
+                return members;
+            }, []);
+
+            if (itemReports.length > 0) {
+                res.render("shift-member-view", {
+                    currentFullName: checkUser.fullname,
+                    currentUser: checkUser.username,
+                    currentProfile: checkUser.profile,
+                    itemReports: itemReports,
+                    shiftMembers: allShiftMembers,
+                    totalReports: itemReports.length,
+                    amountBMI: itemBMI.length,
+                    amountBMII: itemBMII.length,
+                    amountJM: itemJM.length,
+                    amountCM: itemCM.length,
+                    amountRS: itemRS.length,
+                    topNav: "All",
+                    classActive1: "active",
+                    classActive2: "",
+                    classActive3: "",
+                    classActive4: "",
+                    classActive5: "",
+                    classActive6: "",
+                    // generated random id
+                    rid: crypto.randomBytes(6).toString("hex").toUpperCase(),
+                    // toast alert
+                    toastShow: "",
+                    toastMsg: "",
+                });
+            } else {
+                res.render("shift-member-view", {
+                    currentFullName: checkUser.fullname,
+                    currentUser: checkUser.username,
+                    currentProfile: checkUser.profile,
+                    itemReports: "There is no patrol report submitted yet.",
+                    totalReports: "0",
+                    amountBMI: "0",
+                    amountBMII: "0",
+                    amountJM: "0",
+                    amountCM: "0",
+                    amountRS: "0",
+                    topNav: "All",
+                    classActive1: "active",
+                    classActive2: "",
+                    classActive3: "",
+                    classActive4: "",
+                    classActive5: "",
+                    classActive6: "",
+                    // generated random id
+                    rid: crypto.randomBytes(6).toString("hex").toUpperCase(),
+                    // toast alert
+                    toastShow: "",
+                    toastMsg: "",
                 });
             }
         }
@@ -4225,12 +3793,13 @@ const receive = {
 const dutyHandoverSchema = new mongoose.Schema({
     reportId: String,
     date: String,
+    startShift: String,
+    endShift: String,
     location: String,
     notes: String,
     status: String,
     give: give,
     receive: receive,
-    patrolReport: [],
 });
 
 const DutyHandover = mongoose.model("DutyHandover", dutyHandoverSchema);
@@ -4679,6 +4248,8 @@ app.get("/duty-handover/submit", async function (req, res) {
                 validationNotes: "",
                 validationHandoverShift: "",
                 validationSelectedNames: "",
+                validationStartTime: "",
+                validationEndTime: "",
                 //form name
                 shift: "",
                 date: "",
@@ -4690,6 +4261,8 @@ app.get("/duty-handover/submit", async function (req, res) {
                 notes: "",
                 handoverShift: "",
                 selectedNames: "",
+                startTime: "",
+                endTime: "",
                 //toast alert
                 toastShow: "",
                 toastMsg: "",
@@ -4707,6 +4280,8 @@ app.get("/duty-handover/submit", async function (req, res) {
     var validationHandoverShift = "";
     var validationStaffAbsent = "";
     var validationSelectedNames = "";
+    var validationStartTime = "";
+    var validationEndTime = "";
 
     // current date time
     var currentTime = dateLocal.getCurrentTime();
@@ -4722,6 +4297,8 @@ app.get("/duty-handover/submit", async function (req, res) {
     const handoverShift = req.body.handoverShift;
     const staffAbsent = req.body.staffAbsent;
     const confirmRid = req.body.confirmRid;
+    const startTime = req.body.startTime;
+    const endTime = req.body.endTime;
     const selectedNames = req.body.selectedNames
         ? req.body.selectedNames.split(",")
         : [];
@@ -4790,6 +4367,21 @@ app.get("/duty-handover/submit", async function (req, res) {
         validationSelectedNames = "is-valid";
     }
 
+    // Validate the startTime
+    if (!startTime || startTime === "") {
+        validationStartTime = "is-invalid";
+    } else {
+        validationStartTime = "is-valid";
+    }
+
+    // Validate the endTime
+    if (!endTime || endTime === "") {
+        validationEndTime = "is-invalid";
+    } else {
+        validationEndTime = "is-valid";
+    }
+    startTime;
+
     if (
         validationShift === "is-valid" &&
         validationDate === "is-valid" &&
@@ -4798,7 +4390,9 @@ app.get("/duty-handover/submit", async function (req, res) {
         validationNotes === "is-valid" &&
         validationHandoverShift === "is-valid" &&
         validationStaffAbsent === "is-valid" &&
-        validationSelectedNames === "is-valid"
+        validationSelectedNames === "is-valid" &&
+        validationStartTime === "is-valid" &&
+        validationEndTime === "is-valid"
     ) {
         const currentFullName = checkUser.fullname;
         const currentUser = checkUser.username;
@@ -4875,8 +4469,13 @@ app.get("/duty-handover/submit", async function (req, res) {
         // patrol report register
         const newPatrolReport = new PatrolReport({
             reportId: confirmRid,
+            type: "Shift Member Location",
+            shift: shift,
+            startShift: startTime,
+            endShift: endTime,
             date: date,
             location: location,
+            status: "Open",
             shiftMember: selectedNames.map((name) => ({
                 fullName: name,
                 checkPoint: confirmLocation,
@@ -4895,6 +4494,8 @@ app.get("/duty-handover/submit", async function (req, res) {
         const newHandover = new DutyHandover({
             reportId: confirmRid,
             date: date,
+            startShift: startTime,
+            endShift: endTime,
             status: status,
             notes: notes,
             location: location,
@@ -5102,6 +4703,8 @@ app.get("/duty-handover/submit", async function (req, res) {
             validationHandoverShift: validationHandoverShift,
             validationStaffAbsent: validationStaffAbsent,
             validationSelectedNames: validationSelectedNames,
+            validationStartTime: validationStartTime,
+            validationEndTime: validationEndTime,
             //form name
             shift: formData.shift,
             date: formData.date,
@@ -5111,6 +4714,8 @@ app.get("/duty-handover/submit", async function (req, res) {
             handoverShift: formData.handoverShift,
             staffAbsent: formData.staffAbsent,
             selectedNames: selectedNames,
+            startTime: startTime,
+            endTime: endTime,
             //toast alert
             toastShow: "show",
             toastMsg:
@@ -5323,6 +4928,10 @@ app.get("/duty-handover/details", async function (req, res) {
             " pada tarikh " +
             date;
 
+        const updateReport = {
+            status: "Closed",
+        };
+
         const receive = {
             shift: shift,
             headShift: headShift,
@@ -5345,7 +4954,13 @@ app.get("/duty-handover/details", async function (req, res) {
             { new: true },
         );
 
-        if (updatedHandover) {
+        const updatedPatrol = await PatrolReport.findOneAndUpdate(
+            { reportId: reportId },
+            { $set: updateReport },
+            { new: true },
+        );
+
+        if (updatedHandover && updatedPatrol) {
             console.log("Update success");
 
             // Activity
@@ -5358,7 +4973,8 @@ app.get("/duty-handover/details", async function (req, res) {
                     "Submitted a received duty report of " +
                     shift +
                     " & status is " +
-                    status,
+                    status +
+                    " and this shift member patrol report is now closed",
                 about: notes,
             };
 

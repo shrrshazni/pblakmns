@@ -1,0 +1,234 @@
+<%- include("partials/header") %> <%- include("partials/navbar") %>
+
+<div class="content px-0 pt-9">
+  <div class="row g-0">
+    <div class="col-12 col-xxl-10 px-0 bg-soft">
+      <div class="px-4 px-lg-6 pt-6 pb-9">
+        <!-- top header section -->
+        <div class="mb-5">
+          <nav class="mb-4" aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+              <li class="breadcrumb-item active">Reports</li>
+              <li class="breadcrumb-item active">Patrol Report</li>
+              <li class="breadcrumb-item active">Shift Member</li>
+              <li class="breadcrumb-item active"><%= patrolReport.location %></li>
+            </ol>
+          </nav>
+          <div class="d-flex justify-content-between row g-1">
+            <h2 class="col-12 col-xxl-11">
+              Patrol Report Details<span class="fw-normal text-700 ms-3">(<%= patrolReport.date %>)</span>
+            </h2>
+            <div class="font-sans-serif btn-reveal-trigger d-print-none col-12 col-xxl-1">
+              <p class="badge badge-phoenix badge-phoenix-success">
+                <%= patrolReport.status %>
+              </p>
+              <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+                <span class="fas fa-ellipsis-h"></span>
+              </button>
+              <div class="dropdown-menu dropdown-menu-end py-2">
+                <a class="dropdown-item" href="#!" id="printLink">Print</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- body section -->
+        <div class="row gx-0 gx-sm-5 gy-8 mb-n5">
+          <div class="col-12 pe-xl-0">
+            <!-- first section -->
+            <div class="mb-4 mb-xl-7">
+              <div class="row gx-0 gx-sm-7">
+                <div class="col-12 col-xxl-4">
+                  <div class="text-600 fw-semi-bold"><span class="fa-solid fa-keyboard me-2"></span><strong><%= patrolReport.type %></strong></div>
+                  <div class="text-600 fw-semi-bold"><span class="fa-solid fa-flag me-2"></span>Shift : <strong class="text-1000"><%= patrolReport.shift %></strong></div>
+                  <div class="text-600 fw-semi-bold"><span class="fa-solid fa-hourglass-start me-2"></span>Start Shift : <strong class="text-1000"><%= patrolReport.startShift %></strong></div>
+                  <div class="text-600 fw-semi-bold"><span class="fa-solid fa-hourglass-end me-2"></span>End Shift : <strong class="text-1000"><%= patrolReport.endShift %></strong></div>
+                </div>
+                <div class="col-12 col-xxl-8">
+                  <div class="text-600 fw-semi-bold"><span class="fa-solid fa-clipboard-user me-2"></span>Shift Members : </div>
+                  <div id="giveShiftMemberDisplay" class="d-flex row g-1">
+                    <% if (patrolReport && patrolReport.shiftMember && patrolReport.shiftMember.length > 0) { %>
+                    <% patrolReport.shiftMember.forEach(member => { %>
+                    <div class="btn btn-outline-primary col-auto">
+                      <%= member.fullName %>
+                    </div>
+                    <% }); %>
+                    <% } else { %>
+                    <div>No shift members for this handover</div>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="col-12 mb-3">
+          <div class="container mt-2 mb-3 row" style="margin-left: auto; margin-right: auto;">
+            <% if (patrolReport.shiftMember && patrolReport.shiftMember.length > 0) { %>
+            <% patrolReport.shiftMember.forEach(function(member) { %>
+            <div class="card mb-3 col-12 col-xxl-3 scrollbar-overlay" style="height: 30vh;">
+              <div class="card-body">
+                <h5 class="card-title"><%= member.fullName %></h5>
+                <div class="progress mb-3" style="height:15px">
+                  <div class="progress-bar rounded-3" role="progressbar" style="width: 50%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">50%</div>
+                </div>
+                <% if (member.checkPoint && member.checkPoint.length > 0) { %>
+                <% member.checkPoint.forEach(function(checkpoint) { %>
+                <div class="card-text">
+                  <p class="mb-0"><strong>Checkpoint Name:</strong> <%= checkpoint.checkpointName %></p>
+                </div>
+                <% }); %>
+                <% } else { %>
+                <p>No checkpoints available for this member.</p>
+                <% } %>
+              </div>
+            </div>
+            <% }); %>
+            <% } else { %>
+            <p>No shift members available.</p>
+            <% } %>
+          </div>
+        </div>
+
+        <hr />
+        <div class="mt-0">
+          <div class="d-flex align-items-center mb-4">
+            <h3 class="text-1100 me-3">Notes</h3>
+            <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#modalNotes">
+              <span class="fa-solid fa-pen"></span>
+            </button>
+          </div>
+          <p class="text-800"><%= patrolReport.notes %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-xxl-2 px-0 border-start-xxl border-300 border-top-sm position-xxl-fixed end-0">
+      <div class="h-100">
+        <div class="bg-light dark__bg-1100 min-vh-100">
+          <div class="px-4 px-lg-6 py-4">
+            <h4 class="mb-0">Files</h4>
+          </div>
+          <% if (Array.isArray(files) && files.length > 0) { %>
+          <!-- table item -->
+          <% files.forEach(function (item) { %> <% if(item.fileType === ".jpg"
+          || item.fileType === ".jepg" || item.fileType === ".gif" ||
+          item.fileType === ".bmp" || item.fileType === ".png" ) {%>
+
+          <div class="border-top border-300 px-4 px-lg-6 py-4">
+            <div class="me-n3">
+              <div class="d-flex flex-between-center">
+                <div class="d-flex mb-1">
+                  <span class="fa-solid fa-image me-2 text-700 fs--1"></span>
+                  <p class="text-1000 mb-0 lh-1"><%= item.filename %></p>
+                </div>
+                <div class="font-sans-serif btn-reveal-trigger">
+                  <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+                    <span class="fas fa-ellipsis-h"></span>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-end py-2">
+                    <a class="dropdown-item" href="/download/<%= item.filename %>">Download</a>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex fs--1 text-700 mb-2 flex-wrap">
+                <a href="#!"><%= item.by %></a><span class="text-400 mx-1">| </span><span class="text-nowrap"><%= item.date %></span>
+              </div>
+              <img class="rounded-2" id="imageDetails" src="/uploads/<%= item.filename %>" alt="" style="max-width: 200px" />
+            </div>
+          </div>
+          <%} else {%>
+
+          <div class="border-top border-bottom border-300 px-4 px-lg-6 py-4">
+            <div class="me-n3">
+              <div class="d-flex flex-between-center">
+                <div>
+                  <div class="d-flex align-items-center mb-1 flex-wrap">
+                    <p class="text-1000 mb-0 lh-1">
+                      <span class="fa-solid fa-file-lines me-2 fs--1 text-700"></span><%= item.filename %>
+                    </p>
+                  </div>
+                  <div class="d-flex fs--1 text-700 mb-0 flex-wrap">
+                    <a href="#!"><%= item.by %> </a><span class="text-400 mx-1">| </span><span class="text-nowrap"><%= item.date %></span>
+                  </div>
+                </div>
+                <div class="font-sans-serif btn-reveal-trigger">
+                  <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
+                    <span class="fas fa-ellipsis-h"></span>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-end py-2">
+                    <a class="dropdown-item" href="/download/<%= item.filename %>">Download</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% } %> <% }) %> <% } else { %>
+          <div class="border-top border-bottom border-300 px-4 px-lg-6 py-4">
+            <div class="me-n3">
+              <div class="d-flex flex-between-center">
+                <div>
+                  <div class="d-flex align-items-center mb-1 flex-wrap">
+                    No files uploaded
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% } %>
+          <div class="px-5 py-3 px-md-6 mt-3 mb-9">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalNotes" tabindex="-1" aria-labelledby="verticallyCenteredModalLabel" aria-hidden="true" style="display: none">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="verticallyCenteredModalLabel">Notes</h5>
+        <button class="btn p-1" type="button" data-bs-dismiss="modal" aria-label="Close">
+          <span class="fas fa-times fs--1"></span>
+        </button>
+      </div>
+
+      <div class="modal-body row">
+        <form action="/notes-update/patrol-report" method="post" id="notesUpdateForm">
+          <div class="col-12 gy-4">
+            <textarea class="form-control scrollbar-overlay mb-3" id="notesInput" placeholder="Leave a note here" style="height: 75px" name="notes"></textarea>
+          </div>
+
+          <input type="text" style="display: none" value="<%= reportId %>" name="confirmRid" />
+
+          <button class="btn btn-primary myButton" type="submit" id="updateNotes">
+            <div class="btn-content">Update</div>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- alert toast upload -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+    <div class="d-flex">
+      <div class="toast align-items-center text-white bg-primary border-0 light" role="alert" data-bs-autohide="false" aria-live="assertive" aria-atomic="true" id="alertUpdateToast">
+        <div class="d-flex justify-content-between">
+          <div class="toast-body px-0 py-3">
+            <code id="notesAlertContent" class="text-white"></code>
+          </div>
+
+          <button class="btn ms-2 p-0 btn-close-white" type="button" data-bs-dismiss="toast" aria-label="Close">
+            <span class="uil uil-times fs-1"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("partials/navbar-script") %> <%- include("partials/footer") %>
