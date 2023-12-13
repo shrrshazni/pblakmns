@@ -15,6 +15,8 @@ const path = require("path");
 const fileUpload = require("express-fileupload");
 const nodemailer = require("nodemailer");
 const cron = require("node-cron");
+const axios = require("axios");
+// not yet been use
 const jsQR = require("jsqr");
 const NodeWebcam = require("node-webcam");
 // getdate
@@ -579,23 +581,30 @@ app.get("/shift-member/view", async function (req, res) {
         const checkUser = await User.findOne({ username: currentUsername });
 
         if (checkUser) {
-            const itemReports = await PatrolReport.find({}).sort({ date: -1 });
+            const itemReports = await PatrolReport.find({
+                type: "Shift Member Location",
+            }).sort({ date: -1 });
             const itemBMI = await PatrolReport.find({
                 location: "Baitul Makmur I",
+                type: "Shift Member Location",
             }).sort({ date: -1 });
             const itemBMII = await PatrolReport.find({
                 location: "Baitul Makmur II",
+                type: "Shift Member Location",
             }).sort({ date: -1 });
             const itemJM = await PatrolReport.find({
                 location: "Jamek Mosque",
+                type: "Shift Member Location",
             }).sort({ date: -1 });
             const itemCM = await PatrolReport.find({
                 location: "City Mosque",
+                type: "Shift Member Location",
             }).sort({
                 date: -1,
             });
             const itemRS = await PatrolReport.find({
                 location: "Raudhatul Sakinah",
+                type: "Shift Member Location",
             }).sort({ date: -1 });
 
             // Extract shift members from the result
@@ -672,23 +681,30 @@ app.get("/shift-member/view/:customListName", async function (req, res) {
         const customListName = _.upperCase(req.params.customListName);
 
         if (checkUser) {
-            const itemReports = await PatrolReport.find({}).sort({ date: -1 });
+            const itemReports = await PatrolReport.find({
+                type: "Shift Member Location",
+            }).sort({ date: -1 });
             const itemBMI = await PatrolReport.find({
                 location: "Baitul Makmur I",
+                type: "Shift Member Location",
             }).sort({ date: -1 });
             const itemBMII = await PatrolReport.find({
                 location: "Baitul Makmur II",
+                type: "Shift Member Location",
             }).sort({ date: -1 });
             const itemJM = await PatrolReport.find({
                 location: "Jamek Mosque",
+                type: "Shift Member Location",
             }).sort({ date: -1 });
             const itemCM = await PatrolReport.find({
                 location: "City Mosque",
+                type: "Shift Member Location",
             }).sort({
                 date: -1,
             });
             const itemRS = await PatrolReport.find({
                 location: "Raudhatul Sakinah",
+                type: "Shift Member Location",
             }).sort({ date: -1 });
 
             // check customlistname
@@ -1053,37 +1069,69 @@ app.get("/shift-member/details", async function (req, res) {
     }
 });
 
-// Define Mongoose model
-const dataSchema = new mongoose.Schema({
-    key: String,
-    value: String,
-    timestamp: {
-        type: Date,
-        default: Date.now,
-    },
-});
-
-const DataModel = mongoose.model("Data", dataSchema);
-
 // Function to submit data to MongoDB using Mongoose
-const submitData = async (data) => {
-    try {
-        const result = await DataModel.create(data);
-        console.log(`Data submitted with ID: ${result._id}`);
-    } catch (error) {
-        console.error("Error submitting data:", error.message);
+const scheduler = async (data) => {
+    const submitData = await PatrolReport.create(data);
+
+    if (submitData) {
+        console.log("Patrol unit submitted");
+    } else {
+        console.log("Error");
     }
 };
 
 // Schedule the script to run every minute for testing purposes
-cron.schedule('0 9 * * *', () => {
-    
-    const sampleData = { key: 'exampleKey', value: 'exampleValue' };
-    submitData(sampleData);
-}, {
-    scheduled: true,
-    timezone: "Asia/Kuala_Lumpur" // Set the timezone to Malaysia
-});
+cron.schedule(
+    "0 8 * * *",
+    () => {
+        const dateToday = dateLocal.getDate();
+        const checkpointData = [
+            {
+                checkpointName: "Checkpoint 1",
+                logReport: "Log report 1",
+                time: "08:15 AM",
+            },
+            {
+                checkpointName: "Checkpoint 2",
+                logReport: "Log report 2",
+                time: "09:00 AM",
+            },
+            {
+                checkpointName: "Checkpoint 3",
+                logReport: "Log report 3",
+                time: "10:30 AM",
+            },
+            {
+                checkpointName: "Checkpoint 4",
+                logReport: "Log report 4",
+                time: "12:00 PM",
+            },
+            {
+                checkpointName: "Checkpoint 5",
+                logReport: "Log report 5",
+                time: "01:45 PM",
+            },
+        ];
+
+        const patrolUnitData = {
+            reportId: crypto.randomBytes(6).toString("hex").toUpperCase(),
+            type: "Patrol Unit",
+            date: dateToday,
+            status: "Open",
+            startShift: "08:00",
+            endShift: "17:00",
+            notes: "",
+            patrolUnit: checkpointData,
+        };
+
+        scheduler(patrolUnitData);
+        console.log(patrolUnitData);
+    },
+    {
+        scheduled: true,
+        timezone: "Asia/Kuala_Lumpur", // Set the timezone to Malaysia
+    },
+);
 
 // PATROL UNIT
 
@@ -1096,23 +1144,30 @@ app.get("/patrol-unit/view", async function (req, res) {
         const checkUser = await User.findOne({ username: currentUsername });
 
         if (checkUser) {
-            const itemReports = await PatrolReport.find({}).sort({ date: -1 });
+            const itemReports = await PatrolReport.find({
+                type: "Patrol Unit",
+            }).sort({ date: -1 });
             const itemBMI = await PatrolReport.find({
                 location: "Baitul Makmur I",
+                type: "Patrol Unit",
             }).sort({ date: -1 });
             const itemBMII = await PatrolReport.find({
                 location: "Baitul Makmur II",
+                type: "Patrol Unit",
             }).sort({ date: -1 });
             const itemJM = await PatrolReport.find({
                 location: "Jamek Mosque",
+                type: "Patrol Unit",
             }).sort({ date: -1 });
             const itemCM = await PatrolReport.find({
                 location: "City Mosque",
+                type: "Patrol Unit",
             }).sort({
                 date: -1,
             });
             const itemRS = await PatrolReport.find({
                 location: "Raudhatul Sakinah",
+                type: "Patrol Unit",
             }).sort({ date: -1 });
 
             // Extract shift members from the result
@@ -1124,7 +1179,7 @@ app.get("/patrol-unit/view", async function (req, res) {
             }, []);
 
             if (itemReports.length > 0) {
-                res.render("shift-member-view", {
+                res.render("patrol-unit-view", {
                     currentFullName: checkUser.fullname,
                     currentUser: checkUser.username,
                     currentProfile: checkUser.profile,
@@ -1150,7 +1205,7 @@ app.get("/patrol-unit/view", async function (req, res) {
                     toastMsg: "",
                 });
             } else {
-                res.render("shift-member-view", {
+                res.render("patrol-unit-view", {
                     currentFullName: checkUser.fullname,
                     currentUser: checkUser.username,
                     currentProfile: checkUser.profile,
@@ -1173,6 +1228,62 @@ app.get("/patrol-unit/view", async function (req, res) {
                     // toast alert
                     toastShow: "",
                     toastMsg: "",
+                });
+            }
+        }
+    } else {
+        res.redirect("/sign-in");
+    }
+});
+
+app.get("/patrol-unit/details", async function (req, res) {
+    if (req.isAuthenticated()) {
+        var currentUsername = req.session.user.username;
+        const checkUser = await User.findOne({ username: currentUsername });
+
+        const reportId = req.query.id;
+
+        if (checkUser) {
+            const checkReport = await PatrolReport.findOne({
+                reportId: reportId,
+            });
+
+            if (checkReport) {
+                const checkFiles = await File.find({ reportId: reportId });
+
+                if (checkFiles.length > 0) {
+                    res.render("patrol-unit-details", {
+                        currentFullName: checkUser.fullname,
+                        currentUser: checkUser.username,
+                        currentProfile: checkUser.profile,
+                        // patrol report
+                        patrolReport: checkReport,
+                        reportId: reportId,
+                        // files
+                        files: checkFiles,
+                    });
+                } else {
+                    res.render("patrol-unit-details", {
+                        currentFullName: checkUser.fullname,
+                        currentUser: checkUser.username,
+                        currentProfile: checkUser.profile,
+                        // patrol report
+                        patrolReport: checkReport,
+                        reportId: reportId,
+                        // files
+                        files: "",
+                    });
+                }
+            } else {
+                res.render("patrol-unit-details", {
+                    currentFullName: checkUser.fullname,
+                    currentUser: checkUser.username,
+                    currentProfile: checkUser.profile,
+                    // patrol report
+                    patrolReport: "",
+                    reportId: reportId,
+                    // files
+                    files: "",
                 });
             }
         }
@@ -5123,7 +5234,7 @@ app.post("/notes-update/:customNameList", async function (req, res) {
         } else {
             console.log("Report Id are not exist");
         }
-    } else if (customNameList === "patrol-report") {
+    } else if (customNameList === "shift-member") {
         const updatedHandover = await PatrolReport.findOneAndUpdate(
             { reportId: reportId },
             { $set: updatedData },
@@ -5132,7 +5243,7 @@ app.post("/notes-update/:customNameList", async function (req, res) {
 
         if (updatedHandover) {
             console.log("Update success");
-            res.redirect("/patrol-report/details?id=" + reportId);
+            res.redirect("/shift-member/details?id=" + reportId);
         } else {
             console.log("Report Id are not exist");
         }
@@ -5209,6 +5320,47 @@ app.get("/sign-out", function (req, res) {
         }
         res.redirect("/");
     });
+});
+
+// EXAMPLE ADD LOCATION
+
+const locationSchema = new mongoose.Schema({
+    latitude: Number,
+    longitude: Number,
+    name: String,
+    description: String,
+});
+
+const Location = mongoose.model("Location", locationSchema);
+
+// Route to render a form for adding a new location
+app.get("/add-location", async function (req, res) {
+    if (req.isAuthenticated()) {
+        var currentUsername = req.session.user.username;
+
+        const checkUser = await User.findOne({ username: currentUsername });
+
+        if (checkUser) {
+            res.render("add-location", {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
+                rid: crypto.randomBytes(6).toString("hex").toUpperCase(),
+            });
+        }
+    } else {
+        res.redirect("/sign-in");
+    }
+});
+
+app.get('/locations-submit', async (req, res) => {
+    try {
+      const locations = await Location.find({});
+      res.json(locations);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    }
 });
 
 // PORT INITIALIZATION ON CLOUD OR LOCAL (5001)

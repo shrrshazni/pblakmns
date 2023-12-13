@@ -2,9 +2,9 @@ exports.getDate = function () {
   const today = new Date();
 
   const options = {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long'
+    year: '2-digit',
+    day: '2-digit',
+    month: '2-digit'
   };
 
   return today.toLocaleDateString('en-MY', options);
@@ -41,7 +41,7 @@ exports.getCurrentTime = function () {
   const minutes = now.getMinutes();
 
   // Determine whether it's AM or PM
-  const ampm = hours >= 12 ? 'pm' : 'am';
+  const ampm = hours >= 12 ? 'PM' : 'AM';
 
   // Convert hours to 12-hour format
   hours = hours % 12 || 12;
