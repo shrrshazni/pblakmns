@@ -1,0 +1,161 @@
+<div
+  class="tab-pane"
+  role="tabpanel"
+  aria-labelledby="bootstrap-wizard-tab2"
+  id="bootstrap-wizard-tab2"
+>
+  <form
+    id="wizardForm2"
+    novalidate="novalidate"
+    data-wizard-form="2"
+    class="row g-3"
+  >
+    <!-- form title report -->
+    <div class="col-md-4">
+      <label class="form-label" for="validationCustom04">Shift</label>
+
+      <select
+        class="form-select <%= validationShift %>"
+        id="validationCustom04"
+        name="shift"
+      >
+        <option selected="" value="<%= shift %>">Choose Shift</option>
+        <option value="Shift A">Shift A</option>
+        <option value="Shift B">Shift B</option>
+        <option value="Shift C">Shift C</option>
+      </select>
+      <div class="valid-feedback">Looks good!</div>
+      <div class="invalid-feedback">Please select a shift.</div>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label" for="datepicker1">Date</label>
+
+      <input
+        class="form-control <%= validationDate %> datetimepicker flatpickr-input"
+        id="datepicker1"
+        type="text"
+        placeholder="day/month/year"
+        data-options='{"dateFormat":"d/m/y","disableMobile":true,"allowInput":true}'
+        name="date"
+        value="<%= date %>"
+      />
+      <div class="valid-feedback">Looks good!</div>
+      <div class="invalid-feedback">Please select a date here.</div>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label" for="validationCustom05">Location</label>
+
+      <select
+        class="form-select <%= validationLocation %>"
+        id="validationCustom05"
+        name="location"
+      >
+        <option selected="" value="<%= location %>">Choose location</option>
+        <option value="Baitul Makmur I">Baitul Makmur I</option>
+        <option value="Baitul Makmur II">Baitul Makmur II</option>
+        <option value="Jamek Mosque">Jamek Mosque</option>
+        <option value="City Mosque">City Mosque</option>
+        <option value="Raudhatul Sakinah">Raudhatul Sakinah</option>
+      </select>
+      <div class="valid-feedback">Looks good!</div>
+      <div class="invalid-feedback">Please select a title report.</div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="validationCustom03">Head of Shift</label>
+
+      <input
+        class="form-control <%= validationHeadShift %>"
+        id="validationCustom03"
+        type="text"
+        name="headShift"
+        value="<%= headShift %>"
+      />
+      <div class="invalid-feedback">Please provide head shift assigned.</div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="validationCustom04"
+        >Handover shift to be received</label
+      >
+
+      <select
+        class="form-select <%= validationHandoverShift %>"
+        id="validationCustom04"
+        name="handoverShift"
+      >
+        <option selected="" value="<%= handoverShift %>">Choose Shift</option>
+        <option value="Shift A">Shift A</option>
+        <option value="Shift B">Shift B</option>
+        <option value="Shift C">Shift C</option>
+      </select>
+      <div class="valid-feedback">Looks good!</div>
+      <div class="invalid-feedback">Please select a shift.</div>
+    </div>
+
+    <div class="col-md-12">
+      <label class="form-label" for="validationCustom03">Staff on duty</label>
+
+      <input
+        class="form-control <%= validationStaffOnDuty %>"
+        id="validationCustom03"
+        type="text"
+        name="staffOnDuty"
+        value="<%= staffOnDuty %>"
+      />
+      <div class="invalid-feedback">Please provide a staff assigned.</div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="validationCustom03"
+        >Staff on sick leave</label
+      >
+
+      <input
+        class="form-control <%= validationStaffSickLeave %>"
+        id="validationCustom03"
+        type="text"
+        name="staffSickLeave"
+        value="<%= staffSickLeave %>"
+      />
+      <div class="invalid-feedback">Please provide a staff on sick leave.</div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="validationCustom03">Staff absent</label>
+
+      <input
+        class="form-control <%= validationStaffAbsent %>"
+        id="validationCustom03"
+        type="text"
+        name="staffAbsent"
+        value="<%= staffAbsent %>"
+      />
+      <div class="invalid-feedback">Please provide a staff absent.</div>
+    </div>
+
+    <div class="col-12 gy-4 mb-3">
+      <label class="form-label" for="floatingProjectDescription2">Notes</label>
+      <textarea
+        class="form-control <%= validationNotes %> scrollbar-overlay"
+        id="floatingProjectDescription2"
+        placeholder="Leave a note here"
+        style="height: 64px"
+        name="notes"
+      >
+<%= notes %></textarea
+      >
+      <div class="valid-feedback">Looks good!</div>
+      <div class="invalid-feedback">Please enter a note here.</div>
+    </div>
+
+    <input
+      type="text"
+      style="display: none"
+      value="<%= reportId %>"
+      name="confirmRid"
+    />
+  </form>
+</div>

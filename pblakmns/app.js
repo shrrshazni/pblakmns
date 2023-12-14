@@ -10,21 +10,15 @@ const passportLocalMongoose = require('passport-local-mongoose');
 const findOrCreate = require('mongoose-findorcreate');
 const MongoDBSession = require('connect-mongodb-session')(session);
 const crypto = require('crypto');
-// const fs = require('fs');
+const fs = require('fs');
 const path = require('path');
 const fileUpload = require('express-fileupload');
 const nodemailer = require('nodemailer');
-const cron = require('node-cron');
-const axios = require('axios');
-// not yet been use
-const jsQR = require('jsqr');
-const NodeWebcam = require('node-webcam');
 // getdate
 const dateLocal = require('./public/assets/js/date');
-const cool = require('cool-ascii-faces');
+const { string, check } = require('yargs');
 
-const mongoURI =
-  'mongodb+srv://shrrshazni:protechlakmns123@cluster0.rembern.mongodb.net/sessions';
+const mongoURI = 'mongodb://localhost:27017/sessions';
 
 const app = express();
 
@@ -61,9 +55,7 @@ app.use(passport.session());
 main().catch(err => console.log(err));
 
 async function main() {
-  await mongoose.connect(
-    'mongodb+srv://shrrshazni:protechlakmns123@cluster0.rembern.mongodb.net/auxiliaryPolice'
-  );
+  await mongoose.connect('mongodb+srv://shrrshazni:protechlakmns123@cluster0.rembern.mongodb.net/auxiliaryPolice');
 }
 
 //USER
@@ -109,7 +101,10 @@ let transporter = nodemailer.createTransport({
   }
 });
 
-// HOME
+//PAGES INITIALISATION
+
+//HOME
+
 app.get('/', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -130,6 +125,7 @@ app.get('/', async function (req, res) {
 });
 
 // SIGN IN
+
 app
   .get('/sign-in', function (req, res) {
     res.render('sign-in', {
@@ -230,6 +226,7 @@ app
   });
 
 //SIGN UP
+
 app
   .get('/sign-up', function (req, res) {
     res.render('sign-up');
@@ -241,7 +238,6 @@ app
         username: req.body.username,
         fullname: req.body.fullname,
         email: req.body.email,
-        phone: req.body.phone,
         profile: ''
       },
       req.body.password,
@@ -259,6 +255,7 @@ app
   });
 
 //FORGOT PASSWORD
+
 app
   .get('/forgot-password', function (req, res) {
     res.render('forgot-password', {
@@ -301,9 +298,7 @@ app
     }
 
     if (validationEmail === 'is-valid') {
-      const resetPasswordUrl =
-        'https://whispering-coast-01823-a731e7840e6b.herokuapp.com/reset-password/' +
-        userId;
+      const resetPasswordUrl = 'localhost:3000/reset-password/' + userId;
 
       let mailOptions = {
         from: 'shrrshazni@gmail.com',
@@ -443,15 +438,27 @@ app
     }
   });
 
+// iTEM ACTIVITY
+
+const itemActivitySchema = new mongoose.Schema({
+  time: String,
+  by: String,
+  username: String,
+  type: String,
+  title: String,
+  about: String
+});
+
 // ACTIVITY
 const ActivitySchema = new mongoose.Schema({
   date: String,
-  items: []
+  items: [itemActivitySchema]
 });
 
 const Activity = mongoose.model('Activity', ActivitySchema);
 
-// FILES SCHEMA MODEL
+// FILES
+// Define a schema for your model (e.g., for storing file metadata)
 const FileSchema = new mongoose.Schema({
   reportId: String,
   by: String,
@@ -463,38 +470,25 @@ const FileSchema = new mongoose.Schema({
 
 const File = mongoose.model('File', FileSchema);
 
-// PATROL REPORT SECTION
-const checkpoint = {
-  latitude: Number,
-  longitude: Number,
-  checkpointName: String,
-  time: String,
-  logReport: String
-};
-const shiftMember = {
-  fullName: String,
-  checkPoint: [checkpoint]
-};
+//PATROL REPORT SECTION
 
-// PATROL SCHEMA
+//patrol schema init
 const patrolReportSchema = new mongoose.Schema({
   reportId: String,
-  shift: String,
+  username: String,
+  madeBy: String,
   type: String,
+  start: String,
+  end: String,
   date: String,
-  location: String,
-  status: String,
-  startShift: String,
-  endShift: String,
   summary: String,
   notes: String,
-  shiftMember: [shiftMember],
-  patrolUnit: [checkpoint]
+  location: String
 });
 
 const PatrolReport = mongoose.model('PatrolReport', patrolReportSchema);
 
-// UPLOAD FILES PATROL REPORT
+// for upload report files
 app.post('/upload-patrol', async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
     console.log('There is no files selected');
@@ -578,57 +572,29 @@ app.post('/upload-patrol', async (req, res) => {
   }
 });
 
-// SHIFT MEMBER
-
-// VIEW
-app.get('/shift-member/view', async function (req, res) {
+// view
+app.get('/patrol-report/view', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
 
     const checkUser = await User.findOne({ username: currentUsername });
 
     if (checkUser) {
-      const itemReports = await PatrolReport.find({
-        type: 'Shift Member Location'
-      }).sort({ date: -1 });
-      const itemBMI = await PatrolReport.find({
-        location: 'Baitul Makmur I',
-        type: 'Shift Member Location'
-      }).sort({ date: -1 });
+      const itemReports = await PatrolReport.find({}).sort({ date: -1 });
+      const itemBMI = await PatrolReport.find({ location: 'Baitul Makmur I' }).sort({ date: -1 });
       const itemBMII = await PatrolReport.find({
-        location: 'Baitul Makmur II',
-        type: 'Shift Member Location'
+        location: 'Baitul Makmur II'
       }).sort({ date: -1 });
-      const itemJM = await PatrolReport.find({
-        location: 'Jamek Mosque',
-        type: 'Shift Member Location'
-      }).sort({ date: -1 });
-      const itemCM = await PatrolReport.find({
-        location: 'City Mosque',
-        type: 'Shift Member Location'
-      }).sort({
-        date: -1
-      });
-      const itemRS = await PatrolReport.find({
-        location: 'Raudhatul Sakinah',
-        type: 'Shift Member Location'
-      }).sort({ date: -1 });
-
-      // Extract shift members from the result
-      const allShiftMembers = itemReports.reduce((members, report) => {
-        if (report.shiftMember && report.shiftMember.length > 0) {
-          members.push(...report.shiftMember);
-        }
-        return members;
-      }, []);
+      const itemJM = await PatrolReport.find({ location: 'Jamek Mosque' }).sort({ date: -1 });
+      const itemCM = await PatrolReport.find({ location: 'City Mosque' }).sort({ date: -1 });
+      const itemRS = await PatrolReport.find({ location: 'Raudhatul Sakinah' }).sort({ date: -1 });
 
       if (itemReports.length > 0) {
-        res.render('shift-member-view', {
+        res.render('patrol-report-view', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
           currentProfile: checkUser.profile,
           itemReports: itemReports,
-          shiftMembers: allShiftMembers,
           totalReports: itemReports.length,
           amountBMI: itemBMI.length,
           amountBMII: itemBMII.length,
@@ -649,7 +615,7 @@ app.get('/shift-member/view', async function (req, res) {
           toastMsg: ''
         });
       } else {
-        res.render('shift-member-view', {
+        res.render('patrol-report-view', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
           currentProfile: checkUser.profile,
@@ -680,7 +646,8 @@ app.get('/shift-member/view', async function (req, res) {
   }
 });
 
-app.get('/shift-member/view/:customListName', async function (req, res) {
+// view custom name list other locations
+app.get('/patrol-report/view/:customListName', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
     const checkUser = await User.findOne({ username: currentUsername });
@@ -688,37 +655,20 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
     const customListName = _.upperCase(req.params.customListName);
 
     if (checkUser) {
-      const itemReports = await PatrolReport.find({
-        type: 'Shift Member Location'
-      }).sort({ date: -1 });
-      const itemBMI = await PatrolReport.find({
-        location: 'Baitul Makmur I',
-        type: 'Shift Member Location'
-      }).sort({ date: -1 });
+      const itemReports = await PatrolReport.find({}).sort({ date: -1});
+      const itemBMI = await PatrolReport.find({ location: 'Baitul Makmur I' }).sort({ date: -1 });
       const itemBMII = await PatrolReport.find({
-        location: 'Baitul Makmur II',
-        type: 'Shift Member Location'
+        location: 'Baitul Makmur II'
       }).sort({ date: -1 });
-      const itemJM = await PatrolReport.find({
-        location: 'Jamek Mosque',
-        type: 'Shift Member Location'
-      }).sort({ date: -1 });
-      const itemCM = await PatrolReport.find({
-        location: 'City Mosque',
-        type: 'Shift Member Location'
-      }).sort({
-        date: -1
-      });
-      const itemRS = await PatrolReport.find({
-        location: 'Raudhatul Sakinah',
-        type: 'Shift Member Location'
-      }).sort({ date: -1 });
+      const itemJM = await PatrolReport.find({ location: 'Jamek Mosque' }).sort({ date: -1 });
+      const itemCM = await PatrolReport.find({ location: 'City Mosque' }).sort({ date: -1 });
+      const itemRS = await PatrolReport.find({ location: 'Raudhatul Sakinah' }).sort({ date: -1 });
 
       // check customlistname
       if (customListName === 'BMI') {
         // view for baitul makmur 1
         if (itemReports.length > 0) {
-          res.render('shift-member-view', {
+          res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
@@ -743,7 +693,7 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
             toastMsg: ''
           });
         } else {
-          res.render('shift-member-view', {
+          res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
@@ -771,7 +721,7 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
       } else if (customListName === 'BMII') {
         // view for baitul makmur 2
         if (itemReports.length > 0) {
-          res.render('shift-member-view', {
+          res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
@@ -796,7 +746,7 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
             toastMsg: ''
           });
         } else {
-          res.render('shift-member-view', {
+          res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
@@ -824,7 +774,7 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
       } else if (customListName === 'JM') {
         // view for jamek mosque
         if (itemReports.length > 0) {
-          res.render('shift-member-view', {
+          res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
@@ -849,7 +799,7 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
             toastMsg: ''
           });
         } else {
-          res.render('shift-member-view', {
+          res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
@@ -877,7 +827,7 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
       } else if (customListName === 'CM') {
         // view for city mosque
         if (itemReports.length > 0) {
-          res.render('shift-member-view', {
+          res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
@@ -902,7 +852,7 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
             toastMsg: ''
           });
         } else {
-          res.render('shift-member-view', {
+          res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
@@ -930,7 +880,7 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
       } else if (customListName === 'RS') {
         // view for raudhatul sakinah
         if (itemReports.length > 0) {
-          res.render('shift-member-view', {
+          res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
@@ -955,7 +905,7 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
             toastMsg: ''
           });
         } else {
-          res.render('shift-member-view', {
+          res.render('patrol-report-view', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
@@ -989,8 +939,440 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
   }
 });
 
-// DETAILS
-app.get('/shift-member/details', async function (req, res) {
+//submit form
+app
+  .get('/patrol-report/submit', async function (req, res) {
+    if (req.isAuthenticated()) {
+      const currentUsername = req.session.user.username;
+
+      const checkUser = await User.findOne({ username: currentUsername });
+
+      const confirmRid = req.query.rid;
+
+      if (checkUser) {
+        res.render('patrol-report-submit', {
+          currentFullName: checkUser.fullname,
+          currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
+          reportId: confirmRid,
+          //validation
+          validationReportType: '',
+          validationStartTime: '',
+          validationEndTime: '',
+          validationDate: '',
+          validationLocation: '',
+          validationReportSummary: '',
+          validationNotes: '',
+          //form name
+          reportType: '',
+          startTime: '',
+          endTime: '',
+          date: '',
+          location: '',
+          reportSummary: '',
+          notes: '',
+          //toast alert
+          toastShow: '',
+          toastMsg: ''
+        });
+      }
+    } else {
+      res.redirect('/sign-in');
+    }
+  })
+  .post('/patrol-report/submit', async function (req, res) {
+    var validationReportType = '';
+    var validationStartTime = '';
+    var validationEndTime = '';
+    var validationDate = '';
+    var validationLocation = '';
+    var validationReportSummary = '';
+    var validationNotes = '';
+
+    // current date time
+    var currentTime = dateLocal.getCurrentTime();
+    var currentDate = dateLocal.getDateYear();
+
+    const reportType = req.body.reportType;
+    const startTime = req.body.startTime;
+    const endTime = req.body.endTime;
+    const location = req.body.location;
+    const date = req.body.date;
+    const reportSummary = req.body.reportSummary;
+    const notes = req.body.notes;
+
+    // generated rid
+    const confirmRid = req.body.confirmRid;
+
+    const currentUsername = req.session.user.username;
+
+    const checkUser = await User.findOne({ username: currentUsername });
+
+    // Validate the reportType
+    if (!reportType || reportType === '') {
+      validationReportType = 'is-invalid';
+    } else {
+      validationReportType = 'is-valid';
+    }
+
+    // Validate the startTime
+    if (!startTime || startTime === '') {
+      validationStartTime = 'is-invalid';
+    } else {
+      validationStartTime = 'is-valid';
+    }
+
+    // Validate the endTime
+    if (!endTime || endTime === '') {
+      validationEndTime = 'is-invalid';
+    } else {
+      validationEndTime = 'is-valid';
+    }
+
+    // Validate the date
+    if (!date || date === '') {
+      validationDate = 'is-invalid';
+    } else {
+      validationDate = 'is-valid';
+    }
+
+    // Validate the location
+    if (!location || location === '') {
+      validationLocation = 'is-invalid';
+    } else {
+      validationLocation = 'is-valid';
+    }
+
+    // Validate the reportSummary
+    if (!reportSummary || reportSummary === '') {
+      validationReportSummary = 'is-invalid';
+    } else {
+      validationReportSummary = 'is-valid';
+    }
+
+    // Validate the notes
+    if (!notes || notes === '') {
+      validationNotes = 'is-invalid';
+    } else {
+      validationNotes = 'is-valid';
+    }
+
+    if (
+      validationReportType === 'is-valid' &&
+      validationStartTime === 'is-valid' &&
+      validationEndTime === 'is-valid' &&
+      validationDate === 'is-valid' &&
+      validationLocation === 'is-valid' &&
+      validationReportSummary === 'is-valid' &&
+      validationNotes === 'is-valid'
+    ) {
+      const currentFullName = checkUser.fullname;
+      const currentUser = checkUser.username;
+
+      // Activity
+      const newItemActivity = {
+        time: currentTime,
+        by: currentFullName,
+        username: currentUser,
+        type: 'Patrol Report',
+        title: 'Submitted a patrol report of ' + _.lowerCase(reportType),
+        about: reportSummary
+      };
+
+      const newActivity = new Activity({
+        date: currentDate,
+        items: newItemActivity
+      });
+
+      const findDate = await Activity.findOne({ date: currentDate });
+
+      if (findDate) {
+        findDate.items.push(newItemActivity);
+        await findDate.save();
+        console.log('Activity was added to existing date');
+      } else {
+        const resultActivity = Activity.create(newActivity);
+
+        if (resultActivity) {
+          console.log('Added new activity');
+        } else {
+          console.log('Something is wrong');
+        }
+      }
+
+      // Patrol Report
+
+      const newReport = new PatrolReport({
+        reportId: confirmRid,
+        username: currentUser,
+        madeBy: currentFullName,
+        type: reportType,
+        start: startTime,
+        end: endTime,
+        date: date,
+        summary: reportSummary,
+        notes: notes,
+        location: location
+      });
+
+      const existing = await PatrolReport.findOne({ reportId: confirmRid });
+
+      if (!existing) {
+        const result = PatrolReport.create(newReport);
+
+        if (result) {
+          console.log('Successfully added report.');
+
+          const checkUser = await User.findOne({ username: currentUsername });
+
+          if (checkUser) {
+            const itemReports = await PatrolReport.find({}).sort({ date: -1 });
+            const itemBMI = await PatrolReport.find({
+              location: 'Baitul Makmur I'
+            }).sort({ date: -1 });
+            const itemBMII = await PatrolReport.find({
+              location: 'Baitul Makmur II'
+            }).sort({ date: -1 });
+            const itemJM = await PatrolReport.find({
+              location: 'Jamek Mosque'
+            }).sort({ date: -1 });
+            const itemCM = await PatrolReport.find({ location: 'City Mosque' }).sort({ date: -1 });
+            const itemRS = await PatrolReport.find({
+              location: 'Raudhatul Sakinah'
+            }).sort({ date: -1 });
+
+            if (itemReports.length > 0) {
+              res.render('patrol-report-view', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
+                itemReports: itemReports,
+                totalReports: itemReports.length,
+                amountBMI: itemBMI.length,
+                amountBMII: itemBMII.length,
+                amountJM: itemJM.length,
+                amountCM: itemCM.length,
+                amountRS: itemRS.length,
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated random id
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Submit report successful!'
+              });
+            } else {
+              res.render('patrol-report-view', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
+                itemReports: 'There is no patrol report submitted yet.',
+                totalReports: '0',
+                amountBMI: '0',
+                amountBMII: '0',
+                amountJM: '0',
+                amountCM: '0',
+                amountRS: '0',
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated random id
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Submit report successful!'
+              });
+            }
+          }
+        } else {
+          console.log('Add report failed');
+
+          const checkUser = await User.findOne({ username: currentUsername });
+
+          if (checkUser) {
+            const itemReports = await PatrolReport.find({}).sort({ date: -1 });
+            const itemBMI = await PatrolReport.find({
+              location: 'Baitul Makmur I'
+            }).sort({ date: -1 });
+            const itemBMII = await PatrolReport.find({
+              location: 'Baitul Makmur II'
+            }).sort({ date: -1 });
+            const itemJM = await PatrolReport.find({
+              location: 'Jamek Mosque'
+            }).sort({ date: -1 });
+            const itemCM = await PatrolReport.find({ location: 'City Mosque' }).sort({ date: -1 });
+            const itemRS = await PatrolReport.find({
+              location: 'Raudhatul Sakinah'
+            }).sort({ date: -1 });
+
+            if (itemReports.length > 0) {
+              res.render('patrol-report-view', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
+                itemReports: itemReports,
+                totalReports: itemReports.length,
+                amountBMI: itemBMI.length,
+                amountBMII: itemBMII.length,
+                amountJM: itemJM.length,
+                amountCM: itemCM.length,
+                amountRS: itemRS.length,
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated random id
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Add report failed!'
+              });
+            } else {
+              res.render('patrol-report-view', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
+                itemReports: 'There is no patrol report submitted yet.',
+                totalReports: '0',
+                amountBMI: '0',
+                amountBMII: '0',
+                amountJM: '0',
+                amountCM: '0',
+                amountRS: '0',
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated random id
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Add report failed!'
+              });
+            }
+          }
+        }
+      } else {
+        console.log('There is existing report!');
+
+        const checkUser = await User.findOne({ username: currentUsername });
+
+        if (checkUser) {
+          const itemReports = await PatrolReport.find({});
+          const itemBMI = await PatrolReport.find({
+            location: 'Baitul Makmur I'
+          });
+          const itemBMII = await PatrolReport.find({
+            location: 'Baitul Makmur II'
+          });
+          const itemJM = await PatrolReport.find({
+            location: 'Jamek Mosque'
+          });
+          const itemCM = await PatrolReport.find({ location: 'City Mosque' });
+          const itemRS = await PatrolReport.find({
+            location: 'Raudhatul Sakinah'
+          });
+
+          if (itemReports.length > 0) {
+            res.render('patrol-report-view', {
+              currentFullName: checkUser.fullname,
+              currentUser: checkUser.username,
+              currentProfile: checkUser.profile,
+              itemReports: itemReports,
+              totalReports: itemReports.length,
+              amountBMI: itemBMI.length,
+              amountBMII: itemBMII.length,
+              amountJM: itemJM.length,
+              amountCM: itemCM.length,
+              amountRS: itemRS.length,
+              topNav: 'All',
+              classActive1: 'active',
+              classActive2: '',
+              classActive3: '',
+              classActive4: '',
+              classActive5: '',
+              classActive6: '',
+              // generated random id
+              rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+              // toast alert
+              toastShow: 'show',
+              toastMsg: 'There is an exisitng report!'
+            });
+          } else {
+            res.render('patrol-report-view', {
+              currentFullName: checkUser.fullname,
+              currentUser: checkUser.username,
+              currentProfile: checkUser.profile,
+              itemReports: 'There is no patrol report submitted yet.',
+              totalReports: '0',
+              amountBMI: '0',
+              amountBMII: '0',
+              amountJM: '0',
+              amountCM: '0',
+              amountRS: '0',
+              topNav: 'All',
+              classActive1: 'active',
+              classActive2: '',
+              classActive3: '',
+              classActive4: '',
+              classActive5: '',
+              classActive6: '',
+              // generated random id
+              rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+              // toast alert
+              toastShow: 'show',
+              toastMsg: 'There is an existing report!'
+            });
+          }
+        }
+      }
+    } else {
+      // Render the response after the delay
+      res.render('patrol-report-submit', {
+        currentFullName: checkUser.fullname,
+        currentUser: checkUser.username,
+        currentProfile: checkUser.profile,
+        //validation
+        validationReportType: validationReportType,
+        validationDate: validationDate,
+        validationStartTime: validationStartTime,
+        validationEndTime: validationEndTime,
+        validationLocation: validationLocation,
+        validationReportSummary: validationReportSummary,
+        validationNotes: validationNotes,
+        //form
+        reportId: confirmRid,
+        reportType: reportType,
+        startTime: startTime,
+        endTime: endTime,
+        date: date,
+        location: location,
+        reportSummary: reportSummary,
+        notes: notes,
+        //toast alert
+        toastShow: 'show',
+        toastMsg: 'There is error in your input!'
+      });
+    }
+  });
+
+//details
+app.get('/patrol-report/details', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
     const checkUser = await User.findOne({ username: currentUsername });
@@ -1006,37 +1388,50 @@ app.get('/shift-member/details', async function (req, res) {
         const checkFiles = await File.find({ reportId: reportId });
 
         if (checkFiles.length > 0) {
-          res.render('shift-member-details', {
+          res.render('patrol-report-details', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
             // patrol report
-            patrolReport: checkReport,
-            reportId: reportId,
+            reportType: checkReport.type,
+            madeBy: checkReport.madeBy,
+            pbNumber: checkReport.username,
+            startTime: checkReport.start,
+            endTime: checkReport.end,
+            reportSummary: checkReport.summary,
+            notes: checkReport.notes,
             // files
             files: checkFiles
           });
         } else {
-          res.render('shift-member-details', {
+          res.render('patrol-report-details', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
             // patrol report
-            patrolReport: checkReport,
-            reportId: reportId,
+            reportType: checkReport.type,
+            madeBy: checkReport.madeBy,
+            pbNumber: checkReport.username,
+            startTime: checkReport.start,
+            endTime: checkReport.end,
+            reportSummary: checkReport.summary,
+            notes: checkReport.notes,
             // files
-            files: ''
+            files: checkFiles
           });
         }
       } else {
-        res.render('shift-member-details', {
+        res.render('patrol-report-details', {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
           currentProfile: checkUser.profile,
-          // patrol report
-          patrolReport: '',
-          reportId: reportId,
-          // files
+          reportType: '',
+          madeBy: '',
+          pbNumber: '',
+          startTime: '',
+          endTime: '',
+          reportSummary: '',
+          notes: '',
           files: ''
         });
       }
@@ -1046,327 +1441,9 @@ app.get('/shift-member/details', async function (req, res) {
   }
 });
 
-// Function to submit data to MongoDB using Mongoose
-const scheduler = async data => {
-  const submitData = await PatrolReport.create(data);
+//CASE REPORT
 
-  if (submitData) {
-    console.log('Patrol unit submitted');
-  } else {
-    console.log('Error');
-  }
-};
-
-// Schedule the script to run every minute for testing purposes
-cron.schedule(
-  '0 8 * * *',
-  () => {
-    const dateToday = dateLocal.getDate();
-    const checkpointData = [
-      {
-        checkpointName: 'Checkpoint 1',
-        logReport: 'Log report 1',
-        time: '08:15 AM'
-      },
-      {
-        checkpointName: 'Checkpoint 2',
-        logReport: 'Log report 2',
-        time: '09:00 AM'
-      },
-      {
-        checkpointName: 'Checkpoint 3',
-        logReport: 'Log report 3',
-        time: '10:30 AM'
-      },
-      {
-        checkpointName: 'Checkpoint 4',
-        logReport: 'Log report 4',
-        time: '12:00 PM'
-      },
-      {
-        checkpointName: 'Checkpoint 5',
-        logReport: 'Log report 5',
-        time: '01:45 PM'
-      }
-    ];
-
-    const patrolUnitData = {
-      reportId: crypto.randomBytes(6).toString('hex').toUpperCase(),
-      type: 'Patrol Unit',
-      date: dateToday,
-      status: 'Open',
-      startShift: '08:00',
-      endShift: '17:00',
-      notes: '',
-      patrolUnit: checkpointData
-    };
-
-    scheduler(patrolUnitData);
-    console.log(patrolUnitData);
-  },
-  {
-    scheduled: true,
-    timezone: 'Asia/Kuala_Lumpur' // Set the timezone to Malaysia
-  }
-);
-
-// PATROL UNIT
-
-// VIEW
-
-app.get('/patrol-unit/view', async function (req, res) {
-  if (req.isAuthenticated()) {
-    var currentUsername = req.session.user.username;
-
-    const checkUser = await User.findOne({ username: currentUsername });
-
-    if (checkUser) {
-      const itemReports = await PatrolReport.find({
-        type: 'Patrol Unit'
-      }).sort({ date: -1 });
-      const itemBMI = await PatrolReport.find({
-        location: 'Baitul Makmur I',
-        type: 'Patrol Unit'
-      }).sort({ date: -1 });
-      const itemBMII = await PatrolReport.find({
-        location: 'Baitul Makmur II',
-        type: 'Patrol Unit'
-      }).sort({ date: -1 });
-      const itemJM = await PatrolReport.find({
-        location: 'Jamek Mosque',
-        type: 'Patrol Unit'
-      }).sort({ date: -1 });
-      const itemCM = await PatrolReport.find({
-        location: 'City Mosque',
-        type: 'Patrol Unit'
-      }).sort({
-        date: -1
-      });
-      const itemRS = await PatrolReport.find({
-        location: 'Raudhatul Sakinah',
-        type: 'Patrol Unit'
-      }).sort({ date: -1 });
-
-      // Extract shift members from the result
-      const allShiftMembers = itemReports.reduce((members, report) => {
-        if (report.shiftMember && report.shiftMember.length > 0) {
-          members.push(...report.shiftMember);
-        }
-        return members;
-      }, []);
-
-      if (itemReports.length > 0) {
-        res.render('patrol-unit-view', {
-          currentFullName: checkUser.fullname,
-          currentUser: checkUser.username,
-          currentProfile: checkUser.profile,
-          itemReports: itemReports,
-          shiftMembers: allShiftMembers,
-          totalReports: itemReports.length,
-          amountBMI: itemBMI.length,
-          amountBMII: itemBMII.length,
-          amountJM: itemJM.length,
-          amountCM: itemCM.length,
-          amountRS: itemRS.length,
-          topNav: 'All',
-          classActive1: 'active',
-          classActive2: '',
-          classActive3: '',
-          classActive4: '',
-          classActive5: '',
-          classActive6: '',
-          // generated random id
-          rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
-          // toast alert
-          toastShow: '',
-          toastMsg: ''
-        });
-      } else {
-        res.render('patrol-unit-view', {
-          currentFullName: checkUser.fullname,
-          currentUser: checkUser.username,
-          currentProfile: checkUser.profile,
-          itemReports: 'There is no patrol report submitted yet.',
-          totalReports: '0',
-          amountBMI: '0',
-          amountBMII: '0',
-          amountJM: '0',
-          amountCM: '0',
-          amountRS: '0',
-          topNav: 'All',
-          classActive1: 'active',
-          classActive2: '',
-          classActive3: '',
-          classActive4: '',
-          classActive5: '',
-          classActive6: '',
-          // generated random id
-          rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
-          // toast alert
-          toastShow: '',
-          toastMsg: ''
-        });
-      }
-    }
-  } else {
-    res.redirect('/sign-in');
-  }
-});
-
-app
-  .get('/patrol-unit/details', async function (req, res) {
-    if (req.isAuthenticated()) {
-      var currentUsername = req.session.user.username;
-      const checkUser = await User.findOne({ username: currentUsername });
-
-      const reportId = req.query.id;
-
-      if (checkUser) {
-        const checkReport = await PatrolReport.findOne({
-          reportId: reportId
-        });
-
-        // Check for amount of time for checkpoint being submit or not
-        let nonEmptyTimeCount = 0;
-        let totalPatrolUnits = checkReport.patrolUnit.length;
-
-        // Check each patrol unit for non-empty time
-        checkReport.patrolUnit.forEach(patrolUnit => {
-          if (patrolUnit.time && patrolUnit.time.trim() !== '') {
-            nonEmptyTimeCount++;
-          }
-        });
-
-        let percentageNonEmptyTime =
-          (nonEmptyTimeCount / totalPatrolUnits) * 100;
-
-        console.log(percentageNonEmptyTime);
-
-        // check result and render
-        if (checkReport) {
-          const checkFiles = await File.find({ reportId: reportId });
-
-          if (checkFiles.length > 0) {
-            res.render('patrol-unit-details', {
-              currentFullName: checkUser.fullname,
-              currentUser: checkUser.username,
-              currentProfile: checkUser.profile,
-              // patrol report
-              patrolReport: checkReport,
-              percentage: percentageNonEmptyTime.toString(),
-              reportId: reportId,
-              // files
-              files: checkFiles
-            });
-          } else {
-            res.render('patrol-unit-details', {
-              currentFullName: checkUser.fullname,
-              currentUser: checkUser.username,
-              currentProfile: checkUser.profile,
-              // patrol report
-              patrolReport: checkReport,
-              percentage: percentageNonEmptyTime.toString(),
-              reportId: reportId,
-              // files
-              files: ''
-            });
-          }
-        } else {
-          res.render('patrol-unit-details', {
-            currentFullName: checkUser.fullname,
-            currentUser: checkUser.username,
-            currentProfile: checkUser.profile,
-            // patrol report
-            patrolReport: '',
-            percentage: '',
-            reportId: reportId,
-            // files
-            files: ''
-          });
-        }
-      }
-    } else {
-      res.redirect('/sign-in');
-    }
-  })
-  .post('/patrol-unit/details/:reportId', async function (req, res) {
-    try {
-      const reportIdToUpdate = req.params.reportId;
-      //   const checkpointNameToUpdate = req.body.checkpointName;
-      const updatedData = {
-        latitude: req.body.latitude,
-        longitude: req.body.longitude,
-        time: req.body.time,
-        logReport: req.body.logReport,
-        checkpointName: req.body.checkpointName
-      };
-
-      console.log(reportIdToUpdate);
-
-      const updatedPatrolReport = await PatrolReport.findOneAndUpdate(
-        {
-          reportId: reportIdToUpdate,
-          'patrolUnit.checkpointName': 'Checkpoint 5'
-        },
-        { $set: { 'patrolUnit.$': updatedData } },
-        { new: true }
-      );
-
-      if (updatedPatrolReport) {
-        console.log('Success');
-        res.redirect('/patrol-unit/details?id=' + reportIdToUpdate);
-      } else {
-        console.log('Unsuccessful');
-        res.redirect('/patrol-unit/details?id=' + reportIdToUpdate);
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
-    }
-  });
-
-// MAP
-
-// SUBMIT CHECKPOINT DATA
-app.get('/checkpoint-submit/:checkpointName', async function (req, res){
-    const dateToday = dateLocal.getDateYear();
-    const time = dateLocal.getCurrentTime();
-
-    const checkpointName = req.params.checkpointName;
-
-    const checkPatrolUnit = await PatrolReport.findOne({date : dateToday });
-
-});
-
-// GET COORDINATES FROM DATABASE
-app.get('/map-coordinates/:reportId', async (req, res) => {
-  const reportId = req.params.reportId;
-
-  try {
-    // Use findOne to find a single report based on the reportId
-    const patrolReport = await PatrolReport.findOne({ reportId });
-
-    if (!patrolReport) {
-      return res.status(404).json({ error: 'Report not found' });
-    }
-
-    // Extract checkpoint coordinates within the patrolReport and format them
-    const checkpointCoordinates = patrolReport.patrolUnit.map(checkpoint => [
-      checkpoint.longitude,
-      checkpoint.latitude
-    ]);
-
-    // Send the retrieved checkpoint coordinates as JSON
-    res.json(checkpointCoordinates);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-// CASE REPORT
-
-// CASE SCHEMA/MODEL
+// case schema init
 const caseReportSchema = new mongoose.Schema({
   reportId: String,
   username: String,
@@ -1378,13 +1455,12 @@ const caseReportSchema = new mongoose.Schema({
   summary: String,
   actionTaken: String,
   eventSummary: String,
-  staffOnDuty: String,
-  notes: String
+  staffOnDuty: String
 });
 
 const CaseReport = mongoose.model('CaseReport', caseReportSchema);
 
-// UPLOAD FILES CASE REPORT
+// for upload report files
 app.post('/upload-case', async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
     console.log('There is no files selected');
@@ -1468,7 +1544,7 @@ app.post('/upload-case', async (req, res) => {
   }
 });
 
-// VIEW
+// view
 app.get('/case-report/view', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -1476,28 +1552,14 @@ app.get('/case-report/view', async function (req, res) {
     const checkUser = await User.findOne({ username: currentUsername });
 
     if (checkUser) {
-      const itemReports = await CaseReport.find({
-        username: checkUser.username
-      }).sort({ date: -1 });
-      const itemBMI = await CaseReport.find({
-        location: 'Baitul Makmur I',
-        username: checkUser.username
-      }).sort({ date: -1 });
+      const itemReports = await CaseReport.find({username:checkUser.username}).sort({ date: -1 });
+      const itemBMI = await CaseReport.find({ location: 'Baitul Makmur I',username:checkUser.username }).sort({ date: -1 });
       const itemBMII = await CaseReport.find({
         location: 'Baitul Makmur II'
       }).sort({ date: -1 });
-      const itemJM = await CaseReport.find({
-        location: 'Jamek Mosque',
-        username: checkUser.username
-      }).sort({ date: -1 });
-      const itemCM = await CaseReport.find({
-        location: 'City Mosque',
-        username: checkUser.username
-      }).sort({ date: -1 });
-      const itemRS = await CaseReport.find({
-        location: 'Raudhatul Sakinah',
-        username: checkUser.username
-      }).sort({ date: -1 });
+      const itemJM = await CaseReport.find({ location: 'Jamek Mosque',username:checkUser.username }).sort({ date: -1 });
+      const itemCM = await CaseReport.find({ location: 'City Mosque',username:checkUser.username }).sort({ date: -1 });
+      const itemRS = await CaseReport.find({ location: 'Raudhatul Sakinah',username:checkUser.username }).sort({ date: -1 });
 
       if (itemReports.length > 0) {
         res.render('case-report-view', {
@@ -1556,7 +1618,7 @@ app.get('/case-report/view', async function (req, res) {
   }
 });
 
-// VIEW CUSTOM NAME LIST BASED ON LOCATIONS
+// view custom name list other locations
 app.get('/case-report/view/:customListName', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -1565,29 +1627,14 @@ app.get('/case-report/view/:customListName', async function (req, res) {
     const customListName = _.upperCase(req.params.customListName);
 
     if (checkUser) {
-      const itemReports = await CaseReport.find({
-        username: checkUser.username
-      });
-      const itemBMI = await CaseReport.find({
-        location: 'Baitul Makmur I',
-        username: checkUser.username
-      });
+      const itemReports = await CaseReport.find({username:checkUser.username});
+      const itemBMI = await CaseReport.find({ location: 'Baitul Makmur I',username:checkUser.username });
       const itemBMII = await CaseReport.find({
-        location: 'Baitul Makmur II',
-        username: checkUser.username
+        location: 'Baitul Makmur II',username:checkUser.username
       });
-      const itemJM = await CaseReport.find({
-        location: 'Jamek Mosque',
-        username: checkUser.username
-      });
-      const itemCM = await CaseReport.find({
-        location: 'City Mosque',
-        username: checkUser.username
-      });
-      const itemRS = await CaseReport.find({
-        location: 'Raudhatul Sakinah',
-        username: checkUser.username
-      });
+      const itemJM = await CaseReport.find({ location: 'Jamek Mosque',username:checkUser.username });
+      const itemCM = await CaseReport.find({ location: 'City Mosque',username:checkUser.username });
+      const itemRS = await CaseReport.find({ location: 'Raudhatul Sakinah',username:checkUser.username });
 
       // check customlistname
       if (customListName === 'BMI') {
@@ -1864,7 +1911,7 @@ app.get('/case-report/view/:customListName', async function (req, res) {
   }
 });
 
-// SUBMIT REPORT FORM
+//submit form
 app
   .get('/case-report/submit', async function (req, res) {
     if (req.isAuthenticated()) {
@@ -2048,8 +2095,7 @@ app
         actionTaken: actionTaken,
         eventSummary: eventSummary,
         staffOnDuty: staffOnDuty,
-        location: location,
-        notes: ''
+        location: location
       });
 
       const existing = await CaseReport.findOne({ reportId: confirmRid });
@@ -2060,33 +2106,22 @@ app
         if (result) {
           console.log('Successfully added report.');
 
-          const checkUser = await User.findOne({
-            username: currentUsername
-          });
+          const checkUser = await User.findOne({ username: currentUsername });
 
           if (checkUser) {
-            const itemReports = await CaseReport.find({
-              username: checkUser.username
-            }).sort({ date: -1 });
+            const itemReports = await CaseReport.find({username:checkUser.username}).sort({ date: -1 });
             const itemBMI = await CaseReport.find({
-              location: 'Baitul Makmur I',
-              username: checkUser.username
+              location: 'Baitul Makmur I',username:checkUser.username
             }).sort({ date: -1 });
             const itemBMII = await CaseReport.find({
-              location: 'Baitul Makmur II',
-              username: checkUser.username
+              location: 'Baitul Makmur II',username:checkUser.username
             }).sort({ date: -1 });
             const itemJM = await CaseReport.find({
-              location: 'Jamek Mosque',
-              username: checkUser.username
+              location: 'Jamek Mosque',username:checkUser.username
             }).sort({ date: -1 });
-            const itemCM = await CaseReport.find({
-              location: 'City Mosque',
-              username: checkUser.username
-            }).sort({ date: -1 });
+            const itemCM = await CaseReport.find({ location: 'City Mosque',username:checkUser.username }).sort({ date: -1 });
             const itemRS = await CaseReport.find({
-              location: 'Raudhatul Sakinah',
-              username: checkUser.username
+              location: 'Raudhatul Sakinah',username:checkUser.username
             }).sort({ date: -1 });
 
             if (itemReports.length > 0) {
@@ -2144,33 +2179,22 @@ app
         } else {
           console.log('Add report failed');
 
-          const checkUser = await User.findOne({
-            username: currentUsername
-          });
+          const checkUser = await User.findOne({ username: currentUsername });
 
           if (checkUser) {
-            const itemReports = await CaseReport.find({
-              username: checkUser.username
-            }).sort({ date: -1 });
+            const itemReports = await CaseReport.find({username:checkUser.username}).sort({ date: -1 });
             const itemBMI = await CaseReport.find({
-              location: 'Baitul Makmur I',
-              username: checkUser.username
+              location: 'Baitul Makmur I',username:checkUser.username
             }).sort({ date: -1 });
             const itemBMII = await CaseReport.find({
-              location: 'Baitul Makmur II',
-              username: checkUser.username
+              location: 'Baitul Makmur II',username:checkUser.username
             }).sort({ date: -1 });
             const itemJM = await CaseReport.find({
-              location: 'Jamek Mosque',
-              username: checkUser.username
+              location: 'Jamek Mosque',username:checkUser.username
             }).sort({ date: -1 });
-            const itemCM = await CaseReport.find({
-              location: 'City Mosque',
-              username: checkUser.username
-            });
+            const itemCM = await CaseReport.find({ location: 'City Mosque',username:checkUser.username });
             const itemRS = await CaseReport.find({
-              location: 'Raudhatul Sakinah',
-              username: checkUser.username
+              location: 'Raudhatul Sakinah',username:checkUser.username
             }).sort({ date: -1 });
 
             if (itemReports.length > 0) {
@@ -2232,27 +2256,19 @@ app
         const checkUser = await User.findOne({ username: currentUsername });
 
         if (checkUser) {
-          const itemReports = await CaseReport.find({}).sort({
-            date: -1
-          });
+          const itemReports = await CaseReport.find({}).sort({ date: -1 });
           const itemBMI = await CaseReport.find({
-            location: 'Baitul Makmur I',
-            username: checkUser.username
+            location: 'Baitul Makmur I',username:checkUser.username
           }).sort({ date: -1 });
           const itemBMII = await CaseReport.find({
-            location: 'Baitul Makmur II',
-            username: checkUser.username
+            location: 'Baitul Makmur II',username:checkUser.username
           }).sort({ date: -1 });
           const itemJM = await CaseReport.find({
-            location: 'Jamek Mosque',
-            username: checkUser.username
+            location: 'Jamek Mosque',username:checkUser.username
           }).sort({ date: -1 });
-          const itemCM = await CaseReport.find({
-            location: 'City Mosque'
-          }).sort({ date: -1 });
+          const itemCM = await CaseReport.find({ location: 'City Mosque' }).sort({ date: -1 });
           const itemRS = await CaseReport.find({
-            location: 'Raudhatul Sakinah',
-            username: checkUser.username
+            location: 'Raudhatul Sakinah',username:checkUser.username
           }).sort({ date: -1 });
 
           if (itemReports.length > 0) {
@@ -2340,7 +2356,7 @@ app
     }
   });
 
-// DETAILS
+//case-report-details
 app.get('/case-report/details', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -2371,8 +2387,6 @@ app.get('/case-report/details', async function (req, res) {
             actionTaken: checkReport.actionTaken,
             eventSummary: checkReport.eventSummary,
             staffOnDuty: checkReport.staffOnDuty,
-            notes: checkReport.notes,
-            reportId: checkReport.reportId,
             // files
             files: checkFiles
           });
@@ -2391,8 +2405,6 @@ app.get('/case-report/details', async function (req, res) {
             actionTaken: checkReport.actionTaken,
             eventSummary: checkReport.eventSummary,
             staffOnDuty: checkReport.staffOnDuty,
-            notes: checkReport.notes,
-            reportId: checkReport.reportId,
             // files
             files: checkFiles
           });
@@ -2402,7 +2414,6 @@ app.get('/case-report/details', async function (req, res) {
           currentFullName: checkUser.fullname,
           currentUser: checkUser.username,
           currentProfile: checkUser.profile,
-          reportId: '',
           reportType: '',
           madeBy: '',
           pbNumber: '',
@@ -2412,8 +2423,7 @@ app.get('/case-report/details', async function (req, res) {
           actionTaken: '',
           eventSummary: '',
           staffOnDuty: '',
-          files: '',
-          notes: ''
+          files: ''
         });
       }
     }
@@ -2424,7 +2434,7 @@ app.get('/case-report/details', async function (req, res) {
 
 // SCHEDULE
 
-// SCHEDULE SCHEMA/MODEL
+// schedule schema init
 const scheduleSchema = new mongoose.Schema({
   reportId: String,
   by: String,
@@ -2439,7 +2449,8 @@ const scheduleSchema = new mongoose.Schema({
 
 const Schedule = mongoose.model('Schedule', scheduleSchema);
 
-// FILES SCHEDULE SCHEMA/MODEL
+// file schedule schema init
+
 const fileScheduleSchema = new mongoose.Schema({
   reportId: String,
   by: String,
@@ -2451,7 +2462,7 @@ const fileScheduleSchema = new mongoose.Schema({
 
 const FileSchedule = mongoose.model('FileSchedule', fileScheduleSchema);
 
-// UPLOAD FILE SCHEDULE
+// schedule file upload
 app.post('/upload-schedule', async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
     console.log('There is no files selected');
@@ -2499,9 +2510,7 @@ app.post('/upload-schedule', async (req, res) => {
     }
 
     // Check if the report ID exists in the database
-    const existingFile = await FileSchedule.findOne({
-      reportId: confirmRid
-    });
+    const existingFile = await FileSchedule.findOne({ reportId: confirmRid });
 
     if (!existingFile) {
       // No file with the report ID found, proceed with file upload
@@ -2537,7 +2546,7 @@ app.post('/upload-schedule', async (req, res) => {
   }
 });
 
-// SUBMIT FORM
+// schedule submit
 app
   .get('/schedule/submit', async function (req, res) {
     if (req.isAuthenticated()) {
@@ -2722,27 +2731,19 @@ app
           // sucessfully added report
           console.log('Successfully added report!');
 
-          const checkUser = await User.findOne({
-            username: currentUsername
-          });
+          const checkUser = await User.findOne({ username: currentUsername });
 
           if (checkUser) {
             // schedules
-            const itemSchedules = await Schedule.find({}).sort({
-              startDate: -1
-            });
+            const itemSchedules = await Schedule.find({}).sort({ startDate: -1 });
             const itemBMI = await Schedule.find({
               location: 'Baitul Makmur I'
             }).sort({ startDate: -1 });
             const itemBMII = await Schedule.find({
               location: 'Baitul Makmur II'
             }).sort({ startDate: -1 });
-            const itemJM = await Schedule.find({
-              location: 'Jamek Mosque'
-            }).sort({ startDate: -1 });
-            const itemCM = await Schedule.find({
-              location: 'City Mosque'
-            }).sort({ startDate: -1 });
+            const itemJM = await Schedule.find({ location: 'Jamek Mosque' }).sort({ startDate: -1 });
+            const itemCM = await Schedule.find({ location: 'City Mosque' }).sort({ startDate: -1 });
             const itemRS = await Schedule.find({
               location: 'Raudhatul Sakinah'
             }).sort({ startDate: -1 });
@@ -2808,27 +2809,19 @@ app
           // failed added report
           console.log('Report add failed!');
 
-          const checkUser = await User.findOne({
-            username: currentUsername
-          });
+          const checkUser = await User.findOne({ username: currentUsername });
 
           if (checkUser) {
             // schedules
-            const itemSchedules = await Schedule.find({}).sort({
-              startDate: -1
-            });
+            const itemSchedules = await Schedule.find({}).sort({ startDate: -1 });
             const itemBMI = await Schedule.find({
               location: 'Baitul Makmur I'
             }).sort({ startDate: -1 });
             const itemBMII = await Schedule.find({
               location: 'Baitul Makmur II'
             }).sort({ startDate: -1 });
-            const itemJM = await Schedule.find({
-              location: 'Jamek Mosque'
-            }).sort({ startDate: -1 });
-            const itemCM = await Schedule.find({
-              location: 'City Mosque'
-            }).sort({ startDate: -1 });
+            const itemJM = await Schedule.find({ location: 'Jamek Mosque' }).sort({ startDate: -1 });
+            const itemCM = await Schedule.find({ location: 'City Mosque' }).sort({ startDate: -1 });
             const itemRS = await Schedule.find({
               location: 'Raudhatul Sakinah'
             }).sort({ startDate: -1 });
@@ -2898,23 +2891,15 @@ app
 
         if (checkUser) {
           // schedules
-          const itemSchedules = await Schedule.find({}).sort({
-            startDate: -1
-          });
+          const itemSchedules = await Schedule.find({}).sort({ startDate: -1 });
           const itemBMI = await Schedule.find({
             location: 'Baitul Makmur I'
           }).sort({ startDate: -1 });
           const itemBMII = await Schedule.find({
             location: 'Baitul Makmur II'
           }).sort({ startDate: -1 });
-          const itemJM = await Schedule.find({
-            location: 'Jamek Mosque'
-          }).sort({ startDate: -1 });
-          const itemCM = await Schedule.find({
-            location: 'City Mosque'
-          }).sort({
-            startDate: -1
-          });
+          const itemJM = await Schedule.find({ location: 'Jamek Mosque' }).sort({ startDate: -1 });
+          const itemCM = await Schedule.find({ location: 'City Mosque' }).sort({ startDate: -1 });
           const itemRS = await Schedule.find({
             location: 'Raudhatul Sakinah'
           }).sort({ startDate: -1 });
@@ -3007,7 +2992,6 @@ app
     }
   });
 
-// VIEW
 app.get('/schedule', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -3016,24 +3000,14 @@ app.get('/schedule', async function (req, res) {
 
     if (checkUser) {
       // schedules
-      const itemSchedules = await Schedule.find({}).sort({
-        startDate: -1
-      });
-      const itemBMI = await Schedule.find({
-        location: 'Baitul Makmur I'
-      }).sort({ startDate: -1 });
+      const itemSchedules = await Schedule.find({}).sort({ startDate: -1 });
+      const itemBMI = await Schedule.find({ location: 'Baitul Makmur I' }).sort({ startDate: -1 });
       const itemBMII = await Schedule.find({
         location: 'Baitul Makmur II'
       }).sort({ startDate: -1 });
-      const itemJM = await Schedule.find({
-        location: 'Jamek Mosque'
-      }).sort({
-        startDate: -1
-      });
+      const itemJM = await Schedule.find({ location: 'Jamek Mosque' }).sort({ startDate: -1 });
       const itemCM = await Schedule.find({ location: 'City Mosque' });
-      const itemRS = await Schedule.find({
-        location: 'Raudhatul Sakinah'
-      }).sort({ startDate: -1 });
+      const itemRS = await Schedule.find({ location: 'Raudhatul Sakinah' }).sort({ startDate: -1 });
 
       // schedules file
       const itemFiles = await FileSchedule.find({});
@@ -3097,7 +3071,6 @@ app.get('/schedule', async function (req, res) {
   }
 });
 
-// VIEW CUSTOM NAME LIST BASED ON LOCATION
 app.get('/schedule/:customListName', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -3107,28 +3080,14 @@ app.get('/schedule/:customListName', async function (req, res) {
 
     if (checkUser) {
       // schedules
-      const itemSchedules = await Schedule.find({}).sort({
-        startDate: -1
-      });
-      const itemBMI = await Schedule.find({
-        location: 'Baitul Makmur I'
-      }).sort({ startDate: -1 });
+      const itemSchedules = await Schedule.find({}).sort({ startDate: -1 });
+      const itemBMI = await Schedule.find({ location: 'Baitul Makmur I' }).sort({ startDate: -1 });
       const itemBMII = await Schedule.find({
         location: 'Baitul Makmur II'
       }).sort({ startDate: -1 });
-      const itemJM = await Schedule.find({
-        location: 'Jamek Mosque'
-      }).sort({
-        startDate: -1
-      });
-      const itemCM = await Schedule.find({
-        location: 'City Mosque'
-      }).sort({
-        startDate: -1
-      });
-      const itemRS = await Schedule.find({
-        location: 'Raudhatul Sakinah'
-      }).sort({ startDate: -1 });
+      const itemJM = await Schedule.find({ location: 'Jamek Mosque' }).sort({ startDate: -1 });
+      const itemCM = await Schedule.find({ location: 'City Mosque' }).sort({ startDate: -1 });
+      const itemRS = await Schedule.find({ location: 'Raudhatul Sakinah' }).sort({ startDate: -1 });
 
       // schedules file
       const itemFiles = await FileSchedule.find({});
@@ -3420,7 +3379,6 @@ app.get('/schedule/:customListName', async function (req, res) {
 
 //PROFILE
 
-// SHOW PROFILE
 app.get('/social/profile', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -3477,6 +3435,7 @@ app.get('/social/profile', async function (req, res) {
 });
 
 //SETTINGS
+
 app.get('/social/settings', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -3513,7 +3472,6 @@ app.get('/social/settings', async function (req, res) {
   }
 });
 
-// SUBMIT SETTINGS
 app.post('/social/settings/:customListName', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -3584,11 +3542,11 @@ app.post('/social/settings/:customListName', async function (req, res) {
           if (updatedUser) {
             console.log('Successful update user data');
             res.render('settings', {
-              currentFullName: fullName,
+              currentFullName: checkUser.fullname,
               currentUser: checkUser.username,
               currentProfile: checkUser.profile,
-              currentEmail: email,
-              currentPhone: phone,
+              currentEmail: checkUser.email,
+              currentPhone: checkUser.phone,
               // validation
               validationFullName: '',
               validationEmail: '',
@@ -3776,9 +3734,7 @@ app.post('/social/settings/:customListName', async function (req, res) {
         } else {
           // find user full name
           const currentUsername = req.session.user.username;
-          const checkUser = await User.findOne({
-            username: currentUsername
-          });
+          const checkUser = await User.findOne({ username: currentUsername });
 
           // date for upload
           var uploadDate = dateLocal.getDateYear();
@@ -3799,9 +3755,7 @@ app.post('/social/settings/:customListName', async function (req, res) {
             items: newItemActivity
           });
 
-          const findDate = await Activity.findOne({
-            date: uploadDate
-          });
+          const findDate = await Activity.findOne({ date: uploadDate });
 
           if (findDate) {
             findDate.items.push(newItemActivity);
@@ -3849,41 +3803,31 @@ app.post('/social/settings/:customListName', async function (req, res) {
   }
 });
 
-// DUTY HANDOVER
-
-const give = {
-  headShift: String,
-  handoverShift: String,
-  staffAbsent: String,
-  logReport: String,
-  shift: String,
-  shiftMember: [String]
-};
-
-const receive = {
-  headShift: String,
-  handoverShift: String,
-  staffAbsent: String,
-  logReport: String,
-  shift: String,
-  shiftMember: [String]
-};
-
 const dutyHandoverSchema = new mongoose.Schema({
   reportId: String,
-  date: String,
-  startShift: String,
-  endShift: String,
+  giveShift: String,
+  giveDate: String,
+  giveHeadShift: String,
+  giveStaffOnDuty: String,
+  giveStaffSickLeave: String,
+  giveStaffAbsent: String,
+  receiveShift: String,
+  receiveDate: String,
+  receiveHeadShift: String,
+  receiveStaffOnDuty: String,
+  receiveStaffSickLeave: String,
+  receiveStaffAbsent: String,
   location: String,
   notes: String,
   status: String,
-  give: give,
-  receive: receive
+  handoverShift: String,
+  giveLog: String,
+  receiveLog: String
 });
 
 const DutyHandover = mongoose.model('DutyHandover', dutyHandoverSchema);
 
-// VIEW
+// view
 app.get('/duty-handover/view', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -3892,24 +3836,13 @@ app.get('/duty-handover/view', async function (req, res) {
 
     if (checkUser) {
       const itemReports = await DutyHandover.find({}).sort({ date: -1 });
-      console.log(itemReports.give);
-      const itemBMI = await DutyHandover.find({
-        location: 'Baitul Makmur I'
-      }).sort({ date: -1 });
+      const itemBMI = await DutyHandover.find({ location: 'Baitul Makmur I' }).sort({ date: -1 });
       const itemBMII = await DutyHandover.find({
         location: 'Baitul Makmur II'
       }).sort({ date: -1 });
-      const itemJM = await DutyHandover.find({
-        location: 'Jamek Mosque'
-      }).sort({ date: -1 });
-      const itemCM = await DutyHandover.find({
-        location: 'City Mosque'
-      }).sort({
-        date: -1
-      });
-      const itemRS = await DutyHandover.find({
-        location: 'Raudhatul Sakinah'
-      }).sort({ date: -1 });
+      const itemJM = await DutyHandover.find({ location: 'Jamek Mosque' }).sort({ date: -1 });
+      const itemCM = await DutyHandover.find({ location: 'City Mosque' }).sort({ date: -1 });
+      const itemRS = await DutyHandover.find({ location: 'Raudhatul Sakinah' }).sort({ date: -1 });
 
       if (itemReports.length > 0) {
         res.render('duty-handover-view', {
@@ -3968,7 +3901,7 @@ app.get('/duty-handover/view', async function (req, res) {
   }
 });
 
-// VIEW CUSTOM NAME LIST BASE ON LOCATIONS
+// view custom name list other locations
 app.get('/duty-handover/view/:customListName', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
@@ -3978,23 +3911,13 @@ app.get('/duty-handover/view/:customListName', async function (req, res) {
 
     if (checkUser) {
       const itemReports = await DutyHandover.find({}).sort({ date: -1 });
-      const itemBMI = await DutyHandover.find({
-        location: 'Baitul Makmur I'
-      }).sort({ date: -1 });
+      const itemBMI = await DutyHandover.find({ location: 'Baitul Makmur I' }).sort({ date: -1 });
       const itemBMII = await DutyHandover.find({
         location: 'Baitul Makmur II'
       }).sort({ date: -1 });
-      const itemJM = await DutyHandover.find({
-        location: 'Jamek Mosque'
-      }).sort({ date: -1 });
-      const itemCM = await DutyHandover.find({
-        location: 'City Mosque'
-      }).sort({
-        date: -1
-      });
-      const itemRS = await DutyHandover.find({
-        location: 'Raudhatul Sakinah'
-      }).sort({ date: -1 });
+      const itemJM = await DutyHandover.find({ location: 'Jamek Mosque' }).sort({ date: -1 });
+      const itemCM = await DutyHandover.find({ location: 'City Mosque' }).sort({ date: -1 });
+      const itemRS = await DutyHandover.find({ location: 'Raudhatul Sakinah' }).sort({ date: -1 });
 
       // check customlistname
       if (customListName === 'BMI') {
@@ -4271,7 +4194,6 @@ app.get('/duty-handover/view/:customListName', async function (req, res) {
   }
 });
 
-// SUBMIT
 app
   .get('/duty-handover/submit', async function (req, res) {
     if (req.isAuthenticated()) {
@@ -4297,9 +4219,6 @@ app
           validationStaffAbsent: '',
           validationNotes: '',
           validationHandoverShift: '',
-          validationSelectedNames: '',
-          validationStartTime: '',
-          validationEndTime: '',
           //form name
           shift: '',
           date: '',
@@ -4310,9 +4229,6 @@ app
           staffAbsent: '',
           notes: '',
           handoverShift: '',
-          selectedNames: '',
-          startTime: '',
-          endTime: '',
           //toast alert
           toastShow: '',
           toastMsg: ''
@@ -4327,39 +4243,35 @@ app
     var validationDate = '';
     var validationLocation = '';
     var validationHeadShift = '';
+    var validationStaffOnDuty = '';
+    var validationStaffSickLeave = '';
+    var validationStaffAbsent = '';
     var validationNotes = '';
     var validationHandoverShift = '';
-    var validationStaffAbsent = '';
-    var validationSelectedNames = '';
-    var validationStartTime = '';
-    var validationEndTime = '';
 
     // current date time
     var currentTime = dateLocal.getCurrentTime();
     var currentDate = dateLocal.getDateYear();
 
-    const formData = req.body;
-
     const shift = req.body.shift;
     const location = req.body.location;
     const date = req.body.date;
     const headShift = req.body.headShift;
+    const staffOnDuty = req.body.staffOnDuty;
+    const staffSickLeave = req.body.staffSickLeave;
+    const staffAbsent = req.body.staffAbsent;
     const notes = req.body.notes;
     const handoverShift = req.body.handoverShift;
-    const staffAbsent = req.body.staffAbsent;
+
+    // generated rid
     const confirmRid = req.body.confirmRid;
-    const startTime = req.body.startTime;
-    const endTime = req.body.endTime;
-    const selectedNames = req.body.selectedNames
-      ? req.body.selectedNames.split(',')
-      : [];
 
     const currentUsername = req.session.user.username;
 
     const checkUser = await User.findOne({ username: currentUsername });
 
     // Validate the reportType
-    if (!shift || shift === '' || shift === 'Choose a shift') {
+    if (!shift || shift === '') {
       validationShift = 'is-invalid';
     } else {
       validationShift = 'is-valid';
@@ -4373,7 +4285,7 @@ app
     }
 
     // Validate the location
-    if (!location || location === '' || location === 'Choose a location') {
+    if (!location || location === '') {
       validationLocation = 'is-invalid';
     } else {
       validationLocation = 'is-valid';
@@ -4386,22 +4298,18 @@ app
       validationHeadShift = 'is-valid';
     }
 
-    // Validate the notes
-    if (!notes || notes === '') {
-      validationNotes = 'is-invalid';
+    // Validate the staffOnDuty
+    if (!staffOnDuty || staffOnDuty === '') {
+      validationStaffOnDuty = 'is-invalid';
     } else {
-      validationNotes = 'is-valid';
+      validationStaffOnDuty = 'is-valid';
     }
 
-    // Validate the handoverShift
-    if (
-      !handoverShift ||
-      handoverShift === '' ||
-      handoverShift === 'Choose a handover shift'
-    ) {
-      validationHandoverShift = 'is-invalid';
+    // Validate the staffSickLeave
+    if (!staffSickLeave || staffSickLeave === '') {
+      validationStaffSickLeave = 'is-invalid';
     } else {
-      validationHandoverShift = 'is-valid';
+      validationStaffSickLeave = 'is-valid';
     }
 
     // Validate the staffAbsent
@@ -4411,39 +4319,30 @@ app
       validationStaffAbsent = 'is-valid';
     }
 
-    // Validate the selectedNames
-    if (selectedNames.length === 0) {
-      validationSelectedNames = 'is-invalid';
+    // Validate the notes
+    if (!notes || notes === '') {
+      validationNotes = 'is-invalid';
     } else {
-      validationSelectedNames = 'is-valid';
+      validationNotes = 'is-valid';
     }
 
-    // Validate the startTime
-    if (!startTime || startTime === '') {
-      validationStartTime = 'is-invalid';
+    // Validate the handoverShift
+    if (!handoverShift || handoverShift === '') {
+      validationHandoverShift = 'is-invalid';
     } else {
-      validationStartTime = 'is-valid';
+      validationHandoverShift = 'is-valid';
     }
-
-    // Validate the endTime
-    if (!endTime || endTime === '') {
-      validationEndTime = 'is-invalid';
-    } else {
-      validationEndTime = 'is-valid';
-    }
-    startTime;
 
     if (
       validationShift === 'is-valid' &&
       validationDate === 'is-valid' &&
       validationLocation === 'is-valid' &&
       validationHeadShift === 'is-valid' &&
-      validationNotes === 'is-valid' &&
-      validationHandoverShift === 'is-valid' &&
+      validationStaffOnDuty === 'is-valid' &&
+      validationStaffSickLeave === 'is-valid' &&
       validationStaffAbsent === 'is-valid' &&
-      validationSelectedNames === 'is-valid' &&
-      validationStartTime === 'is-valid' &&
-      validationEndTime === 'is-valid'
+      validationNotes === 'is-valid' &&
+      validationHandoverShift === 'is-valid'
     ) {
       const currentFullName = checkUser.fullname;
       const currentUser = checkUser.username;
@@ -4454,289 +4353,288 @@ app
         'Saya ' +
         headShift +
         ' selaku ketua syif ' +
-        _.lowerCase(shift) +
-        ' telah menyerahkan tugas kepada selaku ketua syif, ' +
-        _.lowerCase(handoverShift) +
+        shift +
+        ' telah menyerahkan tugas kepada selaku ketua syif' +
+        handoverShift +
         ' dalam keadaan baik dan senarai peralatan tugas mencukupi di ' +
         location +
         ' pada tarikh ' +
         date;
 
-      // check location
-
-      var confirmLocation = [];
-
-      const locationMappings = {
-        'Baitul Makmur I': [
-          { checkpointName: 'ValueX1', time: '', logReport: '' },
-          { checkpointName: 'ValueX2', time: '', logReport: '' },
-          { checkpointName: 'ValueX3', time: '', logReport: '' },
-          { checkpointName: 'ValueX4', time: '', logReport: '' },
-          { checkpointName: 'ValueX5', time: '', logReport: '' }
-        ],
-        'Baitul Makmur II': [
-          { checkpointName: 'ValueX1', time: '', logReport: '' },
-          { checkpointName: 'ValueX2', time: '', logReport: '' },
-          { checkpointName: 'ValueX3', time: '', logReport: '' },
-          { checkpointName: 'ValueX4', time: '', logReport: '' },
-          { checkpointName: 'ValueX5', time: '', logReport: '' }
-        ],
-        'Jamek Mosque': [
-          { checkpointName: 'ValueX1', time: '', logReport: '' },
-          { checkpointName: 'ValueX2', time: '', logReport: '' },
-          { checkpointName: 'ValueX3', time: '', logReport: '' },
-          { checkpointName: 'ValueX4', time: '', logReport: '' },
-          { checkpointName: 'ValueX5', time: '', logReport: '' }
-        ],
-        'City Mosque': [
-          { checkpointName: 'ValueX1', time: '', logReport: '' },
-          { checkpointName: 'ValueX2', time: '', logReport: '' },
-          { checkpointName: 'ValueX3', time: '', logReport: '' },
-          { checkpointName: 'ValueX4', time: '', logReport: '' },
-          { checkpointName: 'ValueX5', time: '', logReport: '' }
-        ],
-        'Raudhatul Sakinah': [
-          { checkpointName: 'ValueX1', time: '', logReport: '' },
-          { checkpointName: 'ValueX2', time: '', logReport: '' },
-          { checkpointName: 'ValueX3', time: '', logReport: '' },
-          { checkpointName: 'ValueX4', time: '', logReport: '' },
-          { checkpointName: 'ValueX5', time: '', logReport: '' }
-        ]
-        // Define mappings for other locations
+      // Activity
+      const newItemActivity = {
+        time: currentTime,
+        by: currentFullName,
+        username: currentUser,
+        type: 'Duty Handover',
+        title:
+          'Submitted a duty handover report of ' +
+          shift +
+          ' & status is ' +
+          status,
+        about: notes
       };
 
-      if (locationMappings.hasOwnProperty(location)) {
-        confirmLocation = locationMappings[location];
+      const newActivity = new Activity({
+        date: currentDate,
+        items: newItemActivity
+      });
+
+      const findDate = await Activity.findOne({ date: currentDate });
+
+      if (findDate) {
+        findDate.items.push(newItemActivity);
+        await findDate.save();
+        console.log('Activity added to existing date');
+      } else {
+        const resultActivity = Activity.create(newActivity);
+
+        if (resultActivity) {
+          console.log('Added new activity');
+        } else {
+          console.log('Something is wrong');
+        }
       }
-
-      // Access confirmLocation array and its sets of properties
-      confirmLocation.forEach((set, index) => {
-        console.log(`Set ${index + 1}:`);
-        console.log(set.checkpointName); // Access locationName for the set
-        console.log(set.time); // Access time for the set
-        console.log(set.logReport); // Access logReport for the set
-      });
-
-      // patrol report register
-      const newPatrolReport = new PatrolReport({
-        reportId: confirmRid,
-        type: 'Shift Member Location',
-        shift: shift,
-        startShift: startTime,
-        endShift: endTime,
-        date: date,
-        location: location,
-        status: 'Open',
-        shiftMember: selectedNames.map(name => ({
-          fullName: name,
-          checkPoint: confirmLocation
-        }))
-      });
-
-      const giveHandover = {
-        headShift: headShift,
-        handoverShift: handoverShift,
-        staffAbsent: staffAbsent,
-        logReport: giveLog,
-        shift: shift,
-        shiftMember: selectedNames
-      };
 
       const newHandover = new DutyHandover({
         reportId: confirmRid,
-        date: date,
-        startShift: startTime,
-        endShift: endTime,
+        giveShift: shift,
+        giveDate: date,
+        giveHeadShift: headShift,
+        giveStaffOnDuty: staffOnDuty,
+        giveStaffSickLeave: staffSickLeave,
+        giveStaffAbsent: staffAbsent,
         status: status,
         notes: notes,
         location: location,
-        give: giveHandover
+        handoverShift: handoverShift,
+        giveLog: giveLog
       });
 
-      const existing = await DutyHandover.findOne({
-        reportId: confirmRid
-      });
+      const existing = await DutyHandover.findOne({ reportId: confirmRid });
 
       if (!existing) {
-        // Activity
-        const newItemActivity = {
-          time: currentTime,
-          by: currentFullName,
-          username: currentUser,
-          type: 'Duty Handover',
-          title:
-            'Submitted a duty handover report of ' +
-            _.lowerCase(shift) +
-            ' & status is ' +
-            status,
-          about: notes
-        };
+        const result = DutyHandover.create(newHandover);
 
-        const newActivity = new Activity({
-          date: currentDate,
-          items: newItemActivity
-        });
+        if (result) {
+          console.log('Successfully added report.');
 
-        const findDate = await Activity.findOne({ date: currentDate });
+          const checkUser = await User.findOne({ username: currentUsername });
 
-        if (findDate) {
-          findDate.items.push(newItemActivity);
-          await findDate.save();
-          console.log('Activity added to existing date');
+          if (checkUser) {
+            const itemReports = await DutyHandover.find({}).sort({ date: -1 });
+            const itemBMI = await DutyHandover.find({
+              location: 'Baitul Makmur I'
+            }).sort({ date: -1 });
+            const itemBMII = await DutyHandover.find({
+              location: 'Baitul Makmur II'
+            }).sort({ date: -1 });
+            const itemJM = await DutyHandover.find({
+              location: 'Jamek Mosque'
+            }).sort({ date: -1 });
+            const itemCM = await DutyHandover.find({ location: 'City Mosque' }).sort({ date: -1 });
+            const itemRS = await DutyHandover.find({
+              location: 'Raudhatul Sakinah'
+            }).sort({ date: -1 });
+
+            if (itemReports.length > 0) {
+              res.render('duty-handover-view', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
+                itemReports: itemReports,
+                totalReports: itemReports.length,
+                amountBMI: itemBMI.length,
+                amountBMII: itemBMII.length,
+                amountJM: itemJM.length,
+                amountCM: itemCM.length,
+                amountRS: itemRS.length,
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated random id
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Submit report successful!'
+              });
+            } else {
+              res.render('duty-handover-view', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
+                itemReports: 'There is no case report submitted yet.',
+                totalReports: '0',
+                amountBMI: '0',
+                amountBMII: '0',
+                amountJM: '0',
+                amountCM: '0',
+                amountRS: '0',
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated random id
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Submit report successful!'
+              });
+            }
+          }
         } else {
-          const resultActivity = Activity.create(newActivity);
+          console.log('Add report failed');
 
-          if (resultActivity) {
-            console.log('Added new activity');
-          } else {
-            console.log('Something is wrong');
+          const checkUser = await User.findOne({ username: currentUsername });
+
+          if (checkUser) {
+            const itemReports = await DutyHandover.find({}).sort({ date: -1 });
+            const itemBMI = await DutyHandover.find({
+              location: 'Baitul Makmur I'
+            }).sort({ date: -1 });
+            const itemBMII = await DutyHandover.find({
+              location: 'Baitul Makmur II'
+            }).sort({ date: -1 });
+            const itemJM = await DutyHandover.find({
+              location: 'Jamek Mosque'
+            }).sort({ date: -1 });
+            const itemCM = await DutyHandover.find({ location: 'City Mosque' }).sort({ date: -1 });
+            const itemRS = await DutyHandover.find({
+              location: 'Raudhatul Sakinah'
+            }).sort({ date: -1 });
+
+            if (itemReports.length > 0) {
+              res.render('duty-handover-view', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
+                itemReports: itemReports,
+                totalReports: itemReports.length,
+                amountBMI: itemBMI.length,
+                amountBMII: itemBMII.length,
+                amountJM: itemJM.length,
+                amountCM: itemCM.length,
+                amountRS: itemRS.length,
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated random id
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Add report failed!'
+              });
+            } else {
+              res.render('duty-handover-view', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
+                itemReports: 'There is no case report submitted yet.',
+                totalReports: '0',
+                amountBMI: '0',
+                amountBMII: '0',
+                amountJM: '0',
+                amountCM: '0',
+                amountRS: '0',
+                topNav: 'All',
+                classActive1: 'active',
+                classActive2: '',
+                classActive3: '',
+                classActive4: '',
+                classActive5: '',
+                classActive6: '',
+                // generated random id
+                rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+                // toast alert
+                toastShow: 'show',
+                toastMsg: 'Add report failed!'
+              });
+            }
           }
         }
-
-        const result = await newHandover.save();
-
-        const resultPatrolReport = await newPatrolReport.save();
-
-        if (result && resultPatrolReport) {
-          console.log('Successfully added report.');
-        }
-
-        const itemReports = await DutyHandover.find({}).sort({ date: -1 });
-        const itemBMI = await DutyHandover.find({
-          location: 'Baitul Makmur I'
-        }).sort({ date: -1 });
-        const itemBMII = await DutyHandover.find({
-          location: 'Baitul Makmur II'
-        }).sort({ date: -1 });
-        const itemJM = await DutyHandover.find({
-          location: 'Jamek Mosque'
-        }).sort({ date: -1 });
-        const itemCM = await DutyHandover.find({
-          location: 'City Mosque'
-        }).sort({ date: -1 });
-        const itemRS = await DutyHandover.find({
-          location: 'Raudhatul Sakinah'
-        }).sort({ date: -1 });
-
-        if (itemReports.length > 0) {
-          res.render('duty-handover-view', {
-            currentFullName: checkUser.fullname,
-            currentUser: checkUser.username,
-            currentProfile: checkUser.profile,
-            itemReports: itemReports,
-            totalReports: itemReports.length,
-            amountBMI: itemBMI.length,
-            amountBMII: itemBMII.length,
-            amountJM: itemJM.length,
-            amountCM: itemCM.length,
-            amountRS: itemRS.length,
-            topNav: 'All',
-            classActive1: 'active',
-            classActive2: '',
-            classActive3: '',
-            classActive4: '',
-            classActive5: '',
-            classActive6: '',
-            // generated random id
-            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
-            // toast alert
-            toastShow: 'show',
-            toastMsg: 'Submit report successful!'
-          });
-        } else {
-          res.render('duty-handover-view', {
-            currentFullName: checkUser.fullname,
-            currentUser: checkUser.username,
-            currentProfile: checkUser.profile,
-            itemReports: 'There is no case report submitted yet.',
-            totalReports: '0',
-            amountBMI: '0',
-            amountBMII: '0',
-            amountJM: '0',
-            amountCM: '0',
-            amountRS: '0',
-            topNav: 'All',
-            classActive1: 'active',
-            classActive2: '',
-            classActive3: '',
-            classActive4: '',
-            classActive5: '',
-            classActive6: '',
-            // generated random id
-            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
-            // toast alert
-            toastShow: 'show',
-            toastMsg: 'Submit report successful!'
-          });
-        }
       } else {
-        const itemReports = await DutyHandover.find({}).sort({ date: -1 });
-        const itemBMI = await DutyHandover.find({
-          location: 'Baitul Makmur I'
-        }).sort({ date: -1 });
-        const itemBMII = await DutyHandover.find({
-          location: 'Baitul Makmur II'
-        }).sort({ date: -1 });
-        const itemJM = await DutyHandover.find({
-          location: 'Jamek Mosque'
-        }).sort({ date: -1 });
-        const itemCM = await DutyHandover.find({
-          location: 'City Mosque'
-        }).sort({ date: -1 });
-        const itemRS = await DutyHandover.find({
-          location: 'Raudhatul Sakinah'
-        }).sort({ date: -1 });
+        console.log('There is existing report!');
 
-        if (itemReports.length > 0) {
-          res.render('duty-handover-view', {
-            currentFullName: checkUser.fullname,
-            currentUser: checkUser.username,
-            currentProfile: checkUser.profile,
-            itemReports: itemReports,
-            totalReports: itemReports.length,
-            amountBMI: itemBMI.length,
-            amountBMII: itemBMII.length,
-            amountJM: itemJM.length,
-            amountCM: itemCM.length,
-            amountRS: itemRS.length,
-            topNav: 'All',
-            classActive1: 'active',
-            classActive2: '',
-            classActive3: '',
-            classActive4: '',
-            classActive5: '',
-            classActive6: '',
-            // generated random id
-            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
-            // toast alert
-            toastShow: 'show',
-            toastMsg: 'Got existing duty handover'
-          });
-        } else {
-          res.render('duty-handover-view', {
-            currentFullName: checkUser.fullname,
-            currentUser: checkUser.username,
-            currentProfile: checkUser.profile,
-            itemReports: 'There is no case report submitted yet.',
-            totalReports: '0',
-            amountBMI: '0',
-            amountBMII: '0',
-            amountJM: '0',
-            amountCM: '0',
-            amountRS: '0',
-            topNav: 'All',
-            classActive1: 'active',
-            classActive2: '',
-            classActive3: '',
-            classActive4: '',
-            classActive5: '',
-            classActive6: '',
-            // generated random id
-            rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
-            // toast alert
-            toastShow: 'show',
-            toastMsg: 'Got existing duty handover'
-          });
+        const checkUser = await User.findOne({ username: currentUsername });
+
+        if (checkUser) {
+          const itemReports = await DutyHandover.find({}).sort({ date: -1 });
+          const itemBMI = await DutyHandover.find({
+            location: 'Baitul Makmur I'
+          }).sort({ date: -1 });
+          const itemBMII = await DutyHandover.find({
+            location: 'Baitul Makmur II'
+          }).sort({ date: -1 });
+          const itemJM = await DutyHandover.find({
+            location: 'Jamek Mosque'
+          }).sort({ date: -1 });
+          const itemCM = await DutyHandover.find({ location: 'City Mosque' }).sort({ date: -1 });
+          const itemRS = await DutyHandover.find({
+            location: 'Raudhatul Sakinah'
+          }).sort({ date: -1 });
+
+          if (itemReports.length > 0) {
+            res.render('duty-handover-view', {
+              currentFullName: checkUser.fullname,
+              currentUser: checkUser.username,
+              currentProfile: checkUser.profile,
+              itemReports: itemReports,
+              totalReports: itemReports.length,
+              amountBMI: itemBMI.length,
+              amountBMII: itemBMII.length,
+              amountJM: itemJM.length,
+              amountCM: itemCM.length,
+              amountRS: itemRS.length,
+              topNav: 'All',
+              classActive1: 'active',
+              classActive2: '',
+              classActive3: '',
+              classActive4: '',
+              classActive5: '',
+              classActive6: '',
+              // generated random id
+              rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+              // toast alert
+              toastShow: 'show',
+              toastMsg: 'There is an exisitng report!'
+            });
+          } else {
+            res.render('duty-handover-view', {
+              currentFullName: checkUser.fullname,
+              currentUser: checkUser.username,
+              currentProfile: checkUser.profile,
+              itemReports: 'There is no case report submitted yet.',
+              totalReports: '0',
+              amountBMI: '0',
+              amountBMII: '0',
+              amountJM: '0',
+              amountCM: '0',
+              amountRS: '0',
+              topNav: 'All',
+              classActive1: 'active',
+              classActive2: '',
+              classActive3: '',
+              classActive4: '',
+              classActive5: '',
+              classActive6: '',
+              // generated random id
+              rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+              // toast alert
+              toastShow: 'show',
+              toastMsg: 'There is an existing report!'
+            });
+          }
         }
       }
     } else {
@@ -4750,32 +4648,28 @@ app
         validationDate: validationDate,
         validationLocation: validationLocation,
         validationHeadShift: validationHeadShift,
+        validationStaffOnDuty: validationStaffOnDuty,
+        validationStaffSickLeave: validationStaffSickLeave,
+        validationStaffAbsent: validationStaffAbsent,
         validationNotes: validationNotes,
         validationHandoverShift: validationHandoverShift,
-        validationStaffAbsent: validationStaffAbsent,
-        validationSelectedNames: validationSelectedNames,
-        validationStartTime: validationStartTime,
-        validationEndTime: validationEndTime,
         //form name
-        shift: formData.shift,
-        date: formData.date,
-        location: formData.location,
-        headShift: formData.headShift,
-        notes: formData.notes,
-        handoverShift: formData.handoverShift,
-        staffAbsent: formData.staffAbsent,
-        selectedNames: selectedNames,
-        startTime: startTime,
-        endTime: endTime,
+        shift: shift,
+        date: date,
+        location: location,
+        headShift: headShift,
+        staffOnDuty: staffOnDuty,
+        staffSickLeave: staffSickLeave,
+        staffAbsent: staffAbsent,
+        notes: notes,
+        handoverShift: handoverShift,
         //toast alert
         toastShow: 'show',
-        toastMsg:
-          'There is an error at your input or staff on duty is empty, please do check it again'
+        toastMsg: 'There is an error at your input, please do check it again'
       });
     }
   });
 
-// DETAILS
 app
   .get('/duty-handover/details', async function (req, res) {
     if (req.isAuthenticated()) {
@@ -4790,42 +4684,44 @@ app
         });
 
         if (checkReport.status === 'Completed') {
+          console.log(checkReport.status);
           res.render('duty-handover-details', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
             // duty handover details
-            dutyHandover: checkReport,
             reportId: checkReport.reportId,
-            giveShift: checkReport.give.shift,
-            giveDate: checkReport.date,
-            giveHeadShift: checkReport.give.headShift,
-            giveStaffOnDuty: checkReport.give.shiftMember,
-            giveStaffAbsent: checkReport.give.staffAbsent,
-            receiveShift: checkReport.receive.shift,
-            receiveDate: checkReport.date,
-            receiveHeadShift: checkReport.receive.headShift,
-            receiveStaffOnDuty: checkReport.receive.shiftMember,
-            receiveStaffAbsent: checkReport.receive.staffAbsent,
-            giveLog: checkReport.give.logReport,
-            receiveLog: checkReport.receive.logReport,
+            giveShift: checkReport.giveShift,
+            giveDate: checkReport.giveDate,
+            giveHeadShift: checkReport.giveHeadShift,
+            giveStaffOnDuty: checkReport.giveStaffOnDuty,
+            giveStaffSickLeave: checkReport.giveStaffSickLeave,
+            giveStaffAbsent: checkReport.giveStaffAbsent,
+            receiveShift: checkReport.receiveShift,
+            receiveDate: checkReport.receiveDate,
+            receiveHeadShift: checkReport.receiveHeadShift,
+            receiveStaffOnDuty: checkReport.receiveStaffOnDuty,
+            receiveStaffSickLeave: checkReport.receiveStaffSickLeave,
+            receiveStaffAbsent: checkReport.receiveStaffAbsent,
+            giveLog: checkReport.giveLog,
+            receiveLog: checkReport.receiveLog,
             location: checkReport.location,
             status: checkReport.status,
             notes: checkReport.notes,
-            date: checkReport.date,
-            handoverShift: checkReport.give.handoverShift,
-            shift: checkReport.give.shift,
+            date: checkReport.giveDate,
+            handoverShift: checkReport.handoverShift,
+            shift: checkReport.giveShift,
             // validation
             validationHeadShift: '',
             validationStaffOnDuty: '',
+            validationStaffSickLeave: '',
             validationStaffAbsent: '',
             validationNotes: '',
-            validationSelectedNames: '',
             //form name
             headShift: '',
             staffOnDuty: '',
+            staffSickLeave: '',
             staffAbsent: '',
-            selectedNames: '',
             // tab-pane
             showTabPane1: '',
             showTabPane2: '',
@@ -4834,46 +4730,47 @@ app
             toastShow: '',
             toastMsg: ''
           });
-        } else if (checkReport.status === 'Incompleted') {
+        } else {
           res.render('duty-handover-details', {
             currentFullName: checkUser.fullname,
             currentUser: checkUser.username,
             currentProfile: checkUser.profile,
             // duty handover details
-            dutyHandover: checkReport,
             reportId: checkReport.reportId,
-            giveShift: checkReport.give.shift,
-            giveDate: checkReport.date,
-            giveHeadShift: checkReport.give.headShift,
-            giveStaffOnDuty: checkReport.give.shiftMember,
-            giveStaffAbsent: checkReport.give.staffAbsent,
-            receiveShift: checkReport.receive.shift,
-            receiveDate: checkReport.date,
-            receiveHeadShift: checkReport.receive.headShift,
-            receiveStaffOnDuty: checkReport.receive.shiftMember,
-            receiveStaffAbsent: checkReport.receive.staffAbsent,
-            giveLog: checkReport.give.logReport,
-            receiveLog: checkReport.receive.logReport,
+            giveShift: checkReport.giveShift,
+            giveDate: checkReport.giveDate,
+            giveHeadShift: checkReport.giveHeadShift,
+            giveStaffOnDuty: checkReport.giveStaffOnDuty,
+            giveStaffSickLeave: checkReport.giveStaffSickLeave,
+            giveStaffAbsent: checkReport.giveStaffAbsent,
+            receiveShift: checkReport.receiveShift,
+            receiveDate: checkReport.receiveDate,
+            receiveHeadShift: checkReport.receiveHeadShift,
+            receiveStaffOnDuty: checkReport.receiveStaffOnDuty,
+            receiveStaffSickLeave: checkReport.receiveStaffSickLeave,
+            receiveStaffAbsent: checkReport.receiveStaffAbsent,
+            giveLog: checkReport.giveLog,
+            receiveLog: checkReport.receiveLog,
             location: checkReport.location,
             status: checkReport.status,
             notes: checkReport.notes,
-            date: checkReport.date,
-            handoverShift: checkReport.give.handoverShift,
-            shift: checkReport.give.shift,
+            date: checkReport.giveDate,
+            handoverShift: checkReport.handoverShift,
+            shift: checkReport.giveShift,
             // validation
             validationHeadShift: '',
             validationStaffOnDuty: '',
+            validationStaffSickLeave: '',
             validationStaffAbsent: '',
             validationNotes: '',
-            validationSelectedNames: '',
             //form name
             headShift: '',
             staffOnDuty: '',
+            staffSickLeave: '',
             staffAbsent: '',
-            selectedNames: '',
             // tab-pane
-            showTabPane1: 'active',
-            showTabPane2: '',
+            showTabPane1: '',
+            showTabPane2: 'active',
             showTabPane3: '',
             // toast alert
             toastShow: '',
@@ -4907,18 +4804,15 @@ app
     const headShift = req.body.headShift;
     const handoverShift = req.body.handoverShift;
     const staffOnDuty = req.body.staffOnDuty;
+    const staffSickLeave = req.body.staffSickLeave;
     const staffAbsent = req.body.staffAbsent;
     const notes = req.body.notes;
-    const selectedNames = req.body.selectedNames
-      ? req.body.selectedNames.split(',')
-      : [];
 
     var validationHeadShift = '';
     var validationStaffOnDuty = '';
     var validationStaffSickLeave = '';
     var validationStaffAbsent = '';
     var validationNotes = '';
-    var validationSelectedNames = '';
 
     // validation head shift
     if (headShift === '') {
@@ -4932,6 +4826,13 @@ app
       validationStaffOnDuty = 'is-invalid';
     } else {
       validationStaffOnDuty = 'is-valid';
+    }
+
+    // validation staff sick leave
+    if (staffSickLeave === '') {
+      validationStaffSickLeave = 'is-invalid';
+    } else {
+      validationStaffSickLeave = 'is-valid';
     }
 
     // validation absent
@@ -4948,19 +4849,12 @@ app
       validationNotes = 'is-valid';
     }
 
-    // Validate the selectedNames
-    if (selectedNames.length === 0) {
-      validationSelectedNames = 'is-invalid';
-    } else {
-      validationSelectedNames = 'is-valid';
-    }
-
     if (
       validationHeadShift === 'is-valid' &&
       validationStaffOnDuty === 'is-valid' &&
+      validationStaffSickLeave === 'is-valid' &&
       validationStaffAbsent === 'is-valid' &&
-      validationNotes === 'is-valid' &&
-      validationSelectedNames === 'is-valid'
+      validationNotes === 'is-valid'
     ) {
       console.log('Succesful!');
 
@@ -4973,32 +4867,62 @@ app
         'Saya ' +
         headShift +
         ' selaku ketua syif ' +
-        _.lowerCase(shift) +
-        ' telah menerima tugas daripada ketua syif ' +
-        _.lowerCase(handoverShift) +
+        shift +
+        ' telah menerima tugas daripada ketua syif' +
+        handoverShift +
         ' dalam keadaan baik dan senarai peralatan tugas mencukupi di ' +
         location +
         ' pada tarikh ' +
         date;
 
-      const updateReport = {
-        status: 'Closed'
+      // Activity
+      const newItemActivity = {
+        time: currentTime,
+        by: currentFullName,
+        username: currentUser,
+        type: 'Duty Handover',
+        title:
+          'Submitted a received duty report of ' +
+          shift +
+          ' & status is ' +
+          status,
+        about: notes
       };
 
-      const receive = {
-        shift: shift,
-        headShift: headShift,
-        staffAbsent: staffAbsent,
-        handoverShift: handoverShift,
-        logReport: receiveLog,
-        shiftMember: selectedNames
-      };
+      const newActivity = new Activity({
+        date: currentDate,
+        items: newItemActivity
+      });
+
+      const findDate = await Activity.findOne({ date: currentDate });
+
+      if (findDate) {
+        findDate.items.push(newItemActivity);
+        await findDate.save();
+        console.log('Activity added to existing date');
+      } else {
+        const resultActivity = Activity.create(newActivity);
+
+        if (resultActivity) {
+          console.log('Added new activity');
+        } else {
+          console.log('Something is wrong');
+        }
+      }
 
       const updatedData = {
+        reportId: reportId,
+        receiveShift: shift,
+        receiveDate: date,
+        receiveHeadShift: headShift,
+        receiveStaffOnDuty: staffOnDuty,
+        receiveStaffSickLeave: staffSickLeave,
+        receiveStaffAbsent: staffAbsent,
         status: status,
         notes: notes,
         location: location,
-        receive: receive
+        handoverShift: handoverShift,
+        receiveLog: receiveLog
       };
 
       const updatedHandover = await DutyHandover.findOneAndUpdate(
@@ -5007,52 +4931,53 @@ app
         { new: true }
       );
 
-      const updatedPatrol = await PatrolReport.findOneAndUpdate(
-        { reportId: reportId },
-        { $set: updateReport },
-        { new: true }
-      );
-
-      if (updatedHandover && updatedPatrol) {
+      if (updatedHandover) {
         console.log('Update success');
-
-        // Activity
-        const newItemActivity = {
-          time: currentTime,
-          by: currentFullName,
-          username: currentUser,
-          type: 'Duty Handover',
-          title:
-            'Submitted a received duty report of ' +
-            shift +
-            ' & status is ' +
-            status +
-            ' and this shift member patrol report is now closed',
-          about: notes
-        };
-
-        const newActivity = new Activity({
-          date: currentDate,
-          items: newItemActivity
+        res.render('duty-handover-details', {
+          currentFullName: checkUser.fullname,
+          currentUser: checkUser.username,
+          currentProfile: checkUser.profile,
+          // duty handover details
+          reportId: checkReport.reportId,
+          giveShift: checkReport.giveShift,
+          giveDate: checkReport.giveDate,
+          giveHeadShift: checkReport.giveHeadShift,
+          giveStaffOnDuty: checkReport.giveStaffOnDuty,
+          giveStaffSickLeave: checkReport.giveStaffSickLeave,
+          giveStaffAbsent: checkReport.giveStaffAbsent,
+          receiveShift: checkReport.receiveShift,
+          receiveDate: checkReport.receiveDate,
+          receiveHeadShift: checkReport.receiveHeadShift,
+          receiveStaffOnDuty: checkReport.receiveStaffOnDuty,
+          receiveStaffSickLeave: checkReport.receiveStaffSickLeave,
+          receiveStaffAbsent: checkReport.receiveStaffAbsent,
+          giveLog: checkReport.giveLog,
+          receiveLog: checkReport.receiveLog,
+          location: checkReport.location,
+          status: checkReport.status,
+          notes: checkReport.notes,
+          date: checkReport.giveDate,
+          handoverShift: checkReport.handoverShift,
+          shift: checkReport.giveShift,
+          // input form for receive handover
+          headShift: '',
+          staffOnDuty: '',
+          staffSickLeave: '',
+          staffAbsent: '',
+          // validation
+          validationHeadShift: '',
+          validationStaffOnDuty: '',
+          validationStaffSickLeave: '',
+          validationStaffAbsent: '',
+          validationNotes: '',
+          // tab-pane
+          showTabPane1: '',
+          showTabPane2: '',
+          showTabPane3: 'active',
+          // toast alert
+          toastShow: 'show',
+          toastMsg: 'The handover duty have completed'
         });
-
-        const findDate = await Activity.findOne({ date: currentDate });
-
-        if (findDate) {
-          findDate.items.push(newItemActivity);
-          await findDate.save();
-          console.log('Activity added to existing date');
-        } else {
-          const resultActivity = Activity.create(newActivity);
-
-          if (resultActivity) {
-            console.log('Added new activity');
-          } else {
-            console.log('Something is wrong');
-          }
-        }
-
-        res.redirect('/duty-handover/details?id=' + reportId);
       } else {
         console.log('Report Id are not exist');
       }
@@ -5063,38 +4988,38 @@ app
         currentUser: checkUser.username,
         currentProfile: checkUser.profile,
         // duty handover details
-        dutyHandover: checkReport,
         reportId: checkReport.reportId,
-        giveShift: checkReport.give.shift,
-        giveDate: checkReport.date,
-        giveHeadShift: checkReport.give.headShift,
-        giveStaffOnDuty: checkReport.give.shiftMember,
-        giveStaffAbsent: checkReport.give.staffAbsent,
-        receiveShift: checkReport.receive.shift,
-        receiveDate: checkReport.date,
-        receiveHeadShift: checkReport.receive.headShift,
-        receiveStaffOnDuty: checkReport.receive.shiftMember,
-        receiveStaffAbsent: checkReport.receive.staffAbsent,
-        giveLog: checkReport.give.logReport,
-        receiveLog: checkReport.receive.logReport,
+        giveShift: checkReport.giveShift,
+        giveDate: checkReport.giveDate,
+        giveHeadShift: checkReport.giveHeadShift,
+        giveStaffOnDuty: checkReport.giveStaffOnDuty,
+        giveStaffSickLeave: checkReport.giveStaffSickLeave,
+        giveStaffAbsent: checkReport.giveStaffAbsent,
+        receiveShift: checkReport.receiveShift,
+        receiveDate: checkReport.receiveDate,
+        receiveHeadShift: checkReport.receiveHeadShift,
+        receiveStaffOnDuty: checkReport.receiveStaffOnDuty,
+        receiveStaffSickLeave: checkReport.receiveStaffSickLeave,
+        receiveStaffAbsent: checkReport.receiveStaffAbsent,
+        giveLog: checkReport.giveLog,
+        receiveLog: checkReport.receiveLog,
         location: checkReport.location,
         status: checkReport.status,
         notes: checkReport.notes,
-        date: checkReport.date,
-        handoverShift: checkReport.give.handoverShift,
-        shift: checkReport.give.shift,
+        date: checkReport.giveDate,
+        handoverShift: checkReport.handoverShift,
+        shift: checkReport.giveShift,
         // validation
         validationHeadShift: validationHeadShift,
         validationStaffOnDuty: validationStaffOnDuty,
         validationStaffSickLeave: validationStaffSickLeave,
         validationStaffAbsent: validationStaffAbsent,
         validationNotes: validationNotes,
-        validationSelectedNames: validationSelectedNames,
         //form name
         headShift: headShift,
         staffOnDuty: staffOnDuty,
+        staffSickLeave: staffSickLeave,
         staffAbsent: staffAbsent,
-        selectedNames: selectedNames,
         // tab-pane
         showTabPane1: '',
         showTabPane2: 'active',
@@ -5107,153 +5032,6 @@ app
     }
   });
 
-// NOTES UPDATE
-
-// SUBMIT BASED ON CUSTOM NAME LIST
-app.post('/notes-update/:customNameList', async function (req, res) {
-  // initialize data
-  const customNameList = req.params.customNameList;
-  const notes = req.body.notes;
-  const reportId = req.body.confirmRid;
-
-  // find current user
-  var currentUsername = req.session.user.username;
-  const checkUser = await User.findOne({ username: currentUsername });
-
-  // initialize updated data
-  const updatedData = {
-    reportId: reportId,
-    notes: notes
-  };
-
-  // initialize activity
-  // current date time
-  var currentTime = dateLocal.getCurrentTime();
-  var currentDate = dateLocal.getDateYear();
-
-  // Activity
-  const newItemActivity = {
-    time: currentTime,
-    by: checkUser.fullName,
-    username: checkUser.username,
-    type: 'Duty Handover',
-    title: 'Updated notes of ' + customNameList,
-    about: notes
-  };
-
-  const newActivity = new Activity({
-    date: currentDate,
-    items: newItemActivity
-  });
-
-  const findDate = await Activity.findOne({ date: currentDate });
-
-  if (findDate) {
-    findDate.items.push(newItemActivity);
-    await findDate.save();
-    console.log('Activity added to existing date');
-  } else {
-    const resultActivity = Activity.create(newActivity);
-
-    if (resultActivity) {
-      console.log('Added new activity');
-    } else {
-      console.log('Something is wrong');
-    }
-  }
-
-  // duty handover
-  if (customNameList === 'duty-handover') {
-    const updatedHandover = await DutyHandover.findOneAndUpdate(
-      { reportId: reportId },
-      { $set: updatedData },
-      { new: true }
-    );
-
-    if (updatedHandover) {
-      console.log('Update success');
-      res.redirect('/duty-handover/details?id=' + reportId);
-    } else {
-      console.log('Report Id are not exist');
-    }
-  } else if (customNameList === 'shift-member') {
-    const updatedHandover = await PatrolReport.findOneAndUpdate(
-      { reportId: reportId },
-      { $set: updatedData },
-      { new: true }
-    );
-
-    if (updatedHandover) {
-      console.log('Update success');
-      res.redirect('/shift-member/details?id=' + reportId);
-    } else {
-      console.log('Report Id are not exist');
-    }
-  } else if (customNameList === 'case-report') {
-    const updatedHandover = await CaseReport.findOneAndUpdate(
-      { reportId: reportId },
-      { $set: updatedData },
-      { new: true }
-    );
-
-    if (updatedHandover) {
-      console.log('Update success');
-      res.redirect('/case-report/details?id=' + reportId);
-    } else {
-      console.log('Report Id are not exist');
-    }
-  }
-});
-
-// DOWNLOAD
-app.get('/download/:fileName', async function (req, res) {
-  const fileName = req.params.fileName;
-
-  const file = await File.findOne({ filename: fileName });
-
-  if (!file) {
-    console.log('File are not found');
-    const fileSchedule = await FileSchedule({ filename: fileName });
-
-    if (fileSchedule) {
-      const filePath = __dirname + '/public/uploads/' + file.filename;
-
-      // Send the file as a response
-      res.download(filePath, file.filename);
-      console.log('Downloading file schedule...');
-    } else {
-      console.log('Error downloading');
-    }
-  } else {
-    const filePath = __dirname + '/public/uploads/' + file.filename;
-
-    // Send the file as a response
-    res.download(filePath, file.filename);
-    console.log('Downloading file...');
-  }
-});
-
-// SEARCH
-app.get('/search', async function (req, res) {
-  const query = req.query.query;
-
-  try {
-    let results;
-    if (query && query.trim() !== '') {
-      results = await User.find({
-        fullname: { $regex: query, $options: 'i' }
-      });
-    } else {
-      results = [];
-    }
-
-    res.json(results);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
 // SIGN OUT
 app.get('/sign-out', function (req, res) {
   req.session.destroy(function (err) {
@@ -5264,8 +5042,7 @@ app.get('/sign-out', function (req, res) {
   });
 });
 
-// PORT INITIALIZATION ON CLOUD OR LOCAL (5001)
-const PORT = process.env.PORT || 5001;
-
-app.get('/cool', (req, res) => res.send(cool()));
-app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+//check server
+app.listen(3000, function () {
+  console.log('Server started on port 3000.');
+});

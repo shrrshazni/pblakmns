@@ -38,39 +38,42 @@
 
 <script>
   // MAPBOX
-  document.addEventListener('DOMContentLoaded', async function() {
-    const map = L.map('myMapContainer').setView([1.5532, 110.3598], 16);
+//   $(document).ready(function() {
+//     mapboxgl.accessToken = 'pk.eyJ1Ijoic2hycnNoYXpuaSIsImEiOiJjbHEzN3Y0bnIwODZ2MmpwbDF5Y2E0am5sIn0.fFJ-Q9JOI9fsOrkagF6kvA';
 
-    const response = await fetch('/locations-submit');
-    const locations = await response.json();
+//     const map = new mapboxgl.Map({
+//       container: 'myMapContainer', // container ID
+//       center: [110.3459, 1.5762], // starting position [lng, lat]
+//       zoom: 16, // starting zoom
+//       pitch: 62, // starting pitch
+//       bearing: -20 // starting bearing
+//     });
 
-    const markerCoordinates = locations.map(location => [location.latitude, location.longitude]);
+//     // Array of marker coordinates
+//     const markerCoordinates = [
+//       [110.3459, 1.5762],
+//       [110.3465, 1.5750],
+//       [110.3450, 1.5758],
+//       // Add more coordinates as needed
+//     ];
 
-    // Replace 'YOUR_MAPBOX_ACCESS_TOKEN' with your Mapbox access token
-    const mapboxAccessToken = 'pk.eyJ1Ijoic2hycnNoYXpuaSIsImEiOiJjbHEzN3Y0bnIwODZ2MmpwbDF5Y2E0am5sIn0.fFJ-Q9JOI9fsOrkagF6kvA';
+//     // Loop through the markerCoordinates array and add markers to the map
+//     markerCoordinates.forEach((coordinates) => {
+//       const marker = new mapboxgl.Marker()
+//         .setLngLat(coordinates)
+//         .addTo(map);
+//     });
 
-    L.tileLayer(`https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=${mapboxAccessToken}`, {
-      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery &copy; <a href="https://www.mapbox.com/">Mapbox</a>',
-      id: 'mapbox/streets-v11', // You can choose a different Mapbox style
-      tileSize: 512,
-      zoomOffset: -1
-    }).addTo(map);
+//     map.on('style.load', () => {
+//       $('#lightPreset').on('change', function() {
+//         map.setConfigProperty('basemap', 'lightPreset', this.value);
+//       });
 
-    // Add markers to the map
-    const markers = [];
-    markerCoordinates.forEach(coord => {
-      const marker = L.marker(coord).addTo(map);
-      markers.push(marker);
-    });
-
-    // Create a polyline and add it to the map
-    const polyline = L.polyline(markerCoordinates, {
-      color: 'red'
-    }).addTo(map);
-
-    // Fit the map bounds to the polyline
-    map.fitBounds(polyline.getBounds());
-  });
+//       $('.map-overlay-inner input[type="checkbox"]').on('change', function() {
+//         map.setConfigProperty('basemap', this.id, this.checked);
+//       });
+//     });
+//   });
 
   // search function
   $(document).ready(function() {

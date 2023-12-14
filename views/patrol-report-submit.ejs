@@ -1,0 +1,533 @@
+<%- include("partials/header") %> <%- include("partials/navbar") %>
+
+<!-- content -->
+
+<div class="content">
+  <!-- top section -->
+  <nav class="mb-2" aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item active">Reports</li>
+      <li class="breadcrumb-item active">Patrol Report</li>
+    </ol>
+  </nav>
+  <h2 class="mb-2 lh-sm">Submit Report</h2>
+  <p class="text-700 lead mb-2">
+    Personnel submit patrol reports to document activities, incidents, and
+    safety concerns, ensuring accountability and security.
+  </p>
+
+  <div class="mt-4">
+    <div class="row g-4">
+      <div class="col-12 col-xl-10 order-1 order-xl-0">
+        <div class="mb-9">
+          <div
+            class="card shadow-none border border-300 my-4"
+            data-component-card="data-component-card"
+            id="unit-patrol-report-form"
+          >
+            <div class="card-header p-4 border-bottom border-300 bg-soft">
+              <div class="row g-3 justify-content-between align-items-center">
+                <div class="col-12 col-md">
+                  <h4
+                    class="text-900 mb-0"
+                    data-anchor="data-anchor"
+                    id="header-patrol"
+                  >
+                    Patrol Report Form
+                  </h4>
+                </div>
+                <div class="col col-md-auto">
+                  <nav
+                    class="nav nav-underline justify-content-end doc-tab-nav align-items-center"
+                    role="tablist"
+                  >
+                    <button
+                      class="btn btn-link px-2 text-900 copy-code-btn"
+                      type="button"
+                    >
+                      <span class="fas fa-copy me-1"></span>Copy Example</button
+                    ><a
+                      class="btn btn-sm btn-phoenix-primary code-btn ms-2"
+                      data-bs-toggle="collapse"
+                      href="#patrol-report"
+                      role="button"
+                      aria-controls="accordion-example-code"
+                      aria-expanded="false"
+                    >
+                      <span class="me-2" data-feather="eye"></span>Preview</a
+                    ><a class="btn btn-sm btn-phoenix-primary preview-btn ms-2"
+                      ><span class="me-2" data-feather="minimize-2"></span
+                      >Close</a
+                    >
+                  </nav>
+                </div>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <!-- upper section -->
+              <div class="collapse code-collapse" id="patrol-report">
+                <pre
+                  class="scrollbar- bg-200"
+                  style="min-height: 100%; padding: none"
+                ><code class="code-to-copy">
+                 Unit Patrol Location
+                 Report Summary
+                 Saya (Nama Penuh) bersama (Nama Penuh) telah membuat rondaan dilokai di kediaman dan aset
+                 LAKMNS dan mendapati semua lokasi dalam keadaan baik dan terkawal.
+
+                 Unit Patrol Parameter
+                 Report Summary
+                 Saya (Nama Penuh) bersama (Nama Penuh) telah membuat rondaan parameter berkala dan statik.
+                 Lokasi rondaan dari stau tempat ke satu tempat untuk pemantauan adalah di sekitar tempat 
+                 letak kereta, perkarangan luar (Nama Tempat) dan tinjauan kenderaan secara rawak melaporkan
+                 lokasi dalam keadaan baik dan selamat.
+
+                 Shift Member Patrol Location
+                 Report Summary
+                 Contoh 1 - Saya (Nama Penuh) bersama dengan (Nama Penuh) telah melaksanakan rondaan dilokasi
+                 (Nama Tempat) dan mendapati dalam keadaan baik dan terkawal.
+                 Contoh 2 - Saya (Nama Penuh) bersama dengan (Nama Penuh) telah melaksanakan rondaan dilokasi
+                 kediaman CEO LAKMNS dan mendapati dalam keadaan baik dan terkawal. (Ini adalah laporan sewaktu
+                 menaik dan menurunkan bendera di kediaman CEO)
+
+                 Notes
+                 Contoh 1 - Semasa rondaan dilaksanakan, pintu utama pejabat Jabatan Gutan, aras 11 tidak di tutup.
+                 Contoh 2 - (Sekiranya laporan kes yang berat sebagai contoh yang melibatkan kecurian, kerosakan,
+                 khianat, kemalangan Case Report dengan membuat catatan di sini seperti berikut) : Sila rujuk laporan 
+                 di dalam "Case Report" berdasarkan tarikh, masa dan pbnumber.
+                 Contoh 3 - (Untuk penugasan menaik dan menurunkan bendera serta rondaan kediaman CEO adalah seperti
+                 berikut) : "Bendera telah dinaikkan pada jam 0600hrs"
+                </code></pre>
+              </div>
+
+              <div class="p-4">
+                <!-- form >form tag will be merge with file uploader form tag -->
+                <form
+                  action="/patrol-report/submit"
+                  method="post"
+                  class="row g-3 has-validation"
+                  id="reportForm"
+                >
+                  <!-- form title report -->
+                  <div class="col-md-4">
+                    <label class="form-label" for="validationCustom04"
+                      >Report Type</label
+                    >
+
+                    <select
+                      class="form-select <%= validationReportType %>"
+                      id="validationCustom04"
+                      name="reportType"
+                    >
+                      <option selected="" value="<%= reportType %>">
+                        Choose a report type
+                      </option>
+                      <option value="Unit Patrol Location">
+                        Unit Patrol Location
+                      </option>
+                      <option value="Unit Patrol Parameter">
+                        Unit Patrol Parameter
+                      </option>
+                      <option value="Shift Member Patrol Location">
+                        Shift Member Patrol Location
+                      </option>
+                    </select>
+                    <div class="valid-feedback">Looks good!</div>
+                    <div class="invalid-feedback">
+                      Please select a title report.
+                    </div>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label" for="timepicker1"
+                      >Start Patrol</label
+                    >
+
+                    <input
+                      class="form-control <%= validationStartTime %> datetimepicker flatpickr-input"
+                      id="timepicker1"
+                      type="text"
+                      placeholder="hour : minute"
+                      data-options='{"enableTime":true,"noCalendar":true,"dateFormat":"H:i","disableMobile":true,"allowInput":true}'
+                      name="startTime"
+                      value="<%= startTime %>"
+                    />
+                    <div class="valid-feedback">Looks good!</div>
+                    <div class="invalid-feedback">
+                      Please select a time here.
+                    </div>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label" for="timepicker2"
+                      >End Patrol</label
+                    >
+
+                    <input
+                      class="form-control <%= validationEndTime %> datetimepicker flatpickr-input"
+                      id="timepicker2"
+                      type="text"
+                      placeholder="hour : minute"
+                      data-options='{"enableTime":true,"noCalendar":true,"dateFormat":"H:i","disableMobile":true,"allowInput":true}'
+                      name="endTime"
+                      value="<%= endTime %>"
+                    />
+                    <div class="valid-feedback">Looks good!</div>
+                    <div class="invalid-feedback">
+                      Please select a time here.
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label" for="datepicker2">Date</label>
+
+                    <input
+                      class="form-control <%= validationDate %> datetimepicker flatpickr-input"
+                      id="datepicker2"
+                      type="text"
+                      placeholder="day / month / year"
+                      data-options='{"dateFormat":"d/m/y","disableMobile":true,"allowInput":true}'
+                      name="date"
+                      value="<%= date %>"
+                    />
+                    <div class="valid-feedback">Looks good!</div>
+                    <div class="invalid-feedback">
+                      Please select a date here.
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label" for="validationCustom05"
+                      >Location</label
+                    >
+
+                    <select
+                      class="form-select <%= validationLocation %>"
+                      id="validationCustom05"
+                      name="location"
+                    >
+                      <option selected="" value="<%= location %>">
+                        Choose a location
+                      </option>
+                      <option value="Baitul Makmur I">Baitul Makmur I</option>
+                      <option value="Baitul Makmur II">Baitul Makmur II</option>
+                      <option value="Jamek Mosque">Jamek Mosque</option>
+                      <option value="City Mosque">City Mosque</option>
+                      <option value="Raudhatul Sakinah">
+                        Raudhatul Sakinah
+                      </option>
+                    </select>
+                    <div class="valid-feedback">Looks good!</div>
+                    <div class="invalid-feedback">
+                      Please select a title report.
+                    </div>
+                  </div>
+
+                  <div class="col-12 gy-4">
+                    <label class="form-label" for="floatingProjectDescription1"
+                      >Patrol Summary Report</label
+                    >
+                    <textarea
+                      class="form-control <%= validationReportSummary %> scrollbar-overlay"
+                      id="floatingProjectDescription1"
+                      placeholder="Leave a summary report here"
+                      style="height: 128px"
+                      name="reportSummary"
+                    >
+<%= reportSummary %></textarea
+                    >
+                    <div class="valid-feedback">Looks good!</div>
+                    <div class="invalid-feedback">
+                      Please enter a report summary here.
+                    </div>
+                  </div>
+
+                  <div class="col-12 gy-4 mb-3">
+                    <label class="form-label" for="floatingProjectDescription2"
+                      >Notes</label
+                    >
+                    <textarea
+                      class="form-control <%= validationNotes %> scrollbar-overlay"
+                      id="floatingProjectDescription2"
+                      placeholder="Leave a note here"
+                      style="height: 64px"
+                      name="notes"
+                    >
+<%= notes %></textarea
+                    >
+                    <div class="valid-feedback">Looks good!</div>
+                    <div class="invalid-feedback">
+                      Please enter a note here.
+                    </div>
+                  </div>
+
+                  <input
+                    type="text"
+                    style="display: none"
+                    value="<%= reportId %>"
+                    name="confirmRid"
+                  />
+
+                  <!-- Submit button -->
+                  <div class="col-12">
+                    <button
+                      class="btn btn-primary myButton"
+                      type="submit"
+                      id="submitReport"
+                    >
+                      <div class="btn-content">Submit Form</div>
+                    </button>
+                    <a
+                      role="button"
+                      class="btn btn-phoenix-primary bg-transparent border border-0 mx-2"
+                      id="addFiles"
+                      data-bs-toggle="modal"
+                      data-bs-target="#verticallyCentered"
+                      >Add files +</a
+                    >
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- page nav -->
+      <div class="col-12 col-xl-2">
+        <div class="position-sticky mt-xl-4" style="top: 80px">
+          <h5 class="lh-1">On this page</h5>
+          <hr class="text-300" />
+          <ul
+            class="nav nav-vertical flex-column doc-nav"
+            data-doc-nav="data-doc-nav"
+          >
+            <li class="nav-item">
+              <a class="nav-link" href="#header-patrol">Report Example</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#reportForm">Report Form</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#addFiles">Add Files</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#submitReport">Submit Form</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST ALERT -->
+
+<!-- status code-to-copy -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+  <div
+    class="toast align-items-center text-white bg-dark border-0 light"
+    id="icon-copied-toast"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+  >
+    <div class="d-flex justify-content-between">
+      <div class="toast-body px-0 py-3"></div>
+      <button
+        class="btn ms-2 p-0 btn-close-white"
+        type="button"
+        data-bs-dismiss="toast"
+        aria-label="Close"
+      >
+        <span class="uil uil-times fs-1"></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- alert toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+  <div class="d-flex">
+    <div
+      class="toast <%= toastShow %> align-items-center text-white bg-primary border-0 light"
+      role="alert"
+      data-bs-autohide="false"
+      aria-live="assertive"
+      aria-atomic="true"
+      id="alertToast"
+    >
+      <div class="d-flex justify-content-between">
+        <div class="toast-body px-0 py-3">
+          <code class="text-white"><%= toastMsg %></code>
+        </div>
+
+        <button
+          class="btn ms-2 p-0 btn-close-white"
+          type="button"
+          data-bs-dismiss="toast"
+          aria-label="Close"
+        >
+          <span class="uil uil-times fs-1"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+
+<!-- modal for upload files -->
+<div
+  class="modal fade scrollbar-overlay"
+  id="verticallyCentered"
+  tabindex="-1"
+  aria-labelledby="verticallyCenteredModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-md">
+    <div class="modal-content">
+      <div class="modal-header border border-0">
+        <h5 class="modal-title" id="verticallyCenteredModalLabel">
+          Upload Files
+        </h5>
+        <button
+          class="btn p-1"
+          type="button"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <span class="fas fa-times fs--1"></span>
+        </button>
+      </div>
+
+      <div class="modal-body p-3">
+        <!-- file uploader -->
+        <!-- data-options are the setting for dropzone can find the settings also inside -->
+        <form
+          class="dropzone dropzone-multiple p-0 mb-4"
+          id="myDropzone"
+          data-dropzone="data-dropzone"
+          action="/upload-patrol"
+          data-options='{"url":"/upload-patrol","paramName": "file"}'
+        >
+          <div class="dz-message" data-dz-message="data-dz-message">
+            <img
+              class="me-2"
+              src="../../../assets/img/icons/cloud-upload.svg"
+              width="25"
+              alt=""
+            />Drop your files here
+          </div>
+          <div class="dz-preview dz-preview-multiple m-0 d-flex flex-column">
+            <div class="d-flex mb-3 pb-3 border-bottom media">
+              <div class="border border-300 p-2 rounded-2 me-2">
+                <img
+                  class="rounded-2 dz-image"
+                  src="../../../assets/img/icons/file.png"
+                  alt="..."
+                  data-dz-thumbnail="data-dz-thumbnail"
+                />
+              </div>
+              <div class="flex-1 d-flex flex-between-center">
+                <div>
+                  <h6 data-dz-name="data-dz-name"></h6>
+                  <div class="d-flex align-items-center">
+                    <p
+                      class="mb-0 fs--1 text-400 lh-1"
+                      data-dz-size="data-dz-size"
+                    ></p>
+                    <div class="dz-progress">
+                      <span class="dz-upload" data-dz-uploadprogress=""></span>
+                    </div>
+                  </div>
+                  <span
+                    class="fs--2 text-danger"
+                    data-dz-errormessage="data-dz-errormessage"
+                  ></span>
+                </div>
+                <div class="dropdown font-sans-serif">
+                  <button
+                    class="btn btn-link text-600 btn-sm dropdown-toggle btn-reveal dropdown-caret-none"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    <span class="fas fa-ellipsis-h"></span>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-end border py-2">
+                    <a
+                      class="dropdown-item"
+                      href="#!"
+                      data-dz-remove="data-dz-remove"
+                      >Remove File</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <input
+            type="text"
+            style="display: none"
+            value="<%= reportId %>"
+            name="fileReportId"
+          />
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button
+          class="btn btn-primary myButton"
+          type="submit"
+          id="uploadButton"
+        >
+          <div class="btn-content">
+            <span
+              ><i class="fa fa-upload" aria-hidden="true"></i
+              >&nbsp;&nbsp;Upload</span
+            >
+          </div>
+        </button>
+        <button
+          class="btn btn-outline-primary"
+          type="button"
+          data-bs-dismiss="modal"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- alert toast upload -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+    <div class="d-flex">
+      <div
+        class="toast align-items-center text-white bg-primary border-0 light"
+        role="alert"
+        data-bs-autohide="false"
+        aria-live="assertive"
+        aria-atomic="true"
+        id="alertUploadToast"
+      >
+        <div class="d-flex justify-content-between">
+          <div class="toast-body px-0 py-3">
+            <code id="dropzoneAlertContent" class="text-white"></code>
+          </div>
+
+          <button
+            class="btn ms-2 p-0 btn-close-white"
+            type="button"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          >
+            <span class="uil uil-times fs-1"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%-include("partials/navbar-script.ejs") %> <%-include("partials/footer") %>

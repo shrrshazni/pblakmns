@@ -1,0 +1,715 @@
+<%- include("partials/header") %> <%- include("partials/navbar") %>
+
+<div class="content px-0 pt-9">
+  <div class="row g-0">
+    <div class="col-12 col-xxl-9 px-0 bg-soft">
+      <div class="px-4 px-lg-6 pt-6 pb-9">
+        <!-- top header section -->
+        <div class="mb-5">
+          <nav class="mb-4" aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+              <li class="breadcrumb-item active">Duty Handover</li>
+              <li class="breadcrumb-item active"><%= location %></li>
+              <li class="breadcrumb-item active">Details</li>
+            </ol>
+          </nav>
+          <div class="d-flex justify-content-between">
+            <h2 class="text-black fw-bolder mb-2">Duty Handover Details</h2>
+            <div class="font-sans-serif btn-reveal-trigger">
+              <p class="badge badge-phoenix badge-phoenix-success">
+                <%= status %>
+              </p>
+              <button
+                class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal"
+                type="button"
+                data-bs-toggle="dropdown"
+                data-boundary="window"
+                aria-haspopup="true"
+                aria-expanded="false"
+                data-bs-reference="parent"
+              >
+                <span class="fas fa-ellipsis-h"></span>
+              </button>
+              <div class="dropdown-menu dropdown-menu-end py-2">
+                <a class="dropdown-item" href="#!">Edit</a
+                ><a class="dropdown-item text-danger" href="#!">Delete</a
+                ><a class="dropdown-item" href="#!">Print</a>
+              </div>
+            </div>
+          </div>
+          <p class="text-700 lead mb-2">
+            Personnel submit patrol reports to document activities, incidents,
+            and safety concerns, ensuring accountability and security.
+          </p>
+        </div>
+
+        <!-- body section -->
+        <div class="row gx-0 gx-sm-5 gy-8 mb-n5">
+          <div class="col-12 col-xxl-10 col-xl-10 pe-xl-0">
+            <div
+              class="card theme-wizard mb-5"
+              data-theme-wizard="data-theme-wizard"
+            >
+              <div class="card-header bg-100 pt-3 pb-2 border-bottom-0">
+                <ul
+                  class="nav justify-content-between nav-wizard"
+                  role="tablist"
+                >
+                  <li class="nav-item">
+                    <a
+                      class="nav-link <%= showTabPane1 %> fw-semi-bold"
+                      href="#bootstrap-wizard-tab1"
+                      data-bs-toggle="tab"
+                      data-wizard-step="1"
+                    >
+                      <div class="text-center d-inline-block">
+                        <span class="nav-item-circle-parent"
+                          ><span class="nav-item-circle"
+                            ><span class="fas fa-thumbs-up"></span></span></span
+                        ><span class="d-none d-md-block mt-1 fs--1"
+                          >Handover</span
+                        >
+                      </div>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link <%= showTabPane2 %> fw-semi-bold"
+                      href="#bootstrap-wizard-tab2"
+                      data-bs-toggle="tab"
+                      data-wizard-step="2"
+                    >
+                      <div class="text-center d-inline-block">
+                        <span class="nav-item-circle-parent"
+                          ><span class="nav-item-circle"
+                            ><span
+                              class="fas fa-handshake-simple"
+                            ></span></span></span
+                        ><span class="d-none d-md-block mt-1 fs--1"
+                          >Received</span
+                        >
+                      </div>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link <%= showTabPane3 %> fw-semi-bold"
+                      href="#bootstrap-wizard-tab3"
+                      data-bs-toggle="tab"
+                      data-wizard-step="3"
+                    >
+                      <div class="text-center d-inline-block">
+                        <span class="nav-item-circle-parent"
+                          ><span class="nav-item-circle"
+                            ><span class="fas fa-check"></span></span></span
+                        ><span class="d-none d-md-block mt-1 fs--1">Done</span>
+                      </div>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <div class="card-body pt-4 pb-0">
+                <div class="tab-content">
+                  <!-- tab-pane 1 -->
+                  <div
+                    class="tab-pane <%= showTabPane1 %>"
+                    role="tabpanel"
+                    aria-labelledby="bootstrap-wizard-tab1"
+                    id="bootstrap-wizard-tab1"
+                  >
+                    <form
+                      id="wizardForm1"
+                      novalidate="novalidate"
+                      data-wizard-form="1"
+                    >
+                      <div class="row g-3">
+                        <div class="col-6 mb-2">
+                          <label
+                            class="form-label text-900"
+                            for="bootstrap-wizard-wizard-1"
+                            >Shift</label
+                          >
+                          <input
+                            class="form-control"
+                            type="text"
+                            value="<%= giveShift %>"
+                            id="bootstrap-wizard-wizard-1"
+                            disabled
+                          />
+                        </div>
+                        <div class="col-6 mb-2">
+                          <label
+                            class="form-label"
+                            for="bootstrap-wizard-wizard-2"
+                            >Head Shift</label
+                          >
+                          <input
+                            class="form-control"
+                            type="text"
+                            value="<%= giveHeadShift %>"
+                            id="bootstrap-wizard-wizard-2"
+                            disabled
+                          />
+                        </div>
+
+                        <div class="col-sm-12">
+                          <div class="mb-2 mb-sm-0">
+                            <label
+                              class="form-label text-900"
+                              for="bootstrap-wizard-wizard-3"
+                              >Staff On Sick Leave</label
+                            >
+                            <input
+                              class="form-control"
+                              type="text"
+                              value="<%= giveStaffSickLeave %>"
+                              id="bootstrap-wizard-wizard-3"
+                              disabled
+                            />
+                          </div>
+                        </div>
+
+                        <div class="col-sm-12">
+                          <div class="mb-2">
+                            <label
+                              class="form-label text-900"
+                              for="bootstrap-wizard-wizard-4"
+                              >Staff Absent</label
+                            >
+                            <input
+                              class="form-control"
+                              type="text"
+                              value="<%= giveStaffAbsent %>"
+                              id="bootstrap-wizard-wizard-4"
+                              disabled
+                            />
+                          </div>
+                        </div>
+
+                        <hr />
+                        <h4 class="text-1100 mt-2 mb-2">Log Report</h4>
+                        <p class="mt-2 text-800"><%= giveLog %></p>
+                      </div>
+
+                      <!-- next button for wizard -->
+                      <div class="flex-1 text-end py-3">
+                        <button
+                          class="btn btn-primary px-6 px-sm-6"
+                          type="submit"
+                          data-wizard-next-btn="data-wizard-next-btn"
+                        >
+                          Next<span
+                            class="fas fa-chevron-right ms-1"
+                            data-fa-transform="shrink-3"
+                          ></span>
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                  <!-- tab-pane 2 -->
+                  <div
+                    class="tab-pane <%= showTabPane2 %>"
+                    role="tabpanel"
+                    aria-labelledby="bootstrap-wizard-tab2"
+                    id="bootstrap-wizard-tab2"
+                  >
+                    <form
+                      class="row g-3 has-validation"
+                      action="/duty-handover/details"
+                      method="post"
+                    >
+                      <!-- form title report -->
+                      <div class="col-md-4">
+                        <label class="form-label" for="validationCustom04"
+                          >Shift</label
+                        >
+
+                        <select
+                          class="form-select"
+                          id="validationCustom04"
+                          name="shift"
+                        >
+                          <option selected="" value="<%= handoverShift %>">
+                            <%= handoverShift %>
+                          </option>
+                          <option value="Shift A">Shift A</option>
+                          <option value="Shift B">Shift B</option>
+                          <option value="Shift C">Shift C</option>
+                        </select>
+                        <div class="valid-feedback">Looks good!</div>
+                        <div class="invalid-feedback">
+                          Please select a shift.
+                        </div>
+                      </div>
+
+                      <div class="col-md-4">
+                        <label class="form-label" for="datepicker1">Date</label>
+
+                        <input
+                          class="form-control datetimepicker flatpickr-input"
+                          id="datepicker1"
+                          type="text"
+                          placeholder="day/month/year"
+                          data-options='{"dateFormat":"d/m/y","disableMobile":true,"allowInput":true}'
+                          name="date"
+                          value="<%= date %>"
+                        />
+                        <div class="valid-feedback">Looks good!</div>
+                        <div class="invalid-feedback">
+                          Please select a date here.
+                        </div>
+                      </div>
+
+                      <div class="col-md-4">
+                        <label class="form-label" for="validationCustom05"
+                          >Location</label
+                        >
+
+                        <select
+                          class="form-select"
+                          id="validationCustom05"
+                          name="location"
+                        >
+                          <option selected="" value="<%= location %>">
+                            <%= location %>
+                          </option>
+                          <option value="Baitul Makmur I">
+                            Baitul Makmur I
+                          </option>
+                          <option value="Baitul Makmur II">
+                            Baitul Makmur II
+                          </option>
+                          <option value="Jamek Mosque">Jamek Mosque</option>
+                          <option value="City Mosque">City Mosque</option>
+                          <option value="Raudhatul Sakinah">
+                            Raudhatul Sakinah
+                          </option>
+                        </select>
+                        <div class="valid-feedback">Looks good!</div>
+                        <div class="invalid-feedback">
+                          Please select a title report.
+                        </div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <label class="form-label" for="validationCustom03"
+                          >Head of Shift</label
+                        >
+
+                        <input
+                          class="form-control <%= validationHeadShift %>"
+                          id="validationCustom03"
+                          type="text"
+                          name="headShift"
+                          value="<%= headShift %>"
+                        />
+                        <div class="invalid-feedback">
+                          Please provide head shift assigned.
+                        </div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <label class="form-label" for="validationCustom04"
+                          >Handover shift received from</label
+                        >
+
+                        <select
+                          class="form-select"
+                          id="validationCustom04"
+                          name="handoverShift"
+                        >
+                          <option selected="" value="<%= shift %>">
+                            <%= shift %>
+                          </option>
+                          <option value="Shift A">Shift A</option>
+                          <option value="Shift B">Shift B</option>
+                          <option value="Shift C">Shift C</option>
+                        </select>
+                        <div class="valid-feedback">Looks good!</div>
+                        <div class="invalid-feedback">
+                          Please select a shift.
+                        </div>
+                      </div>
+
+                      <div class="col-md-12">
+                        <label class="form-label" for="validationCustom03"
+                          >Staff on duty</label
+                        >
+
+                        <input
+                          class="form-control <%= validationStaffOnDuty %>"
+                          id="validationCustom03"
+                          type="text"
+                          name="staffOnDuty"
+                          value="<%= staffOnDuty %>"
+                        />
+                        <div class="invalid-feedback">
+                          Please provide a staff assigned.
+                        </div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <label class="form-label" for="validationCustom03"
+                          >Staff on sick leave</label
+                        >
+
+                        <input
+                          class="form-control <%= validationStaffSickLeave %>"
+                          id="validationCustom03"
+                          type="text"
+                          name="staffSickLeave"
+                          value="<%= staffSickLeave %>"
+                        />
+                        <div class="invalid-feedback">
+                          Please provide a staff on sick leave.
+                        </div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <label class="form-label" for="validationCustom03"
+                          >Staff absent</label
+                        >
+
+                        <input
+                          class="form-control <%= validationStaffAbsent %>"
+                          id="validationCustom03"
+                          type="text"
+                          name="staffAbsent"
+                          value="<%= staffAbsent %>"
+                        />
+                        <div class="invalid-feedback">
+                          Please provide a staff absent.
+                        </div>
+                      </div>
+
+                      <div class="col-12 gy-4">
+                        <label
+                          class="form-label"
+                          for="floatingProjectDescription2"
+                          >Notes</label
+                        >
+                        <textarea
+                          class="form-control <%= validationNotes %> scrollbar-overlay"
+                          id="floatingProjectDescription2"
+                          placeholder="Leave a note here"
+                          style="height: 64px"
+                          name="notes"
+                        >
+<%= notes %></textarea
+                        >
+                        <div class="valid-feedback">Looks good!</div>
+                        <div class="invalid-feedback">
+                          Please enter a note here.
+                        </div>
+                      </div>
+
+                      <input
+                        type="text"
+                        style="display: none"
+                        value="<%= reportId %>"
+                        name="confirmRid"
+                      />
+
+                      <!-- button -->
+                      <div
+                        class="d-flex pager wizard list-inline justify-content-between mb-3"
+                      >
+                        <!-- previous button for wizard -->
+                        <button
+                          class="btn btn-link ps-0"
+                          type="button"
+                          data-wizard-prev-btn="data-wizard-prev-btn"
+                        >
+                          <span
+                            class="fas fa-chevron-left me-1"
+                            data-fa-transform="shrink-3"
+                          ></span
+                          >Previous
+                        </button>
+                        <button class="btn btn-primary text-end" type="submit">
+                          Submit
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                  <!-- tab-pane 3 -->
+                  <div
+                    class="tab-pane <%= showTabPane3 %>"
+                    role="tabpanel"
+                    aria-labelledby="bootstrap-wizard-tab3"
+                    id="bootstrap-wizard-tab3"
+                  >
+                    <div class="row g-3 g-sm-1 g-md-1">
+                      <h4 class="text-1100 mt-2">Handover</h4>
+                      <div class="col-12">
+                        <label
+                          class="form-label text-primary-300"
+                          for="showgiveLog"
+                          >Give Log</label
+                        >
+                        <p
+                          id="showgivelog"
+                          class="border border-primary-300 rounded-3 p-2"
+                        >
+                          <%= giveLog %>
+                        </p>
+                      </div>
+                      <div class="col-12 col-xxl-6">
+                        <label
+                          class="form-label text-primary-300"
+                          for="giveshift"
+                          >Shift</label
+                        >
+                        <p
+                          id="giveshift"
+                          class="border border-primary-300 rounded-3 p-2"
+                        >
+                          <%= giveShift %>
+                        </p>
+                      </div>
+                      <div class="col-12 col-xxl-6">
+                        <label
+                          class="form-label text-primary-300"
+                          for="giveheadshift"
+                          >Head Shift</label
+                        >
+                        <p
+                          id="giveheadshift"
+                          class="border border-primary-300 rounded-3 p-2"
+                        >
+                          <%= giveHeadShift %>
+                        </p>
+                      </div>
+                      <div class="col-12">
+                        <label
+                          class="form-label text-primary-300"
+                          for="staffonduty"
+                          >Staff On Duty</label
+                        >
+                        <p
+                          id="staffonduty"
+                          class="border border-primary-300 rounded-3 p-2"
+                        >
+                          <%= giveStaffOnDuty %>
+                        </p>
+                      </div>
+                      <div class="col-12 col-xxl-6">
+                        <label
+                          class="form-label text-primary-300"
+                          for="givestaffonsickleave"
+                          >Staff Sick Leave</label
+                        >
+                        <p
+                          id="givestaffonsickleave"
+                          class="border border-primary-300 rounded-3 p-2"
+                        >
+                          <%= giveStaffSickLeave%>
+                        </p>
+                      </div>
+                      <div class="col-12 col-xxl-6">
+                        <label
+                          class="form-label text-primary-300"
+                          for="givestaffabsent"
+                          >Staff Absent</label
+                        >
+                        <p
+                          id="givestaffabsent"
+                          class="border border-primary-300 rounded-3 p-2"
+                        >
+                          <%= giveStaffAbsent %>
+                        </p>
+                      </div>
+                      <h4 class="text-1100 mt-2">Receive</h4>
+                      <div class="col-12">
+                        <label
+                          class="form-label text-primary-300"
+                          for="showgiveLog"
+                          >Receive Log</label
+                        >
+                        <p
+                          id="showgivelog"
+                          class="border border-primary-300 rounded-3 p-2"
+                        >
+                          <%= receiveLog %>
+                        </p>
+                      </div>
+                      <div class="col-12 col-xxl-6">
+                        <label
+                          class="form-label text-primary-300"
+                          for="giveshift"
+                          >Shift</label
+                        >
+                        <p
+                          id="giveshift"
+                          class="border border-primary-300 rounded-3 p-2"
+                        >
+                          <%= receiveShift %>
+                        </p>
+                      </div>
+                      <div class="col-12 col-xxl-6">
+                        <label
+                          class="form-label text-primary-300"
+                          for="giveheadshift"
+                          >Head Shift</label
+                        >
+                        <p
+                          id="giveheadshift"
+                          class="border border-primary-300 rounded-3 p-2"
+                        >
+                          <%= receiveHeadShift %>
+                        </p>
+                      </div>
+                      <div class="col-12">
+                        <label
+                          class="form-label text-primary-300"
+                          for="staffonduty"
+                          >Staff On Duty</label
+                        >
+                        <p
+                          id="staffonduty"
+                          class="border border-primary-300 rounded-3 p-2"
+                        >
+                          <%= receiveStaffOnDuty %>
+                        </p>
+                      </div>
+                      <div class="col-12 col-xxl-6">
+                        <label
+                          class="form-label text-primary-300"
+                          for="givestaffonsickleave"
+                          >Staff Sick Leave</label
+                        >
+                        <p
+                          id="givestaffonsickleave"
+                          class="border border-primary-300 rounded-3 p-2"
+                        >
+                          <%= receiveStaffSickLeave%>
+                        </p>
+                      </div>
+                      <div class="col-12 col-xxl-6 mb-3">
+                        <label
+                          class="form-label text-primary-300"
+                          for="givestaffabsent"
+                          >Staff Absent</label
+                        >
+                        <p
+                          id="givestaffabsent"
+                          class="border border-primary-300 rounded-3 p-2"
+                        >
+                          <%= receiveStaffAbsent %>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <div class="d-flex align-items-center mb-2">
+              <h4 class="me-3">Notes</h4>
+              <button
+                class="btn btn-link p-0"
+                data-bs-toggle="modal"
+                data-bs-target="#modalNotes"
+              >
+                <span class="fa-solid fa-pen"></span>
+              </button>
+            </div>
+            <p class="text-1000"><%= notes %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- alert toast -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+    <div class="d-flex">
+      <div
+        class="toast <%= toastShow %> align-items-center text-white bg-primary border-0 light"
+        role="alert"
+        data-bs-autohide="false"
+        aria-live="assertive"
+        aria-atomic="true"
+        id="alertToast"
+      >
+        <div class="d-flex justify-content-between">
+          <div class="toast-body px-0 py-3">
+            <code class="text-white"><%= toastMsg %></code>
+          </div>
+
+          <button
+            class="btn ms-2 p-0 btn-close-white"
+            type="button"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          >
+            <span class="uil uil-times fs-1"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="modalNotes"
+  tabindex="-1"
+  aria-labelledby="verticallyCenteredModalLabel"
+  aria-hidden="true"
+  style="display: none"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="verticallyCenteredModalLabel">
+          Modal title
+        </h5>
+        <button
+          class="btn p-1"
+          type="button"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <svg
+            class="svg-inline--fa fa-xmark fs--1"
+            aria-hidden="true"
+            focusable="false"
+            data-prefix="fas"
+            data-icon="xmark"
+            role="img"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 320 512"
+            data-fa-i2svg=""
+          >
+            <path
+              fill="currentColor"
+              d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z"
+            ></path></svg
+          ><!-- <span class="fas fa-times fs--1"></span> Font Awesome fontawesome.com -->
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="text-700 lh-lg mb-0">
+          This is a static modal example (meaning its position and display have
+          been overridden). Included are the modal header, modal body (required
+          for padding), and modal footer (optional).
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" type="button">Okay</button>
+        <button
+          class="btn btn-outline-primary"
+          type="button"
+          data-bs-dismiss="modal"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("partials/navbar-script") %> <%- include("partials/footer") %>
