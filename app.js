@@ -1328,15 +1328,60 @@ app
 // MAP
 
 // SUBMIT CHECKPOINT DATA
-app.get('/checkpoint-submit/:checkpointName', async function (req, res){
-    const dateToday = dateLocal.getDateYear();
+app.get(
+  '/checkpoint-submit/:checkpointName/:longitude/:latitude',
+  async function (req, res) {
+    const dateToday = dateLocal.getDate();
     const time = dateLocal.getCurrentTime();
 
-    const checkpointName = req.params.checkpointName;
+    const checkpointName = _.startCase(
+      req.params.checkpointName.replace(/-/g, ' ')
+    );
+    const currentLongitude = req.params.longitude;
+    const currentLatitude = req.params.latitude;
 
-    const checkPatrolUnit = await PatrolReport.findOne({date : dateToday });
+    console.log(dateToday);
+    console.log(checkpointName);
+    console.log(currentLatitude);
+    console.log(currentLongitude);
 
-});
+    const updatedCheckpointData = {
+      time: time, // Replace with the new time
+      longitude: currentLongitude, // Replace with the new longitude
+      latitude: currentLatitude // Replace with the new latitude
+    };
+
+    // Find the patrol report by ID and update the specific checkpoint in the patrolUnit array
+    const checkPatrolUnit = await PatrolReport.findOneAndUpdate(
+      {
+        date: dateToday,
+        'patrolUnit.checkpointName': checkpointName
+      },
+      {
+        $set: {
+          'patrolUnit.$.time': updatedCheckpointData.time,
+          'patrolUnit.$.longitude': updatedCheckpointData.longitude,
+          'patrolUnit.$.latitude': updatedCheckpointData.latitude
+        }
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    if (checkPatrolUnit) {
+      console.log(checkPatrolUnit.reportId);
+      console.log(
+        'Successfully update on patrol unit for ' +
+          dateToday +
+          ' at ' +
+          checkpointName
+      );
+      res.redirect('/patrol-unit/details?id' + checkPatrolUnit.reportId);
+    } else {
+      console.log('Unsuccessful update the qr data!');
+      res.redirect('/patrol-unit/details?id' + checkPatrolUnit.reportId);
+    }
+  }
+);
 
 // GET COORDINATES FROM DATABASE
 app.get('/map-coordinates/:reportId', async (req, res) => {
