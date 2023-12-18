@@ -109,6 +109,27 @@ let transporter = nodemailer.createTransport({
   }
 });
 
+// EXAMPLE
+
+app.get('/example', async function (req, res) {
+  if (req.isAuthenticated()) {
+    var currentUsername = req.session.user.username;
+
+    const checkUser = await User.findOne({ username: currentUsername });
+
+    if (checkUser) {
+      res.render('example', {
+        currentFullName: checkUser.fullname,
+        currentUser: checkUser.username,
+        currentProfile: checkUser.profile,
+        rid: crypto.randomBytes(6).toString('hex').toUpperCase()
+      });
+    }
+  } else {
+    res.redirect('/sign-in');
+  }
+});
+
 // HOME
 app.get('/', async function (req, res) {
   if (req.isAuthenticated()) {
