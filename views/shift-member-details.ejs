@@ -47,10 +47,10 @@
                 <div class="col-12 col-xxl-8">
                   <div class="text-600 fw-semi-bold"><span class="fa-solid fa-clipboard-user me-2"></span>Shift Members : </div>
                   <div id="giveShiftMemberDisplay" class="d-flex row g-1">
-                    <% if (patrolReport && patrolReport.shiftMember && patrolReport.shiftMember.length > 0) { %>
-                    <% patrolReport.shiftMember.forEach(member => { %>
+                    <% if (patrolReport && patrolReport.staff && patrolReport.staff.length > 0) { %>
+                    <% patrolReport.staff.forEach(member => { %>
                     <div class="btn btn-outline-primary col-auto">
-                      <%= member.fullName %>
+                      <%= member %>
                     </div>
                     <% }); %>
                     <% } else { %>
@@ -64,34 +64,12 @@
         </div>
 
         <hr>
-
-        <div class="col-12 mb-3">
-          <div class="container mt-2 mb-3 row" style="margin-left: auto; margin-right: auto;">
-            <% if (patrolReport.shiftMember && patrolReport.shiftMember.length > 0) { %>
-            <% patrolReport.shiftMember.forEach(function(member) { %>
-            <div class="card mb-3 col-12 col-xxl-3 scrollbar-overlay" style="height: 30vh;">
-              <div class="card-body">
-                <h5 class="card-title"><%= member.fullName %></h5>
-                <div class="progress mb-3" style="height:15px">
-                  <div class="progress-bar rounded-3" role="progressbar" style="width: 50%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">50%</div>
-                </div>
-                <% if (member.checkPoint && member.checkPoint.length > 0) { %>
-                <% member.checkPoint.forEach(function(checkpoint) { %>
-                <div class="card-text">
-                  <p class="mb-0"><strong>Checkpoint Name:</strong> <%= checkpoint.checkpointName %></p>
-                </div>
-                <% }); %>
-                <% } else { %>
-                <p>No checkpoints available for this member.</p>
-                <% } %>
-              </div>
-            </div>
-            <% }); %>
-            <% } else { %>
-            <p>No shift members available.</p>
-            <% } %>
-          </div>
+        <!-- Your EJS content goes here -->
+        <div class="col-12">
+            
         </div>
+
+
 
         <hr />
         <div class="mt-0">
