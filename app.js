@@ -16,6 +16,7 @@ const fileUpload = require('express-fileupload');
 const nodemailer = require('nodemailer');
 const cron = require('node-cron');
 const axios = require('axios');
+const cors = require('cors');
 // not yet been use
 const jsQR = require('jsqr');
 const NodeWebcam = require('node-webcam');
@@ -33,6 +34,7 @@ app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
+app.use(cors());
 
 // mongoose session option
 const store = new MongoDBSession({
@@ -109,25 +111,12 @@ let transporter = nodemailer.createTransport({
     }
 });
 
-// EXAMPLE
+// CORS
 
-app.get('/example', async function (req, res) {
-    if (req.isAuthenticated()) {
-        var currentUsername = req.session.user.username;
-
-        const checkUser = await User.findOne({ username: currentUsername });
-
-        if (checkUser) {
-            res.render('example', {
-                currentFullName: checkUser.fullname,
-                currentUser: checkUser.username,
-                currentProfile: checkUser.profile,
-                rid: crypto.randomBytes(6).toString('hex').toUpperCase()
-            });
-        }
-    } else {
-        res.redirect('/sign-in');
-    }
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "http://localhost:5001"); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
 });
 
 // HOME
@@ -494,7 +483,7 @@ const checkpoint = {
     fullName: String
 };
 const cycleAmount = {
-    cycle: Number,
+    cycleSeq: Number,
     timeSlot: String,
     checkpoint: [checkpoint]
 };
@@ -1031,15 +1020,63 @@ app.get('/shift-member/details', async function (req, res) {
 
             const currentTime = new Date().toLocaleTimeString('en-MY', { hour12: false }).replace(':', '');
 
-            const currentCycle = checkReport.shiftMember.cycle.find(cycle => {
-                const [start, end] = cycle.timeSlot.split('-').map(time => parseInt(time, 10));
-                console.log('Current Time:', currentTime);
-                console.log('Cycle Start Time:', start);
-                console.log('Cycle End Time:', end);
-                return currentTime >= start && currentTime < end;
-            });
+            const shiftMemberCycles = checkReport.shiftMember.cycle;
 
-            // console.log('Shift Member Cycles:', checkReport.shiftMember.cycle);
+            const currentTimeNumeric = parseInt(currentTime, 10); // Convert current time to a numeric value for easy comparison
+
+            var currentTimeSlot = '';
+
+            for (const cycle of shiftMemberCycles) {
+                const startTimeNumeric = parseInt(cycle.timeSlot.split('-')[0], 10);
+                const endTimeNumeric = parseInt(cycle.timeSlot.split('-')[1], 10);
+
+                if (currentTimeNumeric >= startTimeNumeric && currentTimeNumeric <= endTimeNumeric) {
+                    // Current time is within the time slot for this cycle
+                    // You can perform your desired actions here
+                    currentTimeSlot = cycle.timeSlot;
+                    break; // Stop checking once a matching time slot is found
+                }
+            }
+
+            // Function to count times with values in a cycle
+            function countTimesWithValuesInCycle(cycle) {
+                let timesWithValuesCount = 0;
+
+                for (const checkpoint of cycle.checkpoint) {
+                    // Check if the time property has a non-empty value
+                    if (checkpoint.time && checkpoint.time.trim() !== '') {
+                        timesWithValuesCount++;
+                    }
+                }
+
+                return timesWithValuesCount;
+            }
+
+            // Function to count total times in a cycle
+            function countTotalTimesInCycle(cycle) {
+                return cycle.checkpoint.length;
+            }
+
+            // Function to count total times with values in all cycles
+            function countTotalTimesWithValuesInShift(shiftMemberCycles) {
+                let totalTimesWithValuesInShift = 0;
+                let totalTimesInShift = 0;
+
+                for (const cycle of shiftMemberCycles) {
+                    totalTimesWithValuesInShift += countTimesWithValuesInCycle(cycle);
+                    totalTimesInShift += countTotalTimesInCycle(cycle);
+                }
+
+                return { totalTimesWithValuesInShift, totalTimesInShift };
+            }
+
+            // Count total times with values and total times in the shift
+            const { totalTimesWithValuesInShift, totalTimesInShift } = countTotalTimesWithValuesInShift(shiftMemberCycles);
+
+            // Calculate percentage
+            const percentageTimesWithValuesInShift = (totalTimesWithValuesInShift / totalTimesInShift) * 100;
+
+            console.log(`Percentage of times with values in the shift: ${percentageTimesWithValuesInShift.toFixed(2)}%`);
 
             if (checkReport) {
                 const checkFiles = await File.find({ reportId: reportId });
@@ -1052,7 +1089,9 @@ app.get('/shift-member/details', async function (req, res) {
                         // patrol report
                         patrolReport: checkReport,
                         reportId: reportId,
-                        currentCycle: currentCycle,
+                        cycle: shiftMemberCycles,
+                        currentTimeSlot: currentTimeSlot,
+                        progressReport: percentageTimesWithValuesInShift.toFixed(0),
                         // files
                         files: checkFiles
                     });
@@ -1064,7 +1103,9 @@ app.get('/shift-member/details', async function (req, res) {
                         // patrol report
                         patrolReport: checkReport,
                         reportId: reportId,
-                        currentCycle: currentCycle,
+                        cycle: shiftMemberCycles,
+                        currentTimeSlot: currentTimeSlot,
+                        progressReport: percentageTimesWithValuesInShift.toFixed(0),
                         // files
                         files: ''
                     });
@@ -1076,7 +1117,9 @@ app.get('/shift-member/details', async function (req, res) {
                     currentProfile: checkUser.profile,
                     // patrol report
                     patrolReport: '',
-                    currentCycle: '',
+                    cycle: '',
+                    currentTimeSlot: '',
+                    progressReport: '',
                     reportId: reportId,
                     // files
                     files: ''
@@ -1087,6 +1130,68 @@ app.get('/shift-member/details', async function (req, res) {
         res.redirect('/sign-in');
     }
 });
+
+// Define route to get a specific patrol report by reportId
+app.get('/echarts-data/:reportId', async (req, res) => {
+    const reportId = req.params.reportId;
+
+    try {
+        const patrolReport = await PatrolReport.findOne({ reportId });
+
+        if (!patrolReport) {
+            res.status(404).json({ error: 'Report not found' });
+            return;
+        }
+
+        const echartsData = {
+            cycle: patrolReport.shiftMember.cycle.map(cycle => ({
+                cycleSeq: cycle.cycleSeq,
+                timeSlot: cycle.timeSlot,
+                checkpoints: cycle.checkpoint.map(checkpoint => ({ time: checkpoint.time }))
+            }))
+        };
+
+        res.status(200).json({ success: true, status: 200, data: echartsData });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+const DataModel = mongoose.model('Data', new mongoose.Schema({
+    timestamp: Date,
+    value: Number,
+}));
+
+//  Sample data
+// const sampleData = [
+//     { timestamp: new Date("2023-01-01T00:00:00.000Z"), value: 25.5 },
+//     { timestamp: new Date("2023-01-01T01:00:00.000Z"), value: 30.0 },
+//     { timestamp: new Date("2023-01-01T02:00:00.000Z"), value: 22.8 },
+//     // Add more data points as needed
+// ];
+
+// // Insert sample data into MongoDB
+// DataModel.insertMany(sampleData)
+//     .then(() => {
+//         console.log('Sample data inserted successfully');
+//         mongoose.connection.close();
+//     })
+//     .catch(error => {
+//         console.error('Error inserting sample data:', error);
+//         mongoose.connection.close();
+//     });
+
+app.get('/api/data', async (req, res) => {
+    try {
+        const data = await DataModel.find({}, 'timestamp value').sort('timestamp');
+        res.json(data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 
 // Function to submit data to MongoDB using Mongoose
 const scheduler = async data => {
@@ -4676,6 +4781,7 @@ app
                 const currentCycleAmount = calculateCycleAmount(i + 1);
 
                 cycles.push({
+                    cycleSeq: i + 1, // Insert the cycleSeq
                     cycleAmount: currentCycleAmount,
                     timeSlot: `${timeSlotStart.toString().padStart(4, '0')}-${timeSlotEnd
                         .toString()
