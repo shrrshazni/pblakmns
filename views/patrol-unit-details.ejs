@@ -107,7 +107,7 @@
               </script>
 
               <div class="progress mb-3" style="height:12.5px">
-                <div class="progress-bar rounded-3" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width:<%= percentage %>%;"><%= percentage %>%</div>
+                <div <% /* eslint-disable css-propertyvalueexpected */ %> class="progress-bar rounded-3" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width:<%= percentage %>%;"><%= percentage %>%</div>
               </div>
             </div>
 

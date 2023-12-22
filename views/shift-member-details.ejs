@@ -60,7 +60,7 @@
                 </div>
                 <div class="col-12">
                   <div class="progress mb-0 mt-3" style="height:12.5px">
-                    <div class="progress-bar rounded-3" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width:<%= progressReport %>%;"><%= progressReport %>%</div>
+                    <div <% /* eslint-disable css-propertyvalueexpected */ %> class="progress-bar rounded-3" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width:<%= progressReport %>%;"><%= progressReport %>%</div>
                   </div>
                 </div>
               </div>
@@ -145,10 +145,8 @@
           }
         </script>
 
-        <hr />
-
         <div class="col-12">
-          <div id="chart" style="height: 450px; width: 600px;"></div>
+          <div id="chart" style="height: 450px;"></div>
         </div>
 
         <script>
