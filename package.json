@@ -4,7 +4,7 @@
   "description": "Auxiallary Police Web App",
   "main": "app.js",
   "engines": {
-    "node": "21.10.0"
+    "node": "20.10.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
