@@ -93,11 +93,13 @@
                         }else {
                           display = "d-none";
                         } %>
-                <div class="col-12 container mx-auto d-block">
+                <div class="col-12 container mx-auto <%= display %>">
                   <div class="d-flex justify-content-between">
                     <h2 class="card-title">
                       <div class="d-sm-block d-lg-flex">
-                        <div class="text1"><%= todayDate %> <%= index+1 %></div>
+                        <div class="text"><%= currentTimeSlot %> & <%= cycle.timeSlot %> & <%= todayDate %> & <%= patrolReport.date %> </div>
+                        <div class="text"><%= display %></div>
+                        <div class="text1">Cycle <%= index+1 %></div>
                         <div class="text2">&nbsp;<span class="fw-normal text-700 ms-0 fs-1 my-auto">(<%= cycle.timeSlot %>)</span></div>
                       </div>
                     </h2>
@@ -116,7 +118,7 @@
                     icon = "fa-solid fa-check"
                     }
                     %>
-                    <div class="card mb-3 col-12 col-xxl-3 p-4 d-block" style="margin: 0.4rem;">
+                    <div class="card mb-3 col-12 col-xxl-3 p-4" style="margin: 0.4rem;">
                       <div class="justify-content-between d-flex">
                         <h5 class="card-title"><%= checkpoint.checkpointName %></h5>
                         <div><span class="<%= icon %> <%= textColor %> fs-1"></span></div>
@@ -134,7 +136,6 @@
                     <% }); %>
                   </div>
                 </div>
-                <hr>
                 <script>
                   // Update countdown for this cycle
                   setInterval(() => {
