@@ -1029,8 +1029,6 @@ app.get('/shift-member/details', async function (req, res) {
 
             const currentTimeNumeric = parseInt(currentTime, 10); // Convert current time to a numeric value for easy comparison
 
-            var currentTimeSlot = '';
-
             for (const cycle of shiftMemberCycles) {
                 const startTimeNumeric = parseInt(cycle.timeSlot.split('-')[0], 10);
                 const endTimeNumeric = parseInt(cycle.timeSlot.split('-')[1], 10);
@@ -1041,10 +1039,11 @@ app.get('/shift-member/details', async function (req, res) {
                 ) {
                     // Current time is within the time slot for this cycle
                     // You can perform your desired actions here
-                    currentTimeSlot = cycle.timeSlot;
+                    var currentTimeSlot = cycle.timeSlot;
                     break; // Stop checking once a matching time slot is found
                 }
             }
+            console.log(currentTimeSlot);
 
             // Function to count times with values in a cycle
             function countTimesWithValuesInCycle(cycle) {
