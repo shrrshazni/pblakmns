@@ -1029,12 +1029,8 @@ app.get('/shift-member/details', async function (req, res) {
 
       const currentTimeNumeric = parseInt(currentTime, 10); // Convert current time to a numeric value for easy comparison
 
-      console.log('currentUsername:', currentUsername);
-      console.log('reportId:', reportId);
-      console.log('checkUser:', checkUser);
-      console.log('checkReport:', checkReport);
-      console.log('checkReport:', checkReport);
       console.log('shiftMemberCycles:', shiftMemberCycles);
+      console.log(currentTimeNumeric);
 
       for (const cycle of shiftMemberCycles) {
         const startTimeNumeric = parseInt(cycle.timeSlot.split('-')[0], 10);
