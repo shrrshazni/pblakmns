@@ -1021,24 +1021,20 @@ app.get('/shift-member/details', async function (req, res) {
         reportId: reportId
       });
 
-      const currentTime = new Date()
-        .toLocaleTimeString('en-MY', { hour12: false })
-        .replace(':', '');
+      const currentTime = new Date().toLocaleTimeString('en-MY', {
+        hour12: false,
+        timeZone: 'UTC'
+      });
 
       const shiftMemberCycles = checkReport.shiftMember.cycle;
 
-      const currentTimeNumeric = parseInt(currentTime, 10); // Convert current time to a numeric value for easy comparison
-
-      console.log('shiftMemberCycles:', shiftMemberCycles);
-      console.log(currentTimeNumeric);
+      console.log('currentTime:', currentTime);
+      const currentTimeNumeric = parseInt(currentTime.replace(':', ''), 10);
+      console.log('currentTimeNumeric:', currentTimeNumeric);
 
       for (const cycle of shiftMemberCycles) {
         const startTimeNumeric = parseInt(cycle.timeSlot.split('-')[0], 10);
         const endTimeNumeric = parseInt(cycle.timeSlot.split('-')[1], 10);
-
-        console.log('currentTimeNumeric:', currentTimeNumeric);
-        console.log('startTimeNumeric:', startTimeNumeric);
-        console.log('endTimeNumeric:', endTimeNumeric);
 
         if (
           currentTimeNumeric >= startTimeNumeric &&
