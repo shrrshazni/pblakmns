@@ -1021,15 +1021,15 @@ app.get('/shift-member/details', async function (req, res) {
         reportId: reportId
       });
 
-      const currentTime = new Date().toLocaleTimeString('en-MY', {
-        hour12: false,
-        timeZone: 'UTC'
-      });
-
       const shiftMemberCycles = checkReport.shiftMember.cycle;
 
-      console.log('currentTime:', currentTime);
+      const currentTime = new Date().toLocaleTimeString('en-MY', {
+        hour12: false,
+        timeZone: 'Asia/Kuala_Lumpur'
+      });
       const currentTimeNumeric = parseInt(currentTime.replace(':', ''), 10);
+
+      console.log('currentTime:', currentTime);
       console.log('currentTimeNumeric:', currentTimeNumeric);
 
       for (const cycle of shiftMemberCycles) {
