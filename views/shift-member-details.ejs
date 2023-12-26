@@ -2,7 +2,7 @@
 
 <div class="content px-0 pt-9">
   <div class="row g-0">
-    <div class="col-12 col-xxl-10 px-0 bg-soft">
+    <div class="col-12 col-xxl-9 px-0 bg-soft">
       <div class="px-4 px-lg-6 pt-6 pb-9">
         <!-- top header section -->
         <div class="mb-5">
@@ -49,9 +49,9 @@
                   <div id="giveShiftMemberDisplay" class="d-flex row g-1">
                     <% if (patrolReport && patrolReport.staff && patrolReport.staff.length > 0) { %>
                     <% patrolReport.staff.forEach(member => { %>
-                    <div class="btn btn-outline-primary col-auto">
+                    <a href="/social/profile/<%= member %>" class="btn btn-outline-primary col-auto">
                       <%= member %>
-                    </div>
+                    </a>
                     <% }); %>
                     <% } else { %>
                     <div>No shift members for this handover</div>
@@ -68,149 +68,169 @@
           </div>
         </div>
 
-        <hr>
-        <!-- Your EJS content goes here -->
-        <div class="col-12">
-          <div class="container">
-            <div class="">
-              <% 
-              var display = "";
-              
-              // Function to get today's date in the format "DD/MM/YY"
-              function getTodayDate() {
-              const today = new Date();
-              const day = String(today.getDate()).padStart(2, '0');
-              const month = String(today.getMonth() + 1).padStart(2, '0'); // Month is zero-based
-              const year = today.getFullYear().toString().substr(-2);
-              return `${day}/${month}/${year}`;
-              }
-
-              const todayDate = getTodayDate();
-
-              %>
-              <% cycle.forEach((cycle, index) => { %>
-              <% if(currentTimeSlot === cycle.timeSlot && todayDate === patrolReport.date){
-                display = "d-block";
-              }else {
-                display = "d-none";
-              } %>
-              <div class="card mb-3 <%= display %>">
-                <div class="card-body">
+        <div class="container border border-300 p-4 ms-0 mb-5 rounded-3">
+          <div class="col-12">
+            <div class="container">
+              <div class="row d-flex justify-content-center">
+                <% 
+                      var display = "";
+                
+                      // Function to get today's date in the format "DD/MM/YY"
+                      function getTodayDate() {
+                        const today = new Date();
+                        const day = String(today.getDate()).padStart(2, '0');
+                        const month = String(today.getMonth() + 1).padStart(2, '0'); // Month is zero-based
+                        const year = today.getFullYear().toString().substr(-2);
+                        return `${day}/${month}/${year}`;
+                      }
+                
+                      const todayDate = getTodayDate();
+                
+                      %>
+                <% cycle.forEach((cycle, index) => { %>
+                <% if(currentTimeSlot === cycle.timeSlot && todayDate === patrolReport.date){
+                          display = "d-block";
+                        }else {
+                          display = "d-none";
+                        } %>
+                <div class="col-12 container mx-auto <%= display %>">
                   <div class="d-flex justify-content-between">
                     <h2 class="card-title">
-                      Cycle <%= index+1 %><span class="fw-normal text-700 ms-3 fs-1 my-auto">(<%= cycle.timeSlot %>)</span>
+                      <div class="d-sm-block d-lg-flex">
+                        <div class="text1">Cycle <%= index+1 %></div>
+                        <div class="text2">&nbsp;<span class="fw-normal text-700 ms-0 fs-1 my-auto">(<%= cycle.timeSlot %>)</span></div>
+                      </div>
                     </h2>
                     <div class="btn btn-link my-auto"><span id="countdown<%= index %>" class="fs-1"></span></div>
                   </div>
-                  <ul class="list-group list-group-flush">
-                    <% cycle.checkpoint.forEach(checkpoint => { %>
-                    <li class="list-group-item">
-                      <p class="card-text"><strong><%= checkpoint.checkpointName %></strong></p>
-                      <p class="card-text">Time: <%= checkpoint.time %></p>
-                      <p class="card-text">Log Report: <%= checkpoint.logReport %></p>
-                      <p class="card-text">Full Name: <%= checkpoint.fullName %></p>
-                    </li>
-                    <% }); %>
-                  </ul>
-                </div>
-              </div>
+                  <div class="row justify-content-center">
+                    <% cycle.checkpoint.forEach((checkpoint, checkpointIndex) => { %>
+                    <% 
+                    var textColor = ""; var icon = "";
 
-              <script>
-                // Update countdown for this cycle
-                setInterval(() => {
-                  updateCountdown('<%= cycle.timeSlot %>', 'countdown<%= index %>');
-                }, 1000);
-              </script>
-              <% }); %>
+                    if (checkpoint.time === ''){
+                    textColor = "text-danger";
+                    icon = "fa-solid fa-xmark";
+                    }else {
+                    textColor = "text-success";
+                    icon = "fa-solid fa-check"
+                    }
+                    %>
+                    <div class="card mb-3 col-12 col-xxl-3 p-4 <%= display %>" style="margin: 0.4rem;">
+                      <div class="justify-content-between d-flex">
+                        <h5 class="card-title"><%= checkpoint.checkpointName %></h5>
+                        <div><span class="<%= icon %> <%= textColor %> fs-1"></span></div>
+                      </div>
+                      <div class="card-body p-0">
+                        <p class="card-text">Time: <%= checkpoint.time %></p>
+                        <p class="card-text">Log Report: <%= checkpoint.logReport %></p>
+                        <p class="card-text">Full Name: <%= checkpoint.fullName %></p>
+                      </div>
+                    </div>
+                    <% if ((checkpointIndex + 1) % 3 === 0) { %>
+                  </div>
+                  <div class="row justify-content-center">
+                    <% } %>
+                    <% }); %>
+                  </div>
+                </div>
+
+                <script>
+                  // Update countdown for this cycle
+                  setInterval(() => {
+                    updateCountdown('<%= cycle.timeSlot %>', 'countdown<%= index %>');
+                  }, 1000);
+                </script>
+                <% }); %>
+              </div>
             </div>
           </div>
-        </div>
 
-        <script>
-          // Function to update the countdown
-          function updateCountdown(targetTimeSlot, countdownElementId) {
-            // Extract the end time from the timeSlot (assuming the format is HHMM-HHMM)
-            const endTimeString = targetTimeSlot.split('-')[1];
+          <script>
+            // Function to update the countdown
+            function updateCountdown(targetTimeSlot, countdownElementId) {
+              // Extract the end time from the timeSlot (assuming the format is HHMM-HHMM)
+              const endTimeString = targetTimeSlot.split('-')[1];
 
-            // Parse the end time in the Kuala Lumpur time zone
-            const endTime = new Date();
-            endTime.setHours(parseInt(endTimeString.substring(0, 2), 10));
-            endTime.setMinutes(parseInt(endTimeString.substring(2), 10));
-            endTime.setSeconds(0);
+              // Parse the end time in the Kuala Lumpur time zone
+              const endTime = new Date();
+              endTime.setHours(parseInt(endTimeString.substring(0, 2), 10));
+              endTime.setMinutes(parseInt(endTimeString.substring(2), 10));
+              endTime.setSeconds(0);
 
-            // Calculate the difference in milliseconds between current time and end time
-            const difference = endTime - new Date();
+              // Calculate the difference in milliseconds between current time and end time
+              const difference = endTime - new Date();
 
-            // Check if the end time has already passed
-            if (difference <= 0) {
-              const countdownElement = document.getElementById(countdownElementId);
-              countdownElement.innerHTML = `End Time: ${endTime.toLocaleTimeString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' })}`;
-              return;
-            }
-
-            // Calculate hours, minutes, and seconds
-            const hours = Math.floor(difference / (1000 * 60 * 60));
-            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-            // Display the countdown in the specified element
-            const countdownElement = document.getElementById(countdownElementId);
-            countdownElement.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
-          }
-        </script>
-
-        <div class="col-12">
-          <div id="chart" style="height: 450px;"></div>
-        </div>
-
-        <script>
-          // Fetch ECharts data from the server
-          fetch('/echarts-data/<%= patrolReport.reportId %>') // Replace 'your_report_id' with the actual report ID
-            .then(response => response.json())
-            .then(data => {
-              if (data.success) {
-                const echartsData = data.data;
-
-                const chart = echarts.init(document.getElementById('chart'));
-
-                // ECharts option configuration
-                const option = {
-                  xAxis: {
-                    type: 'category',
-                    data: echartsData.cycle.map(cycle => cycle.timeSlot),
-                  },
-                  yAxis: {
-                    type: 'value',
-                    axisLabel: {
-                      formatter: '{value}%', // Display percentage symbol on the Y-axis
-                    },
-                    splitLine: {
-                      show: false, // Hide the horizontal grid lines on the Y-axis
-                    },
-                  },
-                  series: [{
-                    data: echartsData.cycle.map(cycle => cycle.percentageWithTime),
-                    type: 'line',
-                    label: {
-                      show: true,
-                      formatter: params => `${params.value.toFixed(0)}%`,
-                      color: '#3874ff', // Display percentage value on the chart
-                    },
-                  }],
-                };
-
-                // Set option and render chart
-                chart.setOption(option);
-              } else {
-                console.error('Error fetching ECharts data:', data.error);
+              // Check if the end time has already passed
+              if (difference <= 0) {
+                const countdownElement = document.getElementById(countdownElementId);
+                countdownElement.innerHTML = `End Time: ${endTime.toLocaleTimeString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' })}`;
+                return;
               }
-            })
-            .catch(error => console.error('Error fetching data:', error));
-        </script>
 
-        <hr />
+              // Calculate hours, minutes, and seconds
+              const hours = Math.floor(difference / (1000 * 60 * 60));
+              const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+              const seconds = Math.floor((difference % (1000 * 60)) / 1000);
 
-        <div class="mt-2">
+              // Display the countdown in the specified element
+              const countdownElement = document.getElementById(countdownElementId);
+              countdownElement.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
+            }
+          </script>
+
+          <div class="col-12">
+            <div id="chart" style="height: 450px;"></div>
+          </div>
+
+          <script>
+            // Fetch ECharts data from the server
+            fetch('/shift-member/echarts-data/<%= patrolReport.reportId %>') // Replace 'your_report_id' with the actual report ID
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  const echartsData = data.data;
+
+                  const chart = echarts.init(document.getElementById('chart'));
+
+                  // ECharts option configuration
+                  const option = {
+                    xAxis: {
+                      type: 'category',
+                      data: echartsData.cycle.map(cycle => cycle.timeSlot),
+                    },
+                    yAxis: {
+                      type: 'value',
+                      axisLabel: {
+                        formatter: '{value}%', // Display percentage symbol on the Y-axis
+                      },
+                      splitLine: {
+                        show: false, // Hide the horizontal grid lines on the Y-axis
+                      },
+                    },
+                    series: [{
+                      data: echartsData.cycle.map(cycle => cycle.percentageWithTime),
+                      type: 'line',
+                      label: {
+                        show: true,
+                        formatter: params => `${params.value.toFixed(0)}%`,
+                        color: '#3874ff', // Display percentage value on the chart
+                      },
+                    }],
+                  };
+
+                  // Set option and render chart
+                  chart.setOption(option);
+                } else {
+                  console.error('Error fetching ECharts data:', data.error);
+                }
+              })
+              .catch(error => console.error('Error fetching data:', error));
+          </script>
+        </div>
+
+        <div class=" col-12 mt-2">
+          <hr>
           <div class="d-flex align-items-center mb-4">
             <h3 class="text-1100 me-3">Notes</h3>
             <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#modalNotes">
@@ -222,7 +242,7 @@
       </div>
     </div>
 
-    <div class="col-12 col-xxl-2 px-0 border-start-xxl border-300 border-top-sm position-xxl-fixed end-0">
+    <div class="col-12 col-xxl-3 px-0 border-start-xxl border-300 border-top-sm position-xxl-fixed end-0">
       <div class="h-25 h-xxl-100">
         <div class="bg-light dark__bg-1100 min-vh-100">
           <div class="px-4 px-lg-6 py-4">
@@ -234,12 +254,28 @@
           || item.fileType === ".jepg" || item.fileType === ".gif" ||
           item.fileType === ".bmp" || item.fileType === ".png" ) {%>
 
-          <div class="border-top border-300 px-4 px-lg-6 py-4">
+          <%
+          var part1 = '';
+          var part2 = '';
+          const maxTextLength = 30;
+          const textToSplit = item.filename;
+
+          let splitIndex = textToSplit.lastIndexOf(' ', maxTextLength);
+          if (splitIndex === -1) {
+              splitIndex = maxTextLength;
+          }
+
+          part1 = textToSplit.substring(0, splitIndex).trim();
+          part2 = textToSplit.substring(splitIndex).trim();
+
+          %>
+
+          <div class="border-top border-bottom border-300 px-4 px-lg-6 py-4">
             <div class="me-n3">
               <div class="d-flex flex-between-center">
                 <div class="d-flex mb-1">
-                  <span class="fa-solid fa-image me-2 text-700 fs--1"></span>
-                  <p class="text-1000 mb-0 lh-1"><%= item.filename %></p>
+                  <span class="fa-solid fa-image me-2 text-700 fs--1 mt-1"></span>
+                  <p class="text-1000 mb-0 lh-1"><%= part1 %><br><%= part2 %></p>
                 </div>
                 <div class="font-sans-serif btn-reveal-trigger">
                   <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
@@ -264,7 +300,7 @@
                 <div>
                   <div class="d-flex align-items-center mb-1 flex-wrap">
                     <p class="text-1000 mb-0 lh-1">
-                      <span class="fa-solid fa-file-lines me-2 fs--1 text-700"></span><%= item.filename %>
+                      <span class="fa-solid fa-file-lines me-2 fs--1 text-700 mt-1"></span><%= part1 %><br><%= part2 %>
                     </p>
                   </div>
                   <div class="d-flex fs--1 text-700 mb-0 flex-wrap">

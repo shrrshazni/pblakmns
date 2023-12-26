@@ -3,7 +3,7 @@
 <div class="content">
   <div class="row g-3">
     <!-- profile card -->
-    <div class="col-12 col-xl-5">
+    <div class="col-12 col-xl-8">
       <div class="pb-5">
         <div class="card mb-1">
           <div
@@ -86,13 +86,13 @@
       </div>
     </div>
 
-    <div class="col-12 col-xl-7">
+    <div class="col-12 col-xl-4">
       <div class="row gx-xl-8 gx-xxl-11">
         <h3 class="mb-4 text-center">Activity Timeline</h3>
         
         <div
           class="col-xl-12 overflow-auto scrollbar-overlay"
-          style="height: 75vh"
+          style="height: 100vh"
         >
           <% if (Array.isArray(activity) && activity.length > 0) { %> <%
           activity.forEach((activity, activityIndex) => { %> <% if (todayDate
