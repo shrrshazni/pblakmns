@@ -1036,16 +1036,23 @@ app.get('/shift-member/details', async function (req, res) {
         const startTimeNumeric = parseInt(cycle.timeSlot.split('-')[0], 10);
         const endTimeNumeric = parseInt(cycle.timeSlot.split('-')[1], 10);
 
+        console.log('currentTimeNumeric:', currentTimeNumeric);
+        console.log('startTimeNumeric:', startTimeNumeric);
+        console.log('endTimeNumeric:', endTimeNumeric);
+
         if (
           currentTimeNumeric >= startTimeNumeric &&
           currentTimeNumeric <= endTimeNumeric
         ) {
-          // Current time is within the time slot for this cycle
-          // You can perform your desired actions here
           var currentTimeSlot = cycle.timeSlot;
           console.log('currentTimeSlot:', currentTimeSlot);
-          break; // Stop checking once a matching time slot is found
+          break;
         }
+      }
+
+      if (currentTimeSlot === undefined) {
+        // Handle the case when no matching time slot is found
+        console.log('No matching time slot found.');
       }
 
       // Function to count times with values in a cycle
