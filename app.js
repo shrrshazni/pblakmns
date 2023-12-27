@@ -1217,7 +1217,7 @@ app.get(
                             const resultString = _.startCase(lowerCase);
 
                             // Update the time in the found checkpoint with the current time
-                            checkpointToUpdate.time = time;
+                            checkpointToUpdate.time = currenttime;
                             checkpointToUpdate.logReport = checkpointName + " have been patrol by " + resultString + " at " + time;
                             checkpointToUpdate.username = checkUser.username;
 
