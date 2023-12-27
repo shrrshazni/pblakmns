@@ -1193,23 +1193,30 @@ app.get(
                         });
                         const currentTime = parseInt(currentTimeNumeric.replace(':', ''), 10);
 
-                        console.log(currentTime);
-                        console.log(startTime);
-                        console.log(endTime);
-
                         // Check if the current time is within the time slot
                         const isWithinTimeSlot =
                             currentTime >= parseInt(startTime, 10) &&
                             currentTime <= parseInt(endTime, 10);
 
                         if (isWithinTimeSlot) {
-                            // Update the time in the cycle with the current time
-                            cycleToUpdate.timeSlot = time;
+                            // Find the index of the checkpoint within the cycle
+                            const checkpointIndex = cycleToUpdate.checkpoint.findIndex(
+                                checkpoint => checkpoint.checkpointName === checkpointName
+                            );
 
-                            // Save the changes to the database
-                            await patrolReport.save();
+                            if (checkpointIndex !== -1) {
+                                // Update the time for the specific checkpoint
+                                cycleToUpdate.checkpoint[checkpointIndex].time = time;
 
-                            res.redirect('/');
+                                // Save the changes to the database
+                                await patrolReport.save();
+
+                                console.log(`Successful update for checkpoint ${checkpointName} using QR scanner!`);
+                                res.redirect('/');
+                            } else {
+                                console.log(`Checkpoint ${checkpointName} not found in the cycle.`);
+                                res.status(404).send(`Checkpoint ${checkpointName} not found in the cycle.`);
+                            }
                         } else {
                             console.log('Current time is not within the time slot.');
                             res.status(404).send('Current time is not within the time slot.');
