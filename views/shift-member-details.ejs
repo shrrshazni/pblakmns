@@ -93,12 +93,10 @@
                         }else {
                           display = "d-none";
                         } %>
-                <div class="col-12 container mx-auto d-block">
+                <div class="col-12 container mx-auto <%= display %>">
                   <div class="d-flex justify-content-between">
                     <h2 class="card-title">
                       <div class="d-sm-block d-lg-flex">
-                        <div class="text"><%= currentTimeSlot %> & <%= cycle.timeSlot %> & <%= todayDate %> & <%= patrolReport.date %> </div>
-                        <div class="text"><%= display %></div>
                         <div class="text1">Cycle <%= index+1 %></div>
                         <div class="text2">&nbsp;<span class="fw-normal text-700 ms-0 fs-1 my-auto">(<%= cycle.timeSlot %>)</span></div>
                       </div>
