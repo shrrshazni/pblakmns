@@ -1217,7 +1217,7 @@ app.get(
                             const resultString = _.startCase(lowerCase);
 
                             // Update the time in the found checkpoint with the current time
-                            checkpointToUpdate.time = currenttime;
+                            checkpointToUpdate.time = currentTime;
                             checkpointToUpdate.logReport = checkpointName + " have been patrol by " + resultString + " at " + time;
                             checkpointToUpdate.username = checkUser.username;
 
@@ -2288,7 +2288,7 @@ app
                 username: currentUser,
                 type: 'Case Report',
                 title: 'Submitted a case report of ' + _.lowerCase(reportType),
-                about: reportSummary
+                about: eventSummary
             };
 
             const newActivity = new Activity({
