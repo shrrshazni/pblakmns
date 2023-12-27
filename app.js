@@ -1209,6 +1209,12 @@ app.get(
                         );
 
                         if (checkpointToUpdate) {
+                            // Get the current time in numeric format (e.g., HHmm)
+                            const currentTimeNumeric1 = new Date().toLocaleTimeString('en-MY', {
+                                hour12: false,
+                                timeZone: 'Asia/Kuala_Lumpur'
+                            });
+                            const currentTime1 = parseInt(currentTimeNumeric1.replace(':', ''), 10);
 
                             const inputString = checkUser.fullname;
 
@@ -1217,7 +1223,7 @@ app.get(
                             const resultString = _.startCase(lowerCase);
 
                             // Update the time in the found checkpoint with the current time
-                            checkpointToUpdate.time = currentTime;
+                            checkpointToUpdate.time = currentTime1;
                             checkpointToUpdate.logReport = checkpointName + " have been patrol by " + resultString + " at " + time;
                             checkpointToUpdate.username = checkUser.username;
 
