@@ -1,1 +1,2 @@
 https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/checkpoint-submit/baitul-makmur-i/parameter-2
+http://localhost:5001/shift-member/checkpoint-submit/baitul-makmur-i/basement-1

@@ -483,7 +483,8 @@ const checkpoint = {
     checkpointName: String,
     time: String,
     logReport: String,
-    fullName: String
+    fullName: String,
+    username: String
 };
 const cycleAmount = {
     cycleSeq: Number,
@@ -1174,57 +1175,67 @@ app.get(
                 if (patrolReport && patrolReport.status === 'Open') {
                     // Find the relevant cycle based on your logic and checkpointName
                     const cycleToUpdate = patrolReport.shiftMember.cycle.find(cycle =>
-                        // Add your conditions here, for example:
-                        cycle.checkpoint.some(
-                            checkpoint =>
-                                checkpoint.checkpointName === checkpointName &&
-                                // Your additional conditions here if needed
-                                true
+                        cycle.checkpoint.some(checkpoint =>
+                            checkpoint.checkpointName === checkpointName &&
+                            isWithinTimeSlot(cycle.timeSlot)
                         )
                     );
 
-                    if (cycleToUpdate) {
+                    // Function to check if the current time is within the given time slot
+                    function isWithinTimeSlot(timeSlot) {
                         // Parse the start and end times from the time slot
-                        const [startTime, endTime] = cycleToUpdate.timeSlot.split('-');
+                        const [startTime, endTime] = timeSlot.split('-');
 
+                        // Get the current time in numeric format (e.g., HHmm)
                         const currentTimeNumeric = new Date().toLocaleTimeString('en-MY', {
                             hour12: false,
                             timeZone: 'Asia/Kuala_Lumpur'
                         });
                         const currentTime = parseInt(currentTimeNumeric.replace(':', ''), 10);
 
+                        // Convert start and end times to numeric format
+                        const startNumeric = parseInt(startTime.replace(':', ''), 10);
+                        const endNumeric = parseInt(endTime.replace(':', ''), 10);
+
                         // Check if the current time is within the time slot
-                        const isWithinTimeSlot =
-                            currentTime >= parseInt(startTime, 10) &&
-                            currentTime <= parseInt(endTime, 10);
+                        return currentTime >= startNumeric && currentTime <= endNumeric;
+                    }
 
-                        if (isWithinTimeSlot) {
-                            // Find the index of the checkpoint within the cycle
-                            const checkpointIndex = cycleToUpdate.checkpoint.findIndex(
-                                checkpoint => checkpoint.checkpointName === checkpointName
-                            );
 
-                            if (checkpointIndex !== -1) {
-                                // Update the time for the specific checkpoint
-                                cycleToUpdate.checkpoint[checkpointIndex].time = time;
+                    if (cycleToUpdate) {
+                        // Find the checkpoint with the matching checkpointName
+                        const checkpointToUpdate = cycleToUpdate.checkpoint.find(checkpoint =>
+                            checkpoint.checkpointName === checkpointName
+                        );
 
-                                // Save the changes to the database
-                                await patrolReport.save();
+                        if (checkpointToUpdate) {
 
-                                console.log(`Successful update for checkpoint ${checkpointName} using QR scanner!`);
-                                res.redirect('/');
-                            } else {
-                                console.log(`Checkpoint ${checkpointName} not found in the cycle.`);
-                                res.status(404).send(`Checkpoint ${checkpointName} not found in the cycle.`);
-                            }
+                            const inputString = checkUser.fullname;
+
+                            const lowerCase = _.toLower(inputString);
+
+                            const resultString = _.startCase(lowerCase);
+
+                            // Update the time in the found checkpoint with the current time
+                            checkpointToUpdate.time = time;
+                            checkpointToUpdate.logReport = checkpointName + " have been patrol by " + resultString + " at " + time;
+                            checkpointToUpdate.username = checkUser.username;
+
+                            // Save the changes to the database
+                            await patrolReport.save();
+
+                            console.log("Successful update using QR scanner!");
+
+                            res.redirect('/');
                         } else {
-                            console.log('Current time is not within the time slot.');
-                            res.status(404).send('Current time is not within the time slot.');
+                            console.log('Checkpoint not found in the cycle.');
+                            res.status(404).send('Checkpoint not found in the cycle.');
                         }
                     } else {
                         console.log('Cycle not found.');
                         res.status(404).send('Cycle not found.');
                     }
+
                 } else {
                     console.log('No patrol report found for the user.');
                     res
