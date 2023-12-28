@@ -1149,7 +1149,6 @@ app.get('/shift-member/details', async function (req, res) {
 app.get(
     '/shift-member/checkpoint-submit/:location/:checkpointName',
     async function (req, res) {
-        if (req.isAuthenticated()) {
             const currentUsername = req.session.user.username;
             const checkUser = await User.findOne({ username: currentUsername });
 
@@ -1251,11 +1250,11 @@ app.get(
                         );
                 }
             }
-        } else {
-            res.redirect('/sign-in');
-        }
     }
 );
+
+// SIGN IN BEFORE SCAN QR
+app.get('/sign-in/shift-member/')
 
 // ECHARTS
 // FETCH DATA
