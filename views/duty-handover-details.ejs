@@ -1,5 +1,17 @@
 <%- include("partials/header") %> <%- include("partials/navbar") %>
 
+<%
+
+var submitDutyHandover = "";
+
+if(role === 'Admin'){
+    submitDutyHandover = "d-none";
+}else {
+    submitDutyHandover = "";
+}
+
+%>
+
 <div class="content px-0 pt-9">
   <div class="row g-0">
     <div class="col-12 col-xxl-12 px-0 bg-soft">
@@ -266,7 +278,7 @@
                         <button class="btn btn-link ps-0" type="button" data-wizard-prev-btn="data-wizard-prev-btn">
                           <span class="fas fa-chevron-left me-1" data-fa-transform="shrink-3"></span>Previous
                         </button>
-                        <button class="btn btn-primary myButton" type="submit">
+                        <button class="btn btn-primary myButton <%= submitDutyHandover %>" type="submit">
                           <div class="btn-content">Submit</div>
                         </button>
                       </div>

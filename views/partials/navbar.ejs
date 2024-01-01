@@ -10,6 +10,37 @@
   <!-- Navbar footer -->
 </nav>
 
+<!-- check role and set which part will be shown -->
+<%
+// for top main nav
+var mainNav1, mainNav2, mainNav3, mainNav4, mainNav5 = "";
+
+// for sub nav
+var subNav1 = "";
+
+if(role === 'Admin'){
+    mainNav1 = "";
+    mainNav2 = "";
+    mainNav3 = "";
+    mainNav4 = "";
+    mainNav5 = "d-none";
+    subNav1 = "d-none";
+}else if (role === 'Head Shift'){
+    mainNav1 = "d-none";
+    mainNav2 = "";
+    mainNav3 = "";
+    mainNav4 = "";
+    mainNav5 = "d-none";
+    subNav1 = "d-none";
+}else {
+    mainNav1 = "d-none";
+    mainNav2 = "d-none";
+    mainNav3 = "";
+    mainNav4 = "";
+    mainNav5 = "";
+    subNav1 = "";
+}
+%>
 <!-- Navbar top -->
 <nav class="navbar navbar-top fixed-top navbar-expand-lg d-print-none" id="navbarTop">
   <!-- Left-side -->
@@ -22,7 +53,7 @@
     <a class="navbar-brand me-1 me-sm-3" href="/">
       <div class="d-flex align-items-center">
         <div class="d-flex align-items-center">
-          <img class="d-lg-none" src="../assets/img/icons/logo.png" alt="logo" width="38" />
+          <img class="d-lg-none" src="/assets/img/icons/logo.png" alt="logo" width="38" />
           <p class="logo-text ms-2 d-none d-sm-block fs-2 d-sm-none d-lg-block">
             Auxiliary Police
           </p>
@@ -37,19 +68,25 @@
     <ul class="navbar-nav navbar-nav-top" data-dropdown-on-hover="data-dropdown-on-hover">
       <!-- Home -->
       <li class="nav-item dropdown">
-        <a class="nav-link lh-1" href="/" role="button"><span class="uil fs-0 me-2 uil-home"></span>Home</a>
+        <a class="nav-link lh-1" href="/" role="button"><span class="uil fs-0 me-2 uil-house-user"></span>Home</a>
+      </li>
+
+      <!-- Dashboard -->
+      <li class="nav-item dropdown <%= mainNav1 %>">
+        <a class="nav-link lh-1" href="/duty-handover/view" role="button"><span
+            class="uil fs-0 me-2 uil-chart"></span>Dashboard</a>
       </li>
 
       <!-- Duty Handover -->
-      <li class="nav-item dropdown">
+      <li class="nav-item dropdown <%= mainNav2 %>">
         <a class="nav-link lh-1" href="/duty-handover/view" role="button"><span
-            class="uil fs-0 me-2 uil-file-export"></span>Duty Handover</a>
+            class="uil fs-0 me-2 uil-cube"></span>Duty Handover</a>
       </li>
 
       <!-- Reports -->
-      <li class="nav-item dropdown"><a class="nav-link dropdown-toggle lh-1" href="#!" role="button"
+      <li class="nav-item dropdown <%= mainNav3 %>"><a class="nav-link dropdown-toggle lh-1" href="#!" role="button"
           data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false"><span
-            class="uil fs-0 me-2 uil-files-landscapes-alt"></span>Reports</a>
+            class="uil fs-0 me-2 uil-clock-two"></span>Reports</a>
 
         <ul class="dropdown-menu navbar-dropdown-caret">
           <li class="dropdown"><a class="dropdown-item dropdown-toggle" id="patrolReports" href="#"
@@ -84,13 +121,13 @@
       </li>
 
       <!-- Schedule -->
-      <li class="nav-item dropdown">
+      <li class="nav-item dropdown<%= mainNav4 %>">
         <a class="nav-link lh-1" href="/schedule" role="button"><span
-            class="uil fs-0 me-2 uil-files-landscapes-alt"></span>Schedule</a>
+            class="uil fs-0 me-2 uil-clipboard-notes"></span>Schedule</a>
       </li>
 
       <!-- Social -->
-      <li class="nav-item dropdown">
+      <li class="nav-item dropdown <%= mainNav5 %>">
         <a class="nav-link dropdown-toggle lh-1" href="#!" role="button" data-bs-toggle="dropdown"
           data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false"><span
             class="uil fs-0 me-2 uil-share-alt"></span>Social</a>
@@ -158,7 +195,7 @@
           </div>
 
           <!-- Content user -->
-          <div class="overflow-auto scrollbar" style="height: 5rem">
+          <div class="overflow-auto scrollbar <%= subNav1 %>" style="height: 5rem">
             <ul class="nav d-flex flex-column mb-2 pb-1">
               <li class="nav-item">
                 <a class="nav-link px-3" href="/social/profile">

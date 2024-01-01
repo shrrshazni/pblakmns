@@ -1,5 +1,19 @@
 <%- include("partials/header") %> <%- include("partials/navbar") %>
 
+<%
+
+var submitCaseReport = "";
+
+if(role === 'Admin'){
+    submitCaseReport = "d-none";
+}else if(role === 'Head Shift'){
+    submitCaseReport = "d-none";
+}else{
+    submitCaseReport = "";
+}
+
+%>
+
 <div class="content">
   <nav class="mb-2" aria-label="breadcrumb">
     <ol class="breadcrumb mb-0">
@@ -24,7 +38,7 @@
         </div>
         <div class="col-auto">
           <a
-            class="btn btn-primary px-5"
+            class="btn btn-primary px-5 <%= submitCaseReport %>"
             href="/case-report/submit?rid=<%= rid %>"
             ><i class="fa-solid fa-plus me-2"></i>Add new report</a
           >

@@ -1,5 +1,17 @@
 <%- include("partials/header") %> <%- include("partials/navbar") %>
 
+<%
+
+var submitSchedule = "";
+
+if(role === 'Admin'){
+    submitSchedule = "";
+}else {
+    submitSchedule = "d-none";
+}
+
+%>
+
 <div class="content">
   <nav class="mb-2" aria-label="breadcrumb">
     <ol class="breadcrumb mb-0">
@@ -22,7 +34,7 @@
             >
           </h2>
         </div>
-        <div class="col-auto">
+        <div class="col-auto <%= submitSchedule %>">
           <a class="btn btn-primary px-5" href="/schedule/submit?rid=<%= rid %>"
             ><i class="fa-solid fa-plus me-2"></i>Add new schedule</a
           >

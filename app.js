@@ -15,11 +15,6 @@ const path = require('path');
 const fileUpload = require('express-fileupload');
 const nodemailer = require('nodemailer');
 const cron = require('node-cron');
-const axios = require('axios');
-const cors = require('cors');
-// not yet been use
-const jsQR = require('jsqr');
-const NodeWebcam = require('node-webcam');
 // getdate
 const dateLocal = require('./public/assets/js/date');
 const cool = require('cool-ascii-faces');
@@ -34,7 +29,6 @@ app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
-app.use(cors());
 
 // mongoose session option
 const store = new MongoDBSession({
@@ -77,7 +71,8 @@ const userSchema = new mongoose.Schema({
   username: String,
   email: String,
   phone: String,
-  profile: String
+  profile: String,
+  role: String
 });
 
 //mongoose passport-local
@@ -111,22 +106,10 @@ let transporter = nodemailer.createTransport({
   }
 });
 
-// CORS
-
-app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:5001'); // update to match the domain you will make the request from
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  );
-  next();
-});
-
 // HOME
 app.get('/', async function (req, res) {
   if (req.isAuthenticated()) {
     var currentUsername = req.session.user.username;
-
     const checkUser = await User.findOne({ username: currentUsername });
 
     if (checkUser) {
@@ -134,7 +117,8 @@ app.get('/', async function (req, res) {
         currentFullName: checkUser.fullname,
         currentUser: checkUser.username,
         currentProfile: checkUser.profile,
-        rid: crypto.randomBytes(6).toString('hex').toUpperCase()
+        rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
+        role: checkUser.role
       });
     }
   } else {
@@ -666,7 +650,9 @@ app.get('/shift-member/view', async function (req, res) {
           rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
           // toast alert
           toastShow: '',
-          toastMsg: ''
+          toastMsg: '',
+          //role
+          role: checkUser.role
         });
       } else {
         res.render('shift-member-view', {
@@ -691,7 +677,9 @@ app.get('/shift-member/view', async function (req, res) {
           rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
           // toast alert
           toastShow: '',
-          toastMsg: ''
+          toastMsg: '',
+          //role
+          role: checkUser.role
         });
       }
     }
@@ -760,7 +748,9 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('shift-member-view', {
@@ -785,7 +775,9 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else if (customListName === 'BMII') {
@@ -813,7 +805,9 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('shift-member-view', {
@@ -838,7 +832,9 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else if (customListName === 'JM') {
@@ -866,7 +862,9 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('shift-member-view', {
@@ -891,7 +889,9 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else if (customListName === 'CM') {
@@ -919,7 +919,9 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('shift-member-view', {
@@ -944,7 +946,9 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else if (customListName === 'RS') {
@@ -972,7 +976,9 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('shift-member-view', {
@@ -997,7 +1003,9 @@ app.get('/shift-member/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else {
@@ -1030,9 +1038,6 @@ app.get('/shift-member/details', async function (req, res) {
       });
       const currentTimeNumeric = parseInt(currentTime.replace(':', ''), 10);
 
-      console.log('currentTime:', currentTime);
-      console.log('currentTimeNumeric:', currentTimeNumeric);
-
       for (const cycle of shiftMemberCycles) {
         const startTimeNumeric = parseInt(cycle.timeSlot.split('-')[0], 10);
         const endTimeNumeric = parseInt(cycle.timeSlot.split('-')[1], 10);
@@ -1042,7 +1047,6 @@ app.get('/shift-member/details', async function (req, res) {
           currentTimeNumeric <= endTimeNumeric
         ) {
           var currentTimeSlot = cycle.timeSlot;
-          console.log('currentTimeSlot:', currentTimeSlot);
           break;
         }
       }
@@ -1121,7 +1125,9 @@ app.get('/shift-member/details', async function (req, res) {
             currentTimeSlot: currentTimeSlot,
             progressReport: percentageTimesWithValuesInShift.toFixed(0),
             // files
-            files: ''
+            files: '',
+            //role
+            role: checkUser.role
           });
         }
       } else {
@@ -1136,7 +1142,9 @@ app.get('/shift-member/details', async function (req, res) {
           progressReport: '',
           reportId: reportId,
           // files
-          files: ''
+          files: '',
+          //role
+          role: checkUser.role
         });
       }
     }
@@ -1182,14 +1190,14 @@ app.get(
     if (checkShiftTime) {
       res.render('shift-member-submit', {
         patrolReport: checkShiftTime,
-        location : location,
-        checkpointName : checkpointName
+        location: location,
+        checkpointName: checkpointName
       });
     } else {
       res.render('shift-member-submit', {
         patrolReport: '',
-        location : '',
-        checkpointName : ''
+        location: '',
+        checkpointName: ''
       });
     }
   }
@@ -1306,9 +1314,6 @@ app.get(
     }
   }
 );
-
-// SIGN IN BEFORE SCAN QR
-app.get('/sign-in/shift-member/');
 
 // ECHARTS
 // FETCH DATA
@@ -1484,7 +1489,9 @@ app.get('/patrol-unit/view', async function (req, res) {
           rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
           // toast alert
           toastShow: '',
-          toastMsg: ''
+          toastMsg: '',
+          //role
+          role: checkUser.role
         });
       } else {
         res.render('patrol-unit-view', {
@@ -1509,7 +1516,9 @@ app.get('/patrol-unit/view', async function (req, res) {
           rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
           // toast alert
           toastShow: '',
-          toastMsg: ''
+          toastMsg: '',
+          //role
+          role: checkUser.role
         });
       }
     }
@@ -1545,8 +1554,6 @@ app
         let percentageNonEmptyTime =
           (nonEmptyTimeCount / totalPatrolUnits) * 100;
 
-        console.log(percentageNonEmptyTime);
-
         // check result and render
         if (checkReport) {
           const checkFiles = await File.find({ reportId: reportId });
@@ -1573,7 +1580,9 @@ app
               percentage: percentageNonEmptyTime.toString(),
               reportId: reportId,
               // files
-              files: ''
+              files: '',
+              //role
+              role: checkUser.role
             });
           }
         } else {
@@ -1586,47 +1595,14 @@ app
             percentage: '',
             reportId: reportId,
             // files
-            files: ''
+            files: '',
+            //role
+            role: checkUser.role
           });
         }
       }
     } else {
       res.redirect('/sign-in');
-    }
-  })
-  .post('/patrol-unit/details/:reportId', async function (req, res) {
-    try {
-      const reportIdToUpdate = req.params.reportId;
-      //   const checkpointNameToUpdate = req.body.checkpointName;
-      const updatedData = {
-        latitude: req.body.latitude,
-        longitude: req.body.longitude,
-        time: req.body.time,
-        logReport: req.body.logReport,
-        checkpointName: req.body.checkpointName
-      };
-
-      console.log(reportIdToUpdate);
-
-      const updatedPatrolReport = await PatrolReport.findOneAndUpdate(
-        {
-          reportId: reportIdToUpdate,
-          'patrolUnit.checkpointName': 'Checkpoint 5'
-        },
-        { $set: { 'patrolUnit.$': updatedData } },
-        { new: true }
-      );
-
-      if (updatedPatrolReport) {
-        console.log('Success');
-        res.redirect('/patrol-unit/details?id=' + reportIdToUpdate);
-      } else {
-        console.log('Unsuccessful');
-        res.redirect('/patrol-unit/details?id=' + reportIdToUpdate);
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
     }
   });
 
@@ -1866,7 +1842,9 @@ app.get('/case-report/view', async function (req, res) {
           rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
           // toast alert
           toastShow: '',
-          toastMsg: ''
+          toastMsg: '',
+          //role
+          role: checkUser.role
         });
       } else {
         res.render('case-report-view', {
@@ -1891,7 +1869,9 @@ app.get('/case-report/view', async function (req, res) {
           rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
           // toast alert
           toastShow: '',
-          toastMsg: ''
+          toastMsg: '',
+          //role
+          role: checkUser.role
         });
       }
     }
@@ -1984,7 +1964,9 @@ app.get('/case-report/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else if (customListName === 'BMII') {
@@ -2012,7 +1994,9 @@ app.get('/case-report/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('case-report-view', {
@@ -2037,7 +2021,9 @@ app.get('/case-report/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else if (customListName === 'JM') {
@@ -2065,7 +2051,9 @@ app.get('/case-report/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('case-report-view', {
@@ -2090,7 +2078,9 @@ app.get('/case-report/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else if (customListName === 'CM') {
@@ -2118,7 +2108,9 @@ app.get('/case-report/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('case-report-view', {
@@ -2143,7 +2135,9 @@ app.get('/case-report/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else if (customListName === 'RS') {
@@ -2171,7 +2165,9 @@ app.get('/case-report/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('case-report-view', {
@@ -2196,7 +2192,9 @@ app.get('/case-report/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else {
@@ -2244,7 +2242,9 @@ app
           staffOnDuty: '',
           //toast alert
           toastShow: '',
-          toastMsg: ''
+          toastMsg: '',
+          //role
+          role: checkUser.role
         });
       }
     } else {
@@ -2448,7 +2448,9 @@ app
                 rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
                 // toast alert
                 toastShow: 'show',
-                toastMsg: 'Submit report successful!'
+                toastMsg: 'Submit report successful!',
+                //role
+                role: checkUser.role
               });
             } else {
               res.render('case-report-view', {
@@ -2473,7 +2475,9 @@ app
                 rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
                 // toast alert
                 toastShow: 'show',
-                toastMsg: 'Submit report successful!'
+                toastMsg: 'Submit report successful!',
+                //role
+                role: checkUser.role
               });
             }
           }
@@ -2532,7 +2536,9 @@ app
                 rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
                 // toast alert
                 toastShow: 'show',
-                toastMsg: 'Add report failed!'
+                toastMsg: 'Add report failed!',
+                //role
+                role: checkUser.role
               });
             } else {
               res.render('case-report-view', {
@@ -2557,7 +2563,9 @@ app
                 rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
                 // toast alert
                 toastShow: 'show',
-                toastMsg: 'Add report failed!'
+                toastMsg: 'Add report failed!',
+                //role
+                role: checkUser.role
               });
             }
           }
@@ -2614,7 +2622,9 @@ app
               rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
               // toast alert
               toastShow: 'show',
-              toastMsg: 'There is an exisitng report!'
+              toastMsg: 'There is an exisitng report!',
+              //role
+              role: checkUser.role
             });
           } else {
             res.render('case-report-view', {
@@ -2639,7 +2649,9 @@ app
               rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
               // toast alert
               toastShow: 'show',
-              toastMsg: 'There is an existing report!'
+              toastMsg: 'There is an existing report!',
+              //role
+              role: checkUser.role
             });
           }
         }
@@ -2671,7 +2683,9 @@ app
         staffOnDuty: staffOnDuty,
         //toast alert
         toastShow: 'show',
-        toastMsg: 'There is error in your input!'
+        toastMsg: 'There is error in your input!',
+        //role
+        role: checkUser.role
       });
     }
   });
@@ -2730,7 +2744,9 @@ app.get('/case-report/details', async function (req, res) {
             notes: checkReport.notes,
             reportId: checkReport.reportId,
             // files
-            files: checkFiles
+            files: checkFiles,
+            //role
+            role: checkUser.role
           });
         }
       } else {
@@ -2749,7 +2765,9 @@ app.get('/case-report/details', async function (req, res) {
           eventSummary: '',
           staffOnDuty: '',
           files: '',
-          notes: ''
+          notes: '',
+          //role
+          role: checkUser.role
         });
       }
     }
@@ -2907,7 +2925,9 @@ app
           notes: '',
           //toast alert
           toastShow: '',
-          toastMsg: ''
+          toastMsg: '',
+          //role
+          role: checkUser.role
         });
       }
     } else {
@@ -3110,7 +3130,9 @@ app
                 rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
                 // toast alert
                 toastShow: 'show',
-                toastMsg: 'Submit schedule successful!'
+                toastMsg: 'Submit schedule successful!',
+                //role
+                role: checkUser.role
               });
             } else {
               res.render('schedule', {
@@ -3136,7 +3158,9 @@ app
                 rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
                 // toast alert
                 toastShow: 'show',
-                toastMsg: 'Submit schedule successful!'
+                toastMsg: 'Submit schedule successful!',
+                //role
+                role: checkUser.role
               });
             }
           }
@@ -3196,7 +3220,9 @@ app
                 rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
                 // toast alert
                 toastShow: 'show',
-                toastMsg: 'Add schedule failed!'
+                toastMsg: 'Add schedule failed!',
+                //role
+                role: checkUser.role
               });
             } else {
               res.render('schedule', {
@@ -3222,7 +3248,9 @@ app
                 rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
                 // toast alert
                 toastShow: 'show',
-                toastMsg: 'Add schedule failed!'
+                toastMsg: 'Add schedule failed!',
+                //role
+                role: checkUser.role
               });
             }
           }
@@ -3282,7 +3310,9 @@ app
               rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
               // toast alert
               toastShow: 'show',
-              toastMsg: 'There is existing schedule!'
+              toastMsg: 'There is existing schedule!',
+              //role
+              role: checkUser.role
             });
           } else {
             res.render('schedule', {
@@ -3308,7 +3338,9 @@ app
               rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
               // toast alert
               toastShow: 'show',
-              toastMsg: 'There is existing schedule!'
+              toastMsg: 'There is existing schedule!',
+              //role
+              role: checkUser.role
             });
           }
         }
@@ -3338,7 +3370,9 @@ app
         notes: notes,
         //toast alert
         toastShow: 'show',
-        toastMsg: 'There is error in your input!'
+        toastMsg: 'There is error in your input!',
+        //role
+        role: checkUser.role
       });
     }
   });
@@ -3398,7 +3432,9 @@ app.get('/schedule', async function (req, res) {
           rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
           // toast alert
           toastShow: '',
-          toastMsg: ''
+          toastMsg: '',
+          //role
+          role: checkUser.role
         });
       } else {
         res.render('schedule', {
@@ -3424,7 +3460,9 @@ app.get('/schedule', async function (req, res) {
           rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
           // toast alert
           toastShow: '',
-          toastMsg: ''
+          toastMsg: '',
+          //role
+          role: checkUser.role
         });
       }
     }
@@ -3496,7 +3534,9 @@ app.get('/schedule/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('schedule', {
@@ -3522,7 +3562,9 @@ app.get('/schedule/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else if (customListName === 'BMII') {
@@ -3551,7 +3593,9 @@ app.get('/schedule/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('schedule', {
@@ -3577,7 +3621,9 @@ app.get('/schedule/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else if (customListName === 'JM') {
@@ -3606,7 +3652,9 @@ app.get('/schedule/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('schedule', {
@@ -3632,7 +3680,9 @@ app.get('/schedule/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else if (customListName === 'CM') {
@@ -3661,7 +3711,9 @@ app.get('/schedule/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('schedule', {
@@ -3687,7 +3739,9 @@ app.get('/schedule/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else if (customListName === 'RS') {
@@ -3716,7 +3770,9 @@ app.get('/schedule/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('schedule', {
@@ -3742,7 +3798,9 @@ app.get('/schedule/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else {
@@ -3790,7 +3848,9 @@ app.get('/social/profile/', async function (req, res) {
           amountCase: checkCaseReport.length,
           amountTotalReports: checkPatrolReport.length + checkCaseReport.length,
           activity: checkActivity,
-          todayDate: todayDate
+          todayDate: todayDate,
+          //role
+          role: checkUser.role
         });
       } else {
         res.render('profile', {
@@ -3803,7 +3863,9 @@ app.get('/social/profile/', async function (req, res) {
           amountCase: checkCaseReport.length,
           amountTotalReports: checkPatrolReport.length + checkCaseReport.length,
           activity: '',
-          todayDate: ''
+          todayDate: '',
+          //role
+          role: checkUser.role
         });
       }
     }
@@ -3856,7 +3918,9 @@ app.get('/social/profile/:fullName', async function (req, res) {
           amountCase: checkCaseReport.length,
           amountTotalReports: checkPatrolReport.length + checkCaseReport.length,
           activity: checkActivity,
-          todayDate: todayDate
+          todayDate: todayDate,
+          //role
+          role: checkUser.role
         });
       } else {
         res.render('profile', {
@@ -3869,7 +3933,9 @@ app.get('/social/profile/:fullName', async function (req, res) {
           amountCase: checkCaseReport.length,
           amountTotalReports: checkPatrolReport.length + checkCaseReport.length,
           activity: '',
-          todayDate: ''
+          todayDate: '',
+          //role
+          role: checkUser.role
         });
       }
     }
@@ -3907,7 +3973,9 @@ app.get('/social/settings', async function (req, res) {
         newPassword: '',
         confirmPassword: '',
         toastShow: '',
-        toastMsg: ''
+        toastMsg: '',
+        //role
+        role: checkUser.role
       });
     }
   } else {
@@ -4006,7 +4074,9 @@ app.post('/social/settings/:customListName', async function (req, res) {
               newPassword: '',
               confirmPassword: '',
               toastShow: 'show',
-              toastMsg: 'Update information succesful'
+              toastMsg: 'Update information succesful',
+              //role
+              role: checkUser.role
             });
           } else {
             console.log('Unsuccessful update user data');
@@ -4031,7 +4101,9 @@ app.post('/social/settings/:customListName', async function (req, res) {
               newPassword: '',
               confirmPassword: '',
               toastShow: 'show',
-              toastMsg: 'Update information error'
+              toastMsg: 'Update information error',
+              //role
+              role: checkUser.role
             });
           }
         } else {
@@ -4056,7 +4128,9 @@ app.post('/social/settings/:customListName', async function (req, res) {
             newPassword: '',
             confirmPassword: '',
             toastShow: 'show',
-            toastMsg: 'There is error in information input'
+            toastMsg: 'There is error in information input',
+            //role
+            role: checkUser.role
           });
         }
       } else if (customListName === 'submit-password') {
@@ -4141,7 +4215,9 @@ app.post('/social/settings/:customListName', async function (req, res) {
                   newPassword: '',
                   confirmPassword: '',
                   toastShow: 'show',
-                  toastMsg: 'Change password successful'
+                  toastMsg: 'Change password successful',
+                  //role
+                  role: checkUser.role
                 });
               }
             });
@@ -4168,7 +4244,9 @@ app.post('/social/settings/:customListName', async function (req, res) {
               newPassword: newPassword,
               confirmPassword: confirmPassword,
               toastShow: 'show',
-              toastMsg: 'There is error in password input'
+              toastMsg: 'There is error in password input',
+              //role
+              role: checkUser.role
             });
           }
         });
@@ -4338,7 +4416,9 @@ app.get('/duty-handover/view', async function (req, res) {
           rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
           // toast alert
           toastShow: '',
-          toastMsg: ''
+          toastMsg: '',
+          //role
+          role: checkUser.role
         });
       } else {
         res.render('duty-handover-view', {
@@ -4363,7 +4443,9 @@ app.get('/duty-handover/view', async function (req, res) {
           rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
           // toast alert
           toastShow: '',
-          toastMsg: ''
+          toastMsg: '',
+          //role
+          role: checkUser.role
         });
       }
     }
@@ -4426,7 +4508,9 @@ app.get('/duty-handover/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('duty-handover-view', {
@@ -4451,7 +4535,9 @@ app.get('/duty-handover/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else if (customListName === 'BMII') {
@@ -4479,7 +4565,9 @@ app.get('/duty-handover/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('duty-handover-view', {
@@ -4504,7 +4592,9 @@ app.get('/duty-handover/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else if (customListName === 'JM') {
@@ -4532,7 +4622,9 @@ app.get('/duty-handover/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('duty-handover-view', {
@@ -4557,7 +4649,9 @@ app.get('/duty-handover/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else if (customListName === 'CM') {
@@ -4585,7 +4679,9 @@ app.get('/duty-handover/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('duty-handover-view', {
@@ -4610,7 +4706,9 @@ app.get('/duty-handover/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else if (customListName === 'RS') {
@@ -4638,7 +4736,9 @@ app.get('/duty-handover/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('duty-handover-view', {
@@ -4663,7 +4763,9 @@ app.get('/duty-handover/view/:customListName', async function (req, res) {
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       } else {
@@ -4719,7 +4821,9 @@ app
           endTime: '',
           //toast alert
           toastShow: '',
-          toastMsg: ''
+          toastMsg: '',
+          //role
+          role: checkUser.role
         });
       }
     } else {
@@ -4951,7 +5055,7 @@ app
       }
 
       // Insert fullName into each checkpoint with a blank value
-      const checkpointsWithFullName = confirmLocation.map(checkpoint => ({
+      confirmLocation.map(checkpoint => ({
         ...checkpoint,
         fullName: '' // Insert the fullName (may be blank)
       }));
@@ -5127,7 +5231,9 @@ app
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: 'show',
-            toastMsg: 'Submit report successful!'
+            toastMsg: 'Submit report successful!',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('duty-handover-view', {
@@ -5152,7 +5258,9 @@ app
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: 'show',
-            toastMsg: 'Submit report successful!'
+            toastMsg: 'Submit report successful!',
+            //role
+            role: checkUser.role
           });
         }
       } else {
@@ -5196,7 +5304,9 @@ app
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: 'show',
-            toastMsg: 'Got existing duty handover'
+            toastMsg: 'Got existing duty handover',
+            //role
+            role: checkUser.role
           });
         } else {
           res.render('duty-handover-view', {
@@ -5221,7 +5331,9 @@ app
             rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
             // toast alert
             toastShow: 'show',
-            toastMsg: 'Got existing duty handover'
+            toastMsg: 'Got existing duty handover',
+            //role
+            role: checkUser.role
           });
         }
       }
@@ -5256,7 +5368,9 @@ app
         //toast alert
         toastShow: 'show',
         toastMsg:
-          'There is an error at your input or staff on duty is empty, please do check it again'
+          'There is an error at your input or staff on duty is empty, please do check it again',
+        //role
+        role: checkUser.role
       });
     }
   });
@@ -5318,7 +5432,9 @@ app
             showTabPane3: 'active',
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         } else if (checkReport.status === 'Incompleted') {
           res.render('duty-handover-details', {
@@ -5363,7 +5479,9 @@ app
             showTabPane3: '',
             // toast alert
             toastShow: '',
-            toastMsg: ''
+            toastMsg: '',
+            //role
+            role: checkUser.role
           });
         }
       }
@@ -5588,7 +5706,9 @@ app
         // toast alert
         toastShow: 'show',
         toastMsg:
-          'There is an error, please do check your input form at received section'
+          'There is an error, please do check your input form at received section',
+        //role
+        role: checkUser.role
       });
     }
   });

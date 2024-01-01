@@ -1,5 +1,19 @@
 <%- include("partials/header") %> <%- include("partials/navbar") %>
 
+<%
+
+var addFiles = "";
+
+if(role === 'Admin'){
+    addFiles = "d-none";
+}else if(role === 'Head Shift'){
+    addFiles = "d-none";
+}else {
+    addFiles = "";
+}
+
+%>
+
 <div class="content px-0 pt-9">
   <div class="row g-0">
     <div class="col-12 col-xxl-10 px-0 bg-soft">
@@ -140,39 +154,6 @@
           </div>
         </div>
 
-        <div class="container mt-2">
-          <h2 class="mb-0">Checkpoint Entry Form</h2>
-
-          <form action="/patrol-unit/details/<%= patrolReport.reportId %>" method="post" class="row g-1">
-            <div class="form-group col-12 col-xxl-12">
-              <label for="checkpointName" class="form-label">Checkpoint Name:</label>
-              <input type="text" class="form-control" id="checkpointName" name="checkpointName" required>
-            </div>
-
-            <div class="form-group col-12 col-xxl-6">
-              <label for="latitude" class="form-label">Latitude:</label>
-              <input type="text" step="any" class="form-control" id="latitude" name="latitude" required>
-            </div>
-
-            <div class="form-group col-12 col-xxl-6">
-              <label for="longitude" class="form-label">Longitude:</label>
-              <input type="text" step="any" class="form-control" id="longitude" name="longitude" required>
-            </div>
-
-            <div class="form-group col-12">
-              <label for="time" class="form-label">Time:</label>
-              <input type="text" class="form-control" id="time" name="time" required>
-            </div>
-
-            <div class="form-group mb-3">
-              <label for="logReport" class="form-label">Log Report:</label>
-              <textarea class="form-control" id="logReport" name="logReport" rows="4" required></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Submit</button>
-          </form>
-        </div>
-
         <hr />
         <div class="mt-0">
           <div class="d-flex align-items-center mb-4">
@@ -274,7 +255,7 @@
             </div>
           </div>
           <% } %>
-          <div class="mt-1 mb-3">
+          <div class="mt-1 mb-3 <%= addFiles %>">
             <a role="button" class="btn btn-phoenix-primary bg-transparent border border-0 mx-2" id="addFiles" data-bs-toggle="modal" data-bs-target="#verticallyCentered">Add files +</a>
           </div>
         </div>
