@@ -11,3 +11,37 @@ https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/checkpoint-s
 https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/checkpoint-submit/baitul-makmur-i/level-4
 http://localhost:5001/shift-member/checkpoint-submit/baitul-makmur-i/level-8
 http://localhost:5001/shift-member/fullname-submit/baitul-makmur-i/level-8
+
+
+<div class="content">
+  <h2 class="mb-2 text-body-emphasis">Admin Dashboard</h2>
+  <h5 class="text-body-tertiary fw-semibold mb-4">Check your growth in one place</h5>
+  <div class="px-3 mb-5">
+    <div class="row justify-content-between">
+      <div class="col-6 col-md-4 col-xxl-2 text-center border-translucent border-start-xxl border-end-xxl-0 border-bottom-xxl-0 border-end border-bottom pb-4 pb-xxl-0 "><span class="uil fs-5 lh-1 uil-envelope text-primary"></span>
+        <h1 class="fs-5 pt-3">28,00</h1>
+        <p class="fs-9 mb-0">Total Emails</p>
+      </div>
+      <div class="col-6 col-md-4 col-xxl-2 text-center border-translucent border-start-xxl border-end-xxl-0 border-bottom-xxl-0 border-end-md border-bottom pb-4 pb-xxl-0"><span class="uil fs-5 lh-1 uil-envelope-upload text-info"></span>
+        <h1 class="fs-5 pt-3">1,866</h1>
+        <p class="fs-9 mb-0">Emails Sent</p>
+      </div>
+      <div class="col-6 col-md-4 col-xxl-2 text-center border-translucent border-start-xxl border-bottom-xxl-0 border-bottom border-end border-end-md-0 pb-4 pb-xxl-0 pt-4 pt-md-0"><span class="uil fs-5 lh-1 uil-envelopes text-primary"></span>
+        <h1 class="fs-5 pt-3">1,366</h1>
+        <p class="fs-9 mb-0">Emails Delivered</p>
+      </div>
+      <div class="col-6 col-md-4 col-xxl-2 text-center border-translucent border-start-xxl border-end-md border-end-xxl-0 border-bottom border-bottom-md-0 pb-4 pb-xxl-0 pt-4 pt-xxl-0"><span class="uil fs-5 lh-1 uil-envelope-open text-info"></span>
+        <h1 class="fs-5 pt-3">1,200</h1>
+        <p class="fs-9 mb-0">Emails Opened</p>
+      </div>
+      <div class="col-6 col-md-4 col-xxl-2 text-center border-translucent border-start-xxl border-end border-end-xxl-0 pb-md-4 pb-xxl-0 pt-4 pt-xxl-0"><span class="uil fs-5 lh-1 uil-envelope-check text-success"></span>
+        <h1 class="fs-5 pt-3">900</h1>
+        <p class="fs-9 mb-0">Emails Clicked</p>
+      </div>
+      <div class="col-6 col-md-4 col-xxl-2 text-center border-translucent border-start-xxl border-end-xxl pb-md-4 pb-xxl-0 pt-4 pt-xxl-0"><span class="uil fs-5 lh-1 uil-envelope-block text-danger"></span>
+        <h1 class="fs-5 pt-3">500</h1>
+        <p class="fs-9 mb-0">Emails Bounce</p>
+      </div>
+    </div>
+  </div>
+</div>
