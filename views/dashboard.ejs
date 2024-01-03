@@ -82,6 +82,91 @@
                       Example 3
                     </div>
                     <div class="card-body">
+                      <!-- Container for ECharts chart -->
+                      <div id="echartsContainer" style="height: 400px;"></div>
+
+                      <!-- Script to render the ECharts chart -->
+                      <script>
+                        // Render ECharts chart based on data
+                        function renderChart(data) {
+                          const weeks = data.map(item => item.weekNumber);
+                          const percentages = data.map(item => item.averagePercentage);
+
+                          // Initialize ECharts instance
+                          const myChart = echarts.init(document.getElementById('echartsContainer'));
+
+                          // ECharts configuration
+                          const option = {
+                            title: {
+                              text: 'Average Percentages by Week within the Month',
+                              subtext: 'Example Chart'
+                            },
+                            xAxis: {
+                              type: 'category',
+                              data: weeks
+                            },
+                            yAxis: {
+                              type: 'value',
+                              axisLabel: {
+                                formatter: '{value}%'
+                              }
+                            },
+                            series: [{
+                              data: percentages,
+                              type: 'bar',
+                              label: {
+                                show: true,
+                                formatter: '{c}%'
+                              }
+                            }]
+                          };
+
+                          // Set ECharts options and render chart
+                          myChart.setOption(option);
+                        }
+
+                        // Fetch data from the server
+                        fetch('/api/averagePercentagesByWeek')
+                          .then(response => response.json())
+                          .then(data => {
+                            // Call the renderChart function with the received data
+                            renderChart(data);
+                          })
+                          .catch(error => {
+                            console.error('Error fetching data:', error);
+                          });
+                      </script>
+                    </div>
+                  </div>
+                </div>
+                <!-- Add more cards as needed for each item in the carousel -->
+              </div>
+            </div>
+
+            <div class="carousel-item ">
+              <div class="row g-3 mb-5 justify-content-center">
+                <div class="col-12">
+                  <div class="card p-3 vh-50">
+                    <div class="card-title">
+                      Example 4
+                    </div>
+                    <div class="card-body">
+                      <!-- Content for Example 2 -->
+                    </div>
+                  </div>
+                </div>
+                <!-- Add more cards as needed for each item in the carousel -->
+              </div>
+            </div>
+
+            <div class="carousel-item ">
+              <div class="row g-3 mb-5 justify-content-center">
+                <div class="col-12">
+                  <div class="card p-3 vh-50">
+                    <div class="card-title">
+                      Example 5
+                    </div>
+                    <div class="card-body">
                       <!-- Content for Example 2 -->
                     </div>
                   </div>
@@ -96,6 +181,8 @@
             <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
             <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
             <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+            <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="4" aria-label="Slide 5"></button>
           </div>
         </div>
       </div>
@@ -103,9 +190,9 @@
 
     <div class="col-12 col-xxl-6">
       <h3>Duty Handover Status</h3>
-      <p class="text-700 fs-1">Example</p>
+      <p class="text-700 fs-1">Status from <%= oneWeekAgo %> until <%= currentDate %></p>
 
-      <div id="pieChart" style="height: 400px;"></div>
+      <div id="pieChart" style="height: 500px;"></div>
 
       <script>
         $(document).ready(async () => {
@@ -119,6 +206,12 @@
               'Incompleted': data.incompletedCount,
             };
 
+            // Set bright colors for each status
+            const statusColors = {
+              'Completed': '#FF6F61', // Salmon
+              'Incompleted': '#FFD700', // Dodger Blue
+            };
+
             // Create pie chart options
             const chart = echarts.init(document.getElementById('pieChart'));
             const options = {
@@ -130,23 +223,30 @@
                 orient: 'vertical',
                 left: 'left',
                 data: Object.keys(statusCounts),
+                textStyle: {
+                  color: '#3874ff', // Change this to the desired legend font color
+                },
               },
               series: [{
                 name: 'Status',
                 type: 'pie',
-                radius: '55%',
+                radius: '70%', // Increase the size by adjusting the radius
                 center: ['50%', '60%'],
                 data: Object.entries(statusCounts).map(([key, value]) => ({
                   name: key,
                   value,
-                })),
-                emphasis: {
                   itemStyle: {
-                    shadowBlur: 10,
-                    shadowOffsetX: 0,
-                    shadowColor: 'rgba(0, 0, 0, 0.5)',
+                    color: statusColors[key] || 'gray', // Set custom color or fallback to gray
                   },
-                },
+                  label: {
+                    show: false, // Hide labels
+                  },
+                  emphasis: {
+                    label: {
+                      show: false, // Hide labels on emphasis
+                    },
+                  },
+                })),
               }, ],
             };
 
