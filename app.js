@@ -627,21 +627,23 @@ app.get('/api/averagePercentagesByWeek/:location', async (req, res) => {
 app.get('/api/dashboard/shiftMember', async (req, res) => {
     try {
 
-        const oneMonthBefore = moment().subtract(1, 'months').toDate();
+        // Get the start of the current month in 'DD/MM/YY' format
+        const startOfMonth = moment().startOf('month').format('DD/MM/YY');
 
-        // Convert dates to the string format used in the database using moment
-        const oneMonthBeforeStr = moment(oneMonthBefore).format('DD/MM/YY');
+        // Get the current date in 'DD/MM/YY' format
+        const currentDate = moment().format('DD/MM/YY');
 
-        console.log('Query Date:', oneMonthBeforeStr);
+        // Log the formatted dates
+        console.log('Start of Month:', startOfMonth);
+        console.log('Current Date:', currentDate);
 
         const allReports = await PatrolReport.find({
-            type: "Shift Member Location",
+            type: 'Shift Member Location',
             date: {
-                $gte: oneMonthBeforeStr,
+                $gte: startOfMonth,
+                $lte: currentDate,
             },
         }).exec();
-
-        console.log(allReports);
 
         // Calculate the week number within the month for a given date
         function getWeekNumberWithinMonth(date) {
@@ -681,8 +683,10 @@ app.get('/api/dashboard/shiftMember', async (req, res) => {
                 });
             });
 
+            const correctFormat = moment(report.date, 'DD/MM/YY').toISOString();
+
             // Extract date from the report
-            const reportDate = new Date(report.date);
+            const reportDate = new Date(correctFormat);
 
             // Extract week number within the month from the date
             const weekNumber = getWeekNumberWithinMonth(reportDate);
@@ -728,112 +732,111 @@ app.get('/api/dashboard/shiftMember', async (req, res) => {
     }
 });
 
-// app.get('api/dashboard/patrolUnit', async (req, res) => {
-//     try {
-//         // Fetch patrol report data for the entire year
-//         const allReports = await PatrolReport.find({ type: "Patrol Unit" });
+app.get('/api/dashboard/patrolUnit', async (req, res) => {
+    try {
 
-//         console.log(allReports);
+        // Get the start of the current month in 'DD/MM/YY' format
+        const startOfMonth = moment().startOf('month').format('DD/MM/YY');
 
-//         // Calculate the date for one month before the current date
-//         const currentDate = new Date();
-//         const oneMonthBefore = new Date(currentDate);
-//         oneMonthBefore.setMonth(currentDate.getMonth() - 1);
+        // Get the current date in 'DD/MM/YY' format
+        const currentDate = moment().format('DD/MM/YY');
 
-//         // Filter data for the month before the current month
-//         const previousMonthData = allReports.filter(report => {
-//             const [day, month, year] = report.date.split('/').map(Number);
-//             const reportDate = new Date(`20${year}`, month - 1, day);
+        // Log the formatted dates
+        console.log('Start of Month:', startOfMonth);
+        console.log('Current Date:', currentDate);
 
-//             return (
-//                 reportDate.getMonth() === oneMonthBefore.getMonth() &&
-//                 reportDate.getFullYear() === oneMonthBefore.getFullYear()
-//             );
-//         });
+        const allReports = await PatrolReport.find({
+            type: 'Patrol Unit',
+            date: {
+                $gte: startOfMonth,
+                $lte: currentDate,
+            },
+        }).exec();
 
-//         // Function to get the week number within the month for a given date
-//         function getWeekNumberWithinMonth(date) {
-//             const dayOfMonth = date.getDate();
+        // Calculate the week number within the month for a given date
+        function getWeekNumberWithinMonth(date) {
+            const dayOfMonth = date.getDate();
 
-//             if (dayOfMonth >= 1 && dayOfMonth <= 7) {
-//                 return 1;
-//             } else if (dayOfMonth >= 8 && dayOfMonth <= 14) {
-//                 return 2;
-//             } else if (dayOfMonth >= 15 && dayOfMonth <= 21) {
-//                 return 3;
-//             } else {
-//                 return 4;
-//             }
-//         }
+            if (dayOfMonth >= 1 && dayOfMonth <= 7) {
+                return 1;
+            } else if (dayOfMonth >= 8 && dayOfMonth <= 14) {
+                return 2;
+            } else if (dayOfMonth >= 15 && dayOfMonth <= 21) {
+                return 3;
+            } else {
+                return 4;
+            }
+        }
 
-//         // Initialize variables to store total checkpoints and checkpoints with time
-//         let totalCheckpoints = 0;
-//         let checkpointsWithTime = 0;
+        // Initialize variables to store total checkpoints and checkpoints with time
+        let totalCheckpoints = 0;
+        let checkpointsWithTime = 0;
 
-//         // Create a map to store accumulated data for each week within the month
-//         const weekDataMap = new Map();
+        // Create a map to store accumulated data for each week within the month
+        const weekDataMap = new Map();
 
-//         // Iterate over the filtered reports
-//         previousMonthData.forEach(report => {
-//             // Increment total checkpoints
-//             report.patrolUnit.forEach(unit => {
-//                 totalCheckpoints++;
-//             });
+        // Iterate over the filtered reports
+        allReports.forEach(report => {
+            // Increment total checkpoints
+            report.patrolUnit.forEach(cycle => {
+                totalCheckpoints += cycle.checkpointName.length;
+            });
 
-//             // Increment checkpoints with time
-//             report.patrolUnit.forEach(unit => {
-//                 if (unit.time.trim() !== "") {
-//                     checkpointsWithTime++;
-//                 }
-//             });
+            // Increment checkpoints with time
+            report.patrolUnit.forEach(cycle => {
+                if (cycle.time.trim() !== "") {
+                    checkpointsWithTime++;
+                }
+            });
 
-//             // Extract date from the report
-//             const [day, month, year] = report.date.split('/').map(Number);
-//             const reportDate = new Date(`20${year}`, month - 1, day);
+            const correctFormat = moment(report.date, 'DD/MM/YY').toISOString();
 
-//             // Extract week number within the month from the date
-//             const weekNumber = getWeekNumberWithinMonth(reportDate);
+            // Extract date from the report
+            const reportDate = new Date(correctFormat);
 
-//             // Calculate the percentage for the report
-//             const reportTotalCheckpoints = totalCheckpoints;
-//             const reportCheckpointsWithTime = checkpointsWithTime;
-//             const percentage = (reportCheckpointsWithTime / reportTotalCheckpoints) * 100 || 0;
+            // Extract week number within the month from the date
+            const weekNumber = getWeekNumberWithinMonth(reportDate);
 
-//             // Accumulate data for each week within the month
-//             if (weekDataMap.has(weekNumber)) {
-//                 const weekData = weekDataMap.get(weekNumber);
-//                 weekData.totalPercentage += percentage;
-//                 weekData.reportCount++;
-//             } else {
-//                 weekDataMap.set(weekNumber, { totalPercentage: percentage, reportCount: 1 });
-//             }
+            // Calculate the percentage for the report
+            const reportTotalCheckpoints = totalCheckpoints;
+            const reportCheckpointsWithTime = checkpointsWithTime;
+            const percentage = (reportCheckpointsWithTime / reportTotalCheckpoints) * 100 || 0;
 
-//             // Reset variables for the next report
-//             totalCheckpoints = 0;
-//             checkpointsWithTime = 0;
-//         });
+            // Accumulate data for each week within the month
+            if (weekDataMap.has(weekNumber)) {
+                const weekData = weekDataMap.get(weekNumber);
+                weekData.totalPercentage += percentage;
+                weekData.reportCount++;
+            } else {
+                weekDataMap.set(weekNumber, { totalPercentage: percentage, reportCount: 1 });
+            }
 
-//         // Calculate average percentage for each week within the month
-//         const averagePercentagesByWeek = [];
-//         for (let weekNumber = 1; weekNumber <= 4; weekNumber++) {
-//             if (weekDataMap.has(weekNumber)) {
-//                 const weekData = weekDataMap.get(weekNumber);
-//                 const averagePercentage = weekData.totalPercentage / weekData.reportCount;
-//                 averagePercentagesByWeek.push({ weekNumber, averagePercentage });
-//             } else {
-//                 // If no reports for a specific week, push zero percentage
-//                 averagePercentagesByWeek.push({ weekNumber, averagePercentage: 0 });
-//             }
-//         }
+            // Reset variables for the next report
+            totalCheckpoints = 0;
+            checkpointsWithTime = 0;
+        });
 
-//         // Log or use the calculated average percentages as needed
-//         console.log("Average Percentages by Week within the Month for Patrol Unit:", averagePercentagesByWeek);
+        // Calculate average percentage for each week within the month
+        const averagePercentagesByWeek = [];
+        for (let weekNumber = 1; weekNumber <= 4; weekNumber++) {
+            if (weekDataMap.has(weekNumber)) {
+                const weekData = weekDataMap.get(weekNumber);
+                const averagePercentage = weekData.totalPercentage / weekData.reportCount;
+                averagePercentagesByWeek.push({ weekNumber, averagePercentage });
+            } else {
+                // If no reports for a specific week, push zero percentage
+                averagePercentagesByWeek.push({ weekNumber, averagePercentage: 0 });
+            }
+        }
 
-//         res.json(averagePercentagesByWeek);
-//     } catch (error) {
-//         res.status(500).json({ error: 'Internal Server Error' });
-//     }
-// });
+        // Log or use the calculated average percentages as needed
+        console.log("Average Percentages by Week within the Month:", averagePercentagesByWeek);
+
+        res.json(averagePercentagesByWeek);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 // DUTY HANDOVER
 
@@ -845,18 +848,10 @@ app.get('/api/dutyHandovers', async (req, res) => {
         // Calculate one week ago
         const oneWeekAgo = moment().subtract(7, 'days').format('DD/MM/YY');
 
-        // Log the formatted dates
-        console.log("Current Date:", currentDate);
-        console.log("One Week Ago:", oneWeekAgo);
-
         // Use these formatted dates in your MongoDB query
         const dutyHandovers = await DutyHandover.find({
-            date: {
-                $gte: currentDate
-            }
+            date: currentDate
         });
-
-        console.log(dutyHandovers);
 
         const completedCount = dutyHandovers.filter(
             item => item.status === 'Completed'
@@ -865,9 +860,6 @@ app.get('/api/dutyHandovers', async (req, res) => {
         const incompletedCount = dutyHandovers.filter(
             item => item.status === 'Incompleted'
         ).length;
-
-        console.log("Completed Count:", completedCount);
-        console.log("Incompleted Count:", incompletedCount);
 
         res.json({ completedCount, incompletedCount });
     } catch (error) {
@@ -2226,32 +2218,58 @@ app.post('/upload-case', async (req, res) => {
 app.get('/case-report/view', async function (req, res) {
     if (req.isAuthenticated()) {
         var currentUsername = req.session.user.username;
-
         const checkUser = await User.findOne({ username: currentUsername });
 
+        var itemReports = "";
+        var itemBMI = "";
+        var itemBMII = "";
+        var itemJM = "";
+        var itemCM = "";
+        var itemRS = "";
+
         if (checkUser) {
-            const itemReports = await CaseReport.find({
-                username: checkUser.username
-            }).sort({ date: -1 });
-            const itemBMI = await CaseReport.find({
-                location: 'Baitul Makmur I',
-                username: checkUser.username
-            }).sort({ date: -1 });
-            const itemBMII = await CaseReport.find({
-                location: 'Baitul Makmur II'
-            }).sort({ date: -1 });
-            const itemJM = await CaseReport.find({
-                location: 'Jamek Mosque',
-                username: checkUser.username
-            }).sort({ date: -1 });
-            const itemCM = await CaseReport.find({
-                location: 'City Mosque',
-                username: checkUser.username
-            }).sort({ date: -1 });
-            const itemRS = await CaseReport.find({
-                location: 'Raudhatul Sakinah',
-                username: checkUser.username
-            }).sort({ date: -1 });
+            if (checkUser.role === "Admin") {
+                itemReports = await CaseReport.find({
+                }).sort({ date: -1 });
+                itemBMI = await CaseReport.find({
+                    location: 'Baitul Makmur I'
+                }).sort({ date: -1 });
+                itemBMII = await CaseReport.find({
+                    location: 'Baitul Makmur II'
+                }).sort({ date: -1 });
+                itemJM = await CaseReport.find({
+                    location: 'Jamek Mosque'
+                }).sort({ date: -1 });
+                itemCM = await CaseReport.find({
+                    location: 'City Mosque'
+                }).sort({ date: -1 });
+                itemRS = await CaseReport.find({
+                    location: 'Raudhatul Sakinah'
+                }).sort({ date: -1 });
+            } else {
+                itemReports = await CaseReport.find({
+                    username: checkUser.username
+                }).sort({ date: -1 });
+                itemBMI = await CaseReport.find({
+                    location: 'Baitul Makmur I',
+                    username: checkUser.username
+                }).sort({ date: -1 });
+                itemBMII = await CaseReport.find({
+                    location: 'Baitul Makmur II'
+                }).sort({ date: -1 });
+                itemJM = await CaseReport.find({
+                    location: 'Jamek Mosque',
+                    username: checkUser.username
+                }).sort({ date: -1 });
+                itemCM = await CaseReport.find({
+                    location: 'City Mosque',
+                    username: checkUser.username
+                }).sort({ date: -1 });
+                itemRS = await CaseReport.find({
+                    location: 'Raudhatul Sakinah',
+                    username: checkUser.username
+                }).sort({ date: -1 });
+            }
 
             if (itemReports.length > 0) {
                 res.render('case-report-view', {
@@ -2321,31 +2339,51 @@ app.get('/case-report/view/:customListName', async function (req, res) {
         const checkUser = await User.findOne({ username: currentUsername });
 
         const customListName = _.upperCase(req.params.customListName);
+        var itemReports = "";
 
         if (checkUser) {
-            const itemReports = await CaseReport.find({
-                username: checkUser.username
-            });
-            const itemBMI = await CaseReport.find({
-                location: 'Baitul Makmur I',
-                username: checkUser.username
-            });
-            const itemBMII = await CaseReport.find({
-                location: 'Baitul Makmur II',
-                username: checkUser.username
-            });
-            const itemJM = await CaseReport.find({
-                location: 'Jamek Mosque',
-                username: checkUser.username
-            });
-            const itemCM = await CaseReport.find({
-                location: 'City Mosque',
-                username: checkUser.username
-            });
-            const itemRS = await CaseReport.find({
-                location: 'Raudhatul Sakinah',
-                username: checkUser.username
-            });
+            if (checkUser.role === "Admin") {
+                itemReports = await CaseReport.find({
+                }).sort({ date: -1 });
+                itemBMI = await CaseReport.find({
+                    location: 'Baitul Makmur I'
+                }).sort({ date: -1 });
+                itemBMII = await CaseReport.find({
+                    location: 'Baitul Makmur II'
+                }).sort({ date: -1 });
+                itemJM = await CaseReport.find({
+                    location: 'Jamek Mosque'
+                }).sort({ date: -1 });
+                itemCM = await CaseReport.find({
+                    location: 'City Mosque'
+                }).sort({ date: -1 });
+                itemRS = await CaseReport.find({
+                    location: 'Raudhatul Sakinah'
+                }).sort({ date: -1 });
+            } else {
+                itemReports = await CaseReport.find({
+                    username: checkUser.username
+                }).sort({ date: -1 });
+                itemBMI = await CaseReport.find({
+                    location: 'Baitul Makmur I',
+                    username: checkUser.username
+                }).sort({ date: -1 });
+                itemBMII = await CaseReport.find({
+                    location: 'Baitul Makmur II'
+                }).sort({ date: -1 });
+                itemJM = await CaseReport.find({
+                    location: 'Jamek Mosque',
+                    username: checkUser.username
+                }).sort({ date: -1 });
+                itemCM = await CaseReport.find({
+                    location: 'City Mosque',
+                    username: checkUser.username
+                }).sort({ date: -1 });
+                itemRS = await CaseReport.find({
+                    location: 'Raudhatul Sakinah',
+                    username: checkUser.username
+                }).sort({ date: -1 });
+            }
 
             // check customlistname
             if (customListName === 'BMI') {
@@ -2373,7 +2411,9 @@ app.get('/case-report/view/:customListName', async function (req, res) {
                         rid: crypto.randomBytes(6).toString('hex').toUpperCase(),
                         // toast alert
                         toastShow: '',
-                        toastMsg: ''
+                        toastMsg: '',
+                        //role
+                        role: checkUser.role
                     });
                 } else {
                     res.render('case-report-view', {
