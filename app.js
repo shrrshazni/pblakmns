@@ -464,6 +464,27 @@ app.get('/dashboard', async function (req, res) {
             status: 'Completed'
         });
 
+        const currentDate1 = new Date();
+
+        // Get the current month and year
+        const currentMonth = currentDate1.getMonth(); // Months are zero-based
+        const currentYear = currentDate1.getFullYear();
+
+        // Calculate the previous month
+        const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+        const previousYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+        // Array of month names
+        const monthNames = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+
+        // Format the previous month as a string
+        const formattedPreviousMonth = `${monthNames[previousMonth]} ${previousYear}`;
+
+        console.log(formattedPreviousMonth);
+
         const currentDate = dateLocal.getDate();
 
         if (checkUser) {
@@ -481,7 +502,8 @@ app.get('/dashboard', async function (req, res) {
                 patrolUnit: patrolUnit,
                 caseReport: caseReport,
                 oneWeekAgo: oneWeekAgo,
-                currentDate: currentDate
+                currentDate: currentDate,
+                previousMonth: formattedPreviousMonth
             });
         }
     } else {
@@ -489,14 +511,17 @@ app.get('/dashboard', async function (req, res) {
     }
 });
 
-// FETCH DATA
+// FETCH DATA FOR CHARTS
 
 // LOCATION
 
-app.get('/api/averagePercentagesByWeek', async (req, res) => {
+app.get('/api/averagePercentagesByWeek/:location', async (req, res) => {
     try {
+        const string = req.params.location;
+        const location = _.startCase(string);
+
         // Fetch patrol report data for the entire year
-        const allReports = await PatrolReport.find({ type: "Shift Member Location" });
+        const allReports = await PatrolReport.find({ type: "Shift Member Location", location: location });
 
         // Calculate the date for the month before the current month
         const currentDate = new Date();
@@ -591,6 +616,109 @@ app.get('/api/averagePercentagesByWeek', async (req, res) => {
             }
         }
 
+        res.json(averagePercentagesByWeek);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// SHIFT MEMBER
+
+app.get('/api/dashboard/shiftMember', async (req, res) => {
+    try {
+
+        const oneMonthBefore = moment().subtract(1, 'months').toDate();
+
+        // Convert dates to the string format used in the database using moment
+        const oneMonthBeforeStr = moment(oneMonthBefore).format('DD/MM/YY');
+
+        console.log('Query Date:', oneMonthBeforeStr);
+
+        const allReports = await PatrolReport.find({
+            type: "Shift Member Location",
+            date: {
+                $gte: oneMonthBeforeStr,
+            },
+        }).exec();
+
+        console.log(allReports);
+
+        // Calculate the week number within the month for a given date
+        function getWeekNumberWithinMonth(date) {
+            const dayOfMonth = date.getDate();
+
+            if (dayOfMonth >= 1 && dayOfMonth <= 7) {
+                return 1;
+            } else if (dayOfMonth >= 8 && dayOfMonth <= 14) {
+                return 2;
+            } else if (dayOfMonth >= 15 && dayOfMonth <= 21) {
+                return 3;
+            } else {
+                return 4;
+            }
+        }
+
+        // Initialize variables to store total checkpoints and checkpoints with time
+        let totalCheckpoints = 0;
+        let checkpointsWithTime = 0;
+
+        // Create a map to store accumulated data for each week within the month
+        const weekDataMap = new Map();
+
+        // Iterate over the filtered reports
+        allReports.forEach(report => {
+            // Increment total checkpoints
+            report.shiftMember.cycle.forEach(cycle => {
+                totalCheckpoints += cycle.checkpoint.length;
+            });
+
+            // Increment checkpoints with time
+            report.shiftMember.cycle.forEach(cycle => {
+                cycle.checkpoint.forEach(checkpoint => {
+                    if (checkpoint.time.trim() !== "") {
+                        checkpointsWithTime++;
+                    }
+                });
+            });
+
+            // Extract date from the report
+            const reportDate = new Date(report.date);
+
+            // Extract week number within the month from the date
+            const weekNumber = getWeekNumberWithinMonth(reportDate);
+
+            // Calculate the percentage for the report
+            const reportTotalCheckpoints = totalCheckpoints;
+            const reportCheckpointsWithTime = checkpointsWithTime;
+            const percentage = (reportCheckpointsWithTime / reportTotalCheckpoints) * 100 || 0;
+
+            // Accumulate data for each week within the month
+            if (weekDataMap.has(weekNumber)) {
+                const weekData = weekDataMap.get(weekNumber);
+                weekData.totalPercentage += percentage;
+                weekData.reportCount++;
+            } else {
+                weekDataMap.set(weekNumber, { totalPercentage: percentage, reportCount: 1 });
+            }
+
+            // Reset variables for the next report
+            totalCheckpoints = 0;
+            checkpointsWithTime = 0;
+        });
+
+        // Calculate average percentage for each week within the month
+        const averagePercentagesByWeek = [];
+        for (let weekNumber = 1; weekNumber <= 4; weekNumber++) {
+            if (weekDataMap.has(weekNumber)) {
+                const weekData = weekDataMap.get(weekNumber);
+                const averagePercentage = weekData.totalPercentage / weekData.reportCount;
+                averagePercentagesByWeek.push({ weekNumber, averagePercentage });
+            } else {
+                // If no reports for a specific week, push zero percentage
+                averagePercentagesByWeek.push({ weekNumber, averagePercentage: 0 });
+            }
+        }
+
         // Log or use the calculated average percentages as needed
         console.log("Average Percentages by Week within the Month:", averagePercentagesByWeek);
 
@@ -600,22 +728,146 @@ app.get('/api/averagePercentagesByWeek', async (req, res) => {
     }
 });
 
+// app.get('api/dashboard/patrolUnit', async (req, res) => {
+//     try {
+//         // Fetch patrol report data for the entire year
+//         const allReports = await PatrolReport.find({ type: "Patrol Unit" });
+
+//         console.log(allReports);
+
+//         // Calculate the date for one month before the current date
+//         const currentDate = new Date();
+//         const oneMonthBefore = new Date(currentDate);
+//         oneMonthBefore.setMonth(currentDate.getMonth() - 1);
+
+//         // Filter data for the month before the current month
+//         const previousMonthData = allReports.filter(report => {
+//             const [day, month, year] = report.date.split('/').map(Number);
+//             const reportDate = new Date(`20${year}`, month - 1, day);
+
+//             return (
+//                 reportDate.getMonth() === oneMonthBefore.getMonth() &&
+//                 reportDate.getFullYear() === oneMonthBefore.getFullYear()
+//             );
+//         });
+
+//         // Function to get the week number within the month for a given date
+//         function getWeekNumberWithinMonth(date) {
+//             const dayOfMonth = date.getDate();
+
+//             if (dayOfMonth >= 1 && dayOfMonth <= 7) {
+//                 return 1;
+//             } else if (dayOfMonth >= 8 && dayOfMonth <= 14) {
+//                 return 2;
+//             } else if (dayOfMonth >= 15 && dayOfMonth <= 21) {
+//                 return 3;
+//             } else {
+//                 return 4;
+//             }
+//         }
+
+//         // Initialize variables to store total checkpoints and checkpoints with time
+//         let totalCheckpoints = 0;
+//         let checkpointsWithTime = 0;
+
+//         // Create a map to store accumulated data for each week within the month
+//         const weekDataMap = new Map();
+
+//         // Iterate over the filtered reports
+//         previousMonthData.forEach(report => {
+//             // Increment total checkpoints
+//             report.patrolUnit.forEach(unit => {
+//                 totalCheckpoints++;
+//             });
+
+//             // Increment checkpoints with time
+//             report.patrolUnit.forEach(unit => {
+//                 if (unit.time.trim() !== "") {
+//                     checkpointsWithTime++;
+//                 }
+//             });
+
+//             // Extract date from the report
+//             const [day, month, year] = report.date.split('/').map(Number);
+//             const reportDate = new Date(`20${year}`, month - 1, day);
+
+//             // Extract week number within the month from the date
+//             const weekNumber = getWeekNumberWithinMonth(reportDate);
+
+//             // Calculate the percentage for the report
+//             const reportTotalCheckpoints = totalCheckpoints;
+//             const reportCheckpointsWithTime = checkpointsWithTime;
+//             const percentage = (reportCheckpointsWithTime / reportTotalCheckpoints) * 100 || 0;
+
+//             // Accumulate data for each week within the month
+//             if (weekDataMap.has(weekNumber)) {
+//                 const weekData = weekDataMap.get(weekNumber);
+//                 weekData.totalPercentage += percentage;
+//                 weekData.reportCount++;
+//             } else {
+//                 weekDataMap.set(weekNumber, { totalPercentage: percentage, reportCount: 1 });
+//             }
+
+//             // Reset variables for the next report
+//             totalCheckpoints = 0;
+//             checkpointsWithTime = 0;
+//         });
+
+//         // Calculate average percentage for each week within the month
+//         const averagePercentagesByWeek = [];
+//         for (let weekNumber = 1; weekNumber <= 4; weekNumber++) {
+//             if (weekDataMap.has(weekNumber)) {
+//                 const weekData = weekDataMap.get(weekNumber);
+//                 const averagePercentage = weekData.totalPercentage / weekData.reportCount;
+//                 averagePercentagesByWeek.push({ weekNumber, averagePercentage });
+//             } else {
+//                 // If no reports for a specific week, push zero percentage
+//                 averagePercentagesByWeek.push({ weekNumber, averagePercentage: 0 });
+//             }
+//         }
+
+//         // Log or use the calculated average percentages as needed
+//         console.log("Average Percentages by Week within the Month for Patrol Unit:", averagePercentagesByWeek);
+
+//         res.json(averagePercentagesByWeek);
+//     } catch (error) {
+//         res.status(500).json({ error: 'Internal Server Error' });
+//     }
+// });
+
 // DUTY HANDOVER
 
 app.get('/api/dutyHandovers', async (req, res) => {
     try {
         // Inside the route handler
+        const currentDate = moment().format('DD/MM/YY');
+
+        // Calculate one week ago
         const oneWeekAgo = moment().subtract(7, 'days').format('DD/MM/YY');
+
+        // Log the formatted dates
+        console.log("Current Date:", currentDate);
+        console.log("One Week Ago:", oneWeekAgo);
+
+        // Use these formatted dates in your MongoDB query
         const dutyHandovers = await DutyHandover.find({
-            date: { $gte: oneWeekAgo }
+            date: {
+                $gte: currentDate
+            }
         });
+
+        console.log(dutyHandovers);
 
         const completedCount = dutyHandovers.filter(
             item => item.status === 'Completed'
         ).length;
+
         const incompletedCount = dutyHandovers.filter(
             item => item.status === 'Incompleted'
         ).length;
+
+        console.log("Completed Count:", completedCount);
+        console.log("Incompleted Count:", incompletedCount);
 
         res.json({ completedCount, incompletedCount });
     } catch (error) {
@@ -5174,8 +5426,8 @@ app
                     { checkpointName: 'Basement 2', time: '', logReport: '' },
                     { checkpointName: 'Basement 3', time: '', logReport: '' },
                     { checkpointName: 'Basement 4', time: '', logReport: '' },
-                    { checkpointName: 'Club House (G)', time: '', logReport: '' },
-                    { checkpointName: 'Old Cafe (G)', time: '', logReport: '' },
+                    { checkpointName: 'Club House (g)', time: '', logReport: '' },
+                    { checkpointName: 'Old Cafe (g)', time: '', logReport: '' },
                     { checkpointName: 'Level 4', time: '', logReport: '' },
                     { checkpointName: 'Level 8', time: '', logReport: '' }
                 ],

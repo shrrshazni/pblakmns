@@ -39,102 +39,172 @@
   <div class="row g-0 mb-5">
     <div class="col-12 col-xxl-6">
       <div class="container">
-        <div id="myCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+        <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 
           <div class="carousel-inner">
             <div class="carousel-item active">
               <div class="row g-3 mb-5 justify-content-center">
                 <div class="col-12">
-                  <div class="card p-3 vh-50">
+                  <div class="card p-4 vh-50">
                     <div class="card-title">
-                      Example 1
-                    </div>
-                    <div class="card-body">
-                      <!-- Content for Example 2 -->
-                    </div>
-                  </div>
-                </div>
-                <!-- Add more cards as needed for each item in the carousel -->
-              </div>
-            </div>
-
-            <div class="carousel-item ">
-              <div class="row g-3 mb-5 justify-content-center">
-                <div class="col-12">
-                  <div class="card p-3 vh-50">
-                    <div class="card-title">
-                      Example 2
-                    </div>
-                    <div class="card-body">
-                      <!-- Content for Example 2 -->
-                    </div>
-                  </div>
-                </div>
-                <!-- Add more cards as needed for each item in the carousel -->
-              </div>
-            </div>
-
-            <div class="carousel-item ">
-              <div class="row g-3 mb-5 justify-content-center">
-                <div class="col-12">
-                  <div class="card p-3 vh-50">
-                    <div class="card-title">
-                      Example 3
+                      <h3>Baitul Makmur I Patrol Activity <span class="text-700 fs-1">(<%= previousMonth %>)</span></h3>
                     </div>
                     <div class="card-body">
                       <!-- Container for ECharts chart -->
-                      <div id="echartsContainer" style="height: 400px;"></div>
+                      <div id="chartLocation1" style="width: 40vw; height: 40vh;"></div>
 
                       <!-- Script to render the ECharts chart -->
                       <script>
-                        // Render ECharts chart based on data
-                        function renderChart(data) {
-                          const weeks = data.map(item => item.weekNumber);
-                          const percentages = data.map(item => item.averagePercentage);
+                        $(document).ready(async () => {
+                          try {
+                            const response = await $.getJSON('/api/averagePercentagesByWeek/baitul-makmur-i');
+                            const data = response;
 
-                          // Initialize ECharts instance
-                          const myChart = echarts.init(document.getElementById('echartsContainer'));
+                            // Use ECharts to render the chart
+                            const chart = echarts.init(document.getElementById('chartLocation1'));
+                            const weekNumbers = data.map(entry => entry.weekNumber);
+                            const averagePercentages = data.map(entry => entry.averagePercentage);
 
-                          // ECharts configuration
-                          const option = {
-                            title: {
-                              text: 'Average Percentages by Week within the Month',
-                              subtext: 'Example Chart'
-                            },
-                            xAxis: {
-                              type: 'category',
-                              data: weeks
-                            },
-                            yAxis: {
-                              type: 'value',
-                              axisLabel: {
-                                formatter: '{value}%'
-                              }
-                            },
-                            series: [{
-                              data: percentages,
-                              type: 'bar',
-                              label: {
-                                show: true,
-                                formatter: '{c}%'
-                              }
-                            }]
-                          };
+                            // Define an array of colors for each bar
+                            const barColors = ['#FF5733', '#33FF57', '#5733FF', '#FF33A1'];
 
-                          // Set ECharts options and render chart
-                          myChart.setOption(option);
-                        }
+                            const option = {
+                              xAxis: {
+                                type: 'category',
+                                data: weekNumbers,
+                                name: 'Week',
+                              },
+                              yAxis: {
+                                type: 'value',
+                                name: 'Average Percentage',
+                                axisLabel: {
+                                  interval: 0,
+                                  rotate: 0, // Rotate yAxis labels if needed
+                                  formatter: '{value}%', // Display yAxis labels in percentage format
+                                },
+                                axisLine: {
+                                  show: false, // Hide yAxis line
+                                },
+                                splitLine: {
+                                  show: false, // Hide grid lines for yAxis
+                                },
+                              },
+                              series: [{
+                                data: averagePercentages,
+                                type: 'bar',
+                                name: 'Average Percentage',
+                                itemStyle: {
+                                  color: (params) => barColors[params.dataIndex % barColors.length], // Set bar colors
+                                },
+                                label: {
+                                  show: true,
+                                  position: 'inside', // Display percentage labels inside the bars
+                                  formatter: (params) => params.value.toFixed(1) + '%', // Format label as rounded-off percentage
+                                  textStyle: {
+                                    color: 'white', // Set font color for the labels
+                                  },
+                                },
+                              }],
+                              legend: {
+                                data: ['Average Percentage'],
+                                align: 'left', // Align the legend to the left
+                                textStyle: {
+                                  color: 'white', // Change the font color of the legend
+                                },
+                                show: false,
+                              },
+                            };
 
-                        // Fetch data from the server
-                        fetch('/api/averagePercentagesByWeek')
-                          .then(response => response.json())
-                          .then(data => {
-                            // Call the renderChart function with the received data
-                            renderChart(data);
-                          })
-                          .catch(error => {
+                            chart.setOption(option);
+                          } catch (error) {
                             console.error('Error fetching data:', error);
-                          });
+                          }
+                        });
+                      </script>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="carousel-item ">
+              <div class="row g-3 mb-5 justify-content-center">
+                <div class="col-12">
+                  <div class="card p-4 vh-50">
+                    <div class="card-title">
+                      <h3>Baitul Makmur II Patrol Activity <span class="text-700 fs-1">(<%= previousMonth %>)</span></h3>
+                    </div>
+                    <div class="card-body">
+                      <!-- Container for ECharts chart -->
+                      <div id="chartLocation2" style="width: 40vw; height: 40vh;"></div>
+
+                      <!-- Script to render the ECharts chart -->
+                      <script>
+                        $(document).ready(async () => {
+                          try {
+                            const response = await $.getJSON('/api/averagePercentagesByWeek/baitul-makmur-II');
+                            const data = response;
+
+                            // Use ECharts to render the chart
+                            const chart = echarts.init(document.getElementById('chartLocation2'));
+                            const weekNumbers = data.map(entry => entry.weekNumber);
+                            const averagePercentages = data.map(entry => entry.averagePercentage);
+
+                            // Define an array of colors for each bar
+                            const barColors = ['#FF5733', '#33FF57', '#5733FF', '#FF33A1'];
+
+                            const option = {
+                              xAxis: {
+                                type: 'category',
+                                data: weekNumbers,
+                                name: 'Week',
+                              },
+                              yAxis: {
+                                type: 'value',
+                                name: 'Average Percentage',
+                                axisLabel: {
+                                  interval: 0,
+                                  rotate: 0, // Rotate yAxis labels if needed
+                                  formatter: '{value}%', // Display yAxis labels in percentage format
+                                },
+                                axisLine: {
+                                  show: false, // Hide yAxis line
+                                },
+                                splitLine: {
+                                  show: false, // Hide grid lines for yAxis
+                                },
+                              },
+                              series: [{
+                                data: averagePercentages,
+                                type: 'bar',
+                                name: 'Average Percentage',
+                                itemStyle: {
+                                  color: (params) => barColors[params.dataIndex % barColors.length], // Set bar colors
+                                },
+                                label: {
+                                  show: true,
+                                  position: 'inside', // Display percentage labels inside the bars
+                                  formatter: (params) => params.value.toFixed(1) + '%', // Format label as rounded-off percentage
+                                  textStyle: {
+                                    color: 'white', // Set font color for the labels
+                                  },
+                                },
+                              }],
+                              legend: {
+                                data: ['Average Percentage'],
+                                align: 'left', // Align the legend to the left
+                                textStyle: {
+                                  color: 'white', // Change the font color of the legend
+                                },
+                                show: false,
+                              },
+                            };
+
+                            chart.setOption(option);
+                          } catch (error) {
+                            console.error('Error fetching data:', error);
+                          }
+                        });
                       </script>
                     </div>
                   </div>
@@ -146,12 +216,82 @@
             <div class="carousel-item ">
               <div class="row g-3 mb-5 justify-content-center">
                 <div class="col-12">
-                  <div class="card p-3 vh-50">
+                  <div class="card p-4 vh-50">
                     <div class="card-title">
-                      Example 4
+                      <h3>Jamek Mosque Patrol Activity <span class="text-700 fs-1">(<%= previousMonth %>)</span></h3>
                     </div>
                     <div class="card-body">
-                      <!-- Content for Example 2 -->
+                      <!-- Container for ECharts chart -->
+                      <div id="chartLocation3" style="width: 40vw; height: 40vh;"></div>
+
+                      <!-- Script to render the ECharts chart -->
+                      <script>
+                        $(document).ready(async () => {
+                          try {
+                            const response = await $.getJSON('/api/averagePercentagesByWeek/jamek-mosque');
+                            const data = response;
+
+                            // Use ECharts to render the chart
+                            const chart = echarts.init(document.getElementById('chartLocation3'));
+                            const weekNumbers = data.map(entry => entry.weekNumber);
+                            const averagePercentages = data.map(entry => entry.averagePercentage);
+
+                            // Define an array of colors for each bar
+                            const barColors = ['#FF5733', '#33FF57', '#5733FF', '#FF33A1'];
+
+                            const option = {
+                              xAxis: {
+                                type: 'category',
+                                data: weekNumbers,
+                                name: 'Week',
+                              },
+                              yAxis: {
+                                type: 'value',
+                                name: 'Average Percentage',
+                                axisLabel: {
+                                  interval: 0,
+                                  rotate: 0, // Rotate yAxis labels if needed
+                                  formatter: '{value}%', // Display yAxis labels in percentage format
+                                },
+                                axisLine: {
+                                  show: false, // Hide yAxis line
+                                },
+                                splitLine: {
+                                  show: false, // Hide grid lines for yAxis
+                                },
+                              },
+                              series: [{
+                                data: averagePercentages,
+                                type: 'bar',
+                                name: 'Average Percentage',
+                                itemStyle: {
+                                  color: (params) => barColors[params.dataIndex % barColors.length], // Set bar colors
+                                },
+                                label: {
+                                  show: true,
+                                  position: 'inside', // Display percentage labels inside the bars
+                                  formatter: (params) => params.value.toFixed(1) + '%', // Format label as rounded-off percentage
+                                  textStyle: {
+                                    color: 'white', // Set font color for the labels
+                                  },
+                                },
+                              }],
+                              legend: {
+                                data: ['Average Percentage'],
+                                align: 'left', // Align the legend to the left
+                                textStyle: {
+                                  color: 'white', // Change the font color of the legend
+                                },
+                                show: false,
+                              },
+                            };
+
+                            chart.setOption(option);
+                          } catch (error) {
+                            console.error('Error fetching data:', error);
+                          }
+                        });
+                      </script>
                     </div>
                   </div>
                 </div>
@@ -162,12 +302,168 @@
             <div class="carousel-item ">
               <div class="row g-3 mb-5 justify-content-center">
                 <div class="col-12">
-                  <div class="card p-3 vh-50">
+                  <div class="card p-4 vh-50">
                     <div class="card-title">
-                      Example 5
+                      <h3>City Mosque Patrol Activity <span class="text-700 fs-1">(<%= previousMonth %>)</span></h3>
                     </div>
                     <div class="card-body">
-                      <!-- Content for Example 2 -->
+                      <!-- Container for ECharts chart -->
+                      <div id="chartLocation4" style="width: 40vw; height: 40vh;"></div>
+
+                      <!-- Script to render the ECharts chart -->
+                      <script>
+                        $(document).ready(async () => {
+                          try {
+                            const response = await $.getJSON('/api/averagePercentagesByWeek/city-mosque');
+                            const data = response;
+
+                            // Use ECharts to render the chart
+                            const chart = echarts.init(document.getElementById('chartLocation4'));
+                            const weekNumbers = data.map(entry => entry.weekNumber);
+                            const averagePercentages = data.map(entry => entry.averagePercentage);
+
+                            // Define an array of colors for each bar
+                            const barColors = ['#FF5733', '#33FF57', '#5733FF', '#FF33A1'];
+
+                            const option = {
+                              xAxis: {
+                                type: 'category',
+                                data: weekNumbers,
+                                name: 'Week',
+                              },
+                              yAxis: {
+                                type: 'value',
+                                name: 'Average Percentage',
+                                axisLabel: {
+                                  interval: 0,
+                                  rotate: 0, // Rotate yAxis labels if needed
+                                  formatter: '{value}%', // Display yAxis labels in percentage format
+                                },
+                                axisLine: {
+                                  show: false, // Hide yAxis line
+                                },
+                                splitLine: {
+                                  show: false, // Hide grid lines for yAxis
+                                },
+                              },
+                              series: [{
+                                data: averagePercentages,
+                                type: 'bar',
+                                name: 'Average Percentage',
+                                itemStyle: {
+                                  color: (params) => barColors[params.dataIndex % barColors.length], // Set bar colors
+                                },
+                                label: {
+                                  show: true,
+                                  position: 'inside', // Display percentage labels inside the bars
+                                  formatter: (params) => params.value.toFixed(1) + '%', // Format label as rounded-off percentage
+                                  textStyle: {
+                                    color: 'white', // Set font color for the labels
+                                  },
+                                },
+                              }],
+                              legend: {
+                                data: ['Average Percentage'],
+                                align: 'left', // Align the legend to the left
+                                textStyle: {
+                                  color: 'white', // Change the font color of the legend
+                                },
+                                show: false,
+                              },
+                            };
+
+                            chart.setOption(option);
+                          } catch (error) {
+                            console.error('Error fetching data:', error);
+                          }
+                        });
+                      </script>
+                    </div>
+                  </div>
+                </div>
+                <!-- Add more cards as needed for each item in the carousel -->
+              </div>
+            </div>
+
+            <div class="carousel-item ">
+              <div class="row g-3 mb-5 justify-content-center">
+                <div class="col-12">
+                  <div class="card p-4 vh-50">
+                    <div class="card-title">
+                      <h3>Raudhatul Sakinah Patrol Activity <span class="text-700 fs-1">(<%= previousMonth %>)</span></h3>
+                    </div>
+                    <div class="card-body">
+                      <!-- Container for ECharts chart -->
+                      <div id="chartLocation5" style="width: 40vw; height: 40vh;"></div>
+
+                      <!-- Script to render the ECharts chart -->
+                      <script>
+                        $(document).ready(async () => {
+                          try {
+                            const response = await $.getJSON('/api/averagePercentagesByWeek/raudhatul-sakinah');
+                            const data = response;
+
+                            // Use ECharts to render the chart
+                            const chart = echarts.init(document.getElementById('chartLocation5'));
+                            const weekNumbers = data.map(entry => entry.weekNumber);
+                            const averagePercentages = data.map(entry => entry.averagePercentage);
+
+                            // Define an array of colors for each bar
+                            const barColors = ['#FF5733', '#33FF57', '#5733FF', '#FF33A1'];
+
+                            const option = {
+                              xAxis: {
+                                type: 'category',
+                                data: weekNumbers,
+                                name: 'Week',
+                              },
+                              yAxis: {
+                                type: 'value',
+                                name: 'Average Percentage',
+                                axisLabel: {
+                                  interval: 0,
+                                  rotate: 0, // Rotate yAxis labels if needed
+                                  formatter: '{value}%', // Display yAxis labels in percentage format
+                                },
+                                axisLine: {
+                                  show: false, // Hide yAxis line
+                                },
+                                splitLine: {
+                                  show: false, // Hide grid lines for yAxis
+                                },
+                              },
+                              series: [{
+                                data: averagePercentages,
+                                type: 'bar',
+                                name: 'Average Percentage',
+                                itemStyle: {
+                                  color: (params) => barColors[params.dataIndex % barColors.length], // Set bar colors
+                                },
+                                label: {
+                                  show: true,
+                                  position: 'inside', // Display percentage labels inside the bars
+                                  formatter: (params) => params.value.toFixed(1) + '%', // Format label as rounded-off percentage
+                                  textStyle: {
+                                    color: 'white', // Set font color for the labels
+                                  },
+                                },
+                              }],
+                              legend: {
+                                data: ['Average Percentage'],
+                                align: 'left', // Align the legend to the left
+                                textStyle: {
+                                  color: 'white', // Change the font color of the legend
+                                },
+                                show: false,
+                              },
+                            };
+
+                            chart.setOption(option);
+                          } catch (error) {
+                            console.error('Error fetching data:', error);
+                          }
+                        });
+                      </script>
                     </div>
                   </div>
                 </div>
@@ -264,11 +560,127 @@
     <div class="col-12 col-xxl-6 vh-50">
       <h3>Shift Member Patrol</h3>
       <p class="text-700 fs-1">Example</p>
+
+      <!-- Container for ECharts chart -->
+      <div id="chartShiftMember" style="width: 100%; height: 90%;"></div>
+
+      <!-- Script to render the ECharts chart -->
+      <script>
+        $(document).ready(async () => {
+          try {
+            const response = await $.getJSON('/api/dashboard/shiftMember');
+            const data = response;
+
+            // Extract data for ECharts
+            const xAxisData = data.map(item => `Week ${item.weekNumber}`);
+            const seriesData = data.map(item => item.averagePercentage);
+
+            // Initialize ECharts
+            const myChart = echarts.init(document.getElementById('chartShiftMember'));
+
+            // ECharts configuration
+            const option = {
+              tooltip: {
+                trigger: 'axis',
+                formatter: '{b}: {c}%'
+              },
+              xAxis: {
+                type: 'category',
+                data: xAxisData,
+                name: 'Week'
+              },
+              yAxis: {
+                type: 'value',
+                name: 'Average Percentage (%)'
+              },
+              series: [{
+                type: 'line',
+                data: seriesData,
+                label: {
+                  show: true,
+                  formatter: (params) => params.value.toFixed(1) + '%', // Format label as rounded-off percentage
+                  textStyle: {
+                    color: '#3874ff', // Set font color for the labels
+                  },
+                },
+                lineStyle: {
+                  color: 'y' // Change the color here
+                }
+              }]
+            };
+
+            // Set ECharts configuration
+            myChart.setOption(option);
+
+            chart.setOption(option);
+          } catch (error) {
+            console.error('Error fetching data:', error);
+          }
+        });
+      </script>
     </div>
 
     <div class="col-12 col-xxl-6 vh-50">
       <h3>Patrol Unit</h3>
       <p class="text-700 fs-1">Example</p>
+
+      <!-- Container for ECharts chart -->
+      <div id="chartPatrolUnit" style="width: 100%; height: 90%;"></div>
+
+      <!-- Script to render the ECharts chart -->
+      <script>
+        $(document).ready(async () => {
+          try {
+            const response = await $.getJSON('/api/dashboard/patrolUnit');
+            const data = response;
+
+            // Extract data for ECharts
+            const xAxisData = data.map(item => `Week ${item.weekNumber}`);
+            const seriesData = data.map(item => item.averagePercentage);
+
+            // Initialize ECharts
+            const myChart = echarts.init(document.getElementById('chartPatrolUnit'));
+
+            // ECharts configuration
+            const option = {
+              tooltip: {
+                trigger: 'axis',
+                formatter: '{b}: {c}%'
+              },
+              xAxis: {
+                type: 'category',
+                data: xAxisData,
+                name: 'Week'
+              },
+              yAxis: {
+                type: 'value',
+                name: 'Average Percentage (%)'
+              },
+              series: [{
+                type: 'line',
+                data: seriesData,
+                label: {
+                  show: true,
+                  formatter: (params) => params.value.toFixed(1) + '%', // Format label as rounded-off percentage
+                  textStyle: {
+                    color: '#3874ff', // Set font color for the labels
+                  },
+                },
+                lineStyle: {
+                  color: 'y' // Change the color here
+                }
+              }]
+            };
+
+            // Set ECharts configuration
+            myChart.setOption(option);
+
+            chart.setOption(option);
+          } catch (error) {
+            console.error('Error fetching data:', error);
+          }
+        });
+      </script>
     </div>
 
     <div class="col-12 vh-50">
