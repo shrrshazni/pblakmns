@@ -14,10 +14,11 @@
 
           <% if (patrolReport) { %>
           <p>Date: <%= patrolReport.date %></p>
+          <p>Report: <%= patrolReport.reportId %></p>
 
           <% if (patrolReport.staff && patrolReport.staff.length > 0) { %>
             <% patrolReport.staff.forEach(function(staffMember) { %>
-            <a href="/shift-member/checkpoint-submit/<%= location %>/<%= checkpointName %>/<%= staffMember %>" class="btn btn-outline-primary col-auto">
+            <a href="/shift-member/checkpoint-submit/<%= location %>/<%= checkpointName %>/<%= staffMember %>/<%= patrolReport.reportId %>" class="btn btn-outline-primary col-auto">
               <%= staffMember %>
             </a>
             <% }); %>

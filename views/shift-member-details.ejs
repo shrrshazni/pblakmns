@@ -80,8 +80,8 @@ if(role === 'Admin'){
 
                 <div class="col-12 mb-4">
                   <div class="embed-responsive embed-responsive-16by9">
-                    <video class="embed-responsive-item" width="100%" height="100%" autoplay muted>
-                      <source src="/video/vid2.mp4" type="video/mp4">
+                    <video class="embed-responsive-item" width="100%" height="100%" autoplay muted loop>
+                      <source src="/video/vid1.mp4" type="video/mp4">
                       Your browser does not support the video tag.
                     </video>
                   </div>
@@ -91,9 +91,9 @@ if(role === 'Admin'){
           </div>
         </div>
 
-        <div class="col-12 container border border-300 p-0 mb-5 rounded-3" style="margin: 0 auto;">
+        <div class="col-12 container border border-300 p-0 rounded-3 ms-lg-2">
           <div class="col-12">
-            <div class="container p-2">
+            <div class="container">
               <div class="row d-flex justify-content-center">
                 <% 
                       var display = "";
@@ -106,19 +106,46 @@ if(role === 'Admin'){
                         const year = today.getFullYear().toString().substr(-2);
                         return `${day}/${month}/${year}`;
                       }
+
+                      function getYesterdayDate() {
+                        const yesterday = new Date(); // Create a new Date object representing the current date and time
+                        yesterday.setDate(yesterday.getDate() - 1); // Subtract one day from the current date
+                        const day = String(yesterday.getDate()).padStart(2, '0'); // Get the day of the month and pad with leading zeros if needed
+                        const month = String(yesterday.getMonth() + 1).padStart(2, '0'); // Get the month (zero-based) and add 1 to get the correct month, then pad with leading zeros if needed
+                        const year = yesterday.getFullYear().toString().substr(-2); // Get the year and take the last two digits
+                        return `${day}/${month}/${year}`; // Return the formatted date as a string
+                      }
+
+                      // Call the function to get yesterday's date and store it in the variable yesterdayDate
+                      const yesterdayDate = getYesterdayDate();
                 
                       const todayDate = getTodayDate();
+
+                      var checkDate = "";
                 
                       %>
                 <% cycle.forEach((cycle, index) => { %>
-                <% if(currentTimeSlot === cycle.timeSlot && todayDate === patrolReport.date){
-                          display = "d-block";
-                        }else {
-                          display = "d-none";
-                        } %>
+                <% if(currentTimeSlot === cycle.timeSlot){
+                       if(patrolReport.startShift === '2300'){
+                          if(patrolReport.date === todayDate  || patrolReport.date === yesterdayDate ){
+                            display = "d-block";
+                          }else{
+                            display = "d-none"
+                          }
+                       }else if(patrolReport.startShift === '0700' && patrolReport.startShift === '1500'){
+                          if(patrolReport.date === todayDate ){
+                            display = "d-block";
+                          }else{
+                            display = "d-none"
+                          }
+                       }       
+                    }else{
+                        display = "d-none";
+                    }
+                %>
                 <div class="col-12 container mx-auto <%= display %>">
                   <div class="d-flex justify-content-between">
-                    <h2 class="card-title">
+                    <h2 class="card-title p-3 mb-3">
                       <div class="d-sm-block d-lg-flex">
                         <div class="text1">Cycle <%= index+1 %></div>
                         <div class="text2">&nbsp;<span class="fw-normal text-700 ms-0 fs-1 my-auto">(<%= cycle.timeSlot %>)</span></div>
@@ -126,7 +153,7 @@ if(role === 'Admin'){
                     </h2>
                     <div class="btn btn-link my-auto"><span id="countdown<%= index %>" class="fs-1"></span></div>
                   </div>
-                  <div class="row justify-content-center">
+                  <div class="row justify-content-center px-3 mb-0">
                     <% cycle.checkpoint.forEach((checkpoint, checkpointIndex) => { %>
                     <% 
                     var textColor = ""; var icon = "";
@@ -139,12 +166,12 @@ if(role === 'Admin'){
                     icon = "fa-solid fa-check"
                     }
                     %>
-                    <div class="card mb-3 col-12 col-xxl-3 p-4" style="margin: 0.4rem;">
+                    <div class="card mb-3 col-12 col-xxl-3 p-3" style="margin: 0.4rem;">
                       <div class="justify-content-between d-flex">
                         <h5 class="card-title"><%= checkpoint.checkpointName %></h5>
                         <div><span class="<%= icon %> <%= textColor %> fs-1"></span></div>
                       </div>
-                      <div class="card-body p-0">
+                      <div class="card-body">
                         <p class="card-text">Time: <strong><%= checkpoint.time %></strong></p>
                         <p class="card-text">Log Report: <strong style="font-style: italic;"><%= checkpoint.logReport %></strong></p>
                         <p class="card-text badge badge-phoenix-primary text-primary ms-n2"><%= checkpoint.username %></p>
@@ -152,7 +179,7 @@ if(role === 'Admin'){
                     </div>
                     <% if ((checkpointIndex + 1) % 3 === 0) { %>
                   </div>
-                  <div class="row justify-content-center">
+                  <div class="row justify-content-center px-3 mb-0">
                     <% } %>
                     <% }); %>
                   </div>
@@ -202,7 +229,7 @@ if(role === 'Admin'){
           </script>
 
           <div class="col-12">
-            <div id="chart" style="height: 450px; width: 100%;"></div>
+            <div class="ms-3" id="chart" style="height: 450px; width: 100%;"></div>
           </div>
 
           <script>

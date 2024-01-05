@@ -11,6 +11,6 @@ https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-sub
 https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-i/level-4
 https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-i/level-8
 
-https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/checkpoint-submit/baitul-makmur-i/level-8
-
 https://guarded-shore-55159-b88e13b0676b.herokuapp.com/patrol-unit/checkpoint-submit/mufti-residence/110.3333/1.7333
+
+http://localhost:5001/shift-member/fullname-submit/baitul-makmur-i/level-8
