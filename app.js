@@ -1917,12 +1917,12 @@ cron.schedule(
         time: ''
       },
       {
-        checkpointName: 'CEO Residence',
+        checkpointName: 'Ceo Residence',
         logReport: '',
         time: ''
       },
       {
-        checkpointName: 'SICC',
+        checkpointName: 'Sicc',
         logReport: '',
         time: ''
       }
@@ -1951,17 +1951,26 @@ cron.schedule(
   '00 17 * * *',
   async () => {
     try {
-      const dateToday = new Date().getDate();
+      const dateToday = dateLocal.getDate();
+
+      console.log(dateToday);
 
       // Update status of Patrol Reports with today's date to 'Closed'
-      await PatrolReport.updateMany(
+      const patrolUnit= await PatrolReport.findOneAndUpdate(
         { date: dateToday, status: 'Open' },
         { $set: { status: 'Closed' } }
       );
 
-      console.log(
-        `Patrol Reports for date ${dateToday} updated and closed at 5 PM`
-      );
+      if(patrolUnit){
+        console.log(
+            `Patrol Reports for date ${dateToday} updated and closed at 5 PM`
+          );
+      }else{
+        console.log(
+            `Failed to update`
+          );
+      }
+      
     } catch (error) {
       console.error('Error in scheduled task at 5 PM:', error);
     }
@@ -5658,7 +5667,7 @@ app
           { checkpointName: 'Main Entrance', time: '', logReport: '' },
           { checkpointName: 'Gate 2', time: '', logReport: '' },
           {
-            checkpointName: 'Backside Mosque (Cemetery)',
+            checkpointName: 'Backside Mosque (cemetery)',
             time: '',
             logReport: ''
           },

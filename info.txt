@@ -1,0 +1,101 @@
+//account info
+
+-Admin 1
+username:00001 
+
+-Admin 2
+username:00002
+
+-Head Shift Baitul Makmur I
+username:00011
+
+
+-Head Shift Baitul Makmur II
+username:00012
+
+
+-Head Shift Jamek Mosque
+username:00013
+
+
+-Head Shift City Mosque
+username:00014
+
+
+-Head Shift Raudhatul Sakinah
+username:00015
+
+
+// shift member 
+
+BMI
+
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-i/parameter-1
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-i/parameter-2
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-i/parameter-3
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-i/parameter-4
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-i/basement-1
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-i/basement-2
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-i/basement-3
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-i/basement-4
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-i/club-house
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-i/old-cafe
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-i/level-4
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-i/level-8
+
+BMII
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/basement-1-(a)
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/basement-1-(b)
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/basement-1-(c)
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/basement-2-(a)
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/basement-2-(b)
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/basement-2-(c)
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/ground-floor-1
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/ground-floor-2
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/service-lift-level-6
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/service-lift-level-10
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/service-lift-level-11
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/outside-cafe-1
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/outside-cafe-2
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/emergency entrance
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/genset-outside-building
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/level-8
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/level-17
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/level-5-(a)
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/level-5-(b)
+
+jamek mosque
+
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/jamek-mosque/mimbar-area
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/jamek-mosque/bilal-area
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/jamek-mosque/cooling-tower
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/jamek-mosque/mosque-tower
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/jamek-mosque/first-gate
+
+city mosque
+
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/city-mosque/main-entrance
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/city-mosque/gate-2
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/city-mosque/backside-mosque-(cemetery)
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/city-mosque/muslimah-pray-area
+
+raudhatul-sakinah
+
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/raudhatul-sakinah/cemetery-area-1
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/raudhatul-sakinah/cemetery-area-2
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/raudhatul-sakinah/cemetery-area-3
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/raudhatul-sakinah/cemetery-area-4
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/raudhatul-sakinah/office-area-1
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/raudhatul-sakinah/office-area-2
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/raudhatul-sakinah/office-area-3
+
+// patrol unit 
+
+//have not yet determine each of location's coordinates
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/patrol-unit/checkpoint-submit/mufti-residence/110.3333/1.7333
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/patrol-unit/checkpoint-submit/ceo-residence/110.3333/1.7333
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/patrol-unit/checkpoint-submit/encik-drahman-residence/110.3333/1.7333
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/patrol-unit/checkpoint-submit/sicc/110.3333/1.7333
+
+// now also have to wait on the 3d video
+
