@@ -248,7 +248,7 @@ app
           res.redirect('/sign-up');
         } else {
           passport.authenticate('local')(req, res, function () {
-            res.redirect('/sign-in');
+            res.redirect('/');
           });
         }
       }
@@ -459,10 +459,6 @@ app.get('/dashboard', async function (req, res) {
 
     // Find duty handovers for the past week
     const oneWeekAgo = moment().subtract(7, 'days').format('DD/MM/YY');
-    const pastWeek = await DutyHandover.find({
-      date: { $gte: oneWeekAgo },
-      status: 'Completed'
-    });
 
     const currentDate1 = new Date();
 
@@ -492,8 +488,7 @@ app.get('/dashboard', async function (req, res) {
 
     // Format the previous month as a string
     const formattedPreviousMonth = `${monthNames[previousMonth]} ${previousYear}`;
-
-    console.log(formattedPreviousMonth);
+    const formattedCurrentMonth = `${monthNames[currentMonth]} ${currentYear}`;
 
     const currentDate = dateLocal.getDate();
 
@@ -513,6 +508,7 @@ app.get('/dashboard', async function (req, res) {
         caseReport: caseReport,
         oneWeekAgo: oneWeekAgo,
         currentDate: currentDate,
+        currentMonth : formattedCurrentMonth,
         previousMonth: formattedPreviousMonth
       });
     }
@@ -1482,12 +1478,25 @@ app.get('/shift-member/details', async function (req, res) {
         const startTimeNumeric = parseInt(cycle.timeSlot.split('-')[0], 10);
         const endTimeNumeric = parseInt(cycle.timeSlot.split('-')[1], 10);
 
-        if (
-          currentTimeNumeric >= startTimeNumeric &&
-          currentTimeNumeric <= endTimeNumeric
-        ) {
-          var currentTimeSlot = cycle.timeSlot;
-          break;
+        console.log(startTimeNumeric);
+        console.log(endTimeNumeric);
+
+        if (cycle.timeSlot === '2300-0000') {
+          if (
+            currentTimeNumeric >= startTimeNumeric &&
+            currentTimeNumeric >= endTimeNumeric
+          ) {
+            var currentTimeSlot = cycle.timeSlot;
+            break;
+          }
+        } else {
+          if (
+            currentTimeNumeric >= startTimeNumeric &&
+            currentTimeNumeric <= endTimeNumeric
+          ) {
+            var currentTimeSlot = cycle.timeSlot;
+            break;
+          }
         }
       }
 
@@ -1608,6 +1617,9 @@ app.get(
     const today = moment().format('DD/MM/YY');
     const yesterday = moment().subtract(1, 'days').format('DD/MM/YY');
 
+    console.log('Today:', today);
+    console.log('Yesterday:', yesterday);
+
     const currentTimestamp = new Date();
     const currentTimeNumeric = parseInt(
       currentTimestamp
@@ -1619,48 +1631,46 @@ app.get(
       10
     );
 
-    console.log('Current Time Numeric:', currentTimeNumeric);
-
     const checkShiftTime = await PatrolReport.find({
-      location: location,
-      startShift: { $lte: currentTimeNumeric.toString() },
-      endShift: { $gte: currentTimeNumeric.toString() }
+      location: location
     });
 
-    if (checkShiftTime) {
-      if (checkShiftTime.startShift === '2300') {
-        const filteredReports1 = await PatrolReport.findOne({
-          location: location,
-          startShift: '2300', // Adjust this value as needed
-          $or: [{ date: today }, { date: yesterday }]
-        });
+    let isStartShift2300 = false;
 
-        res.render('shift-member-submit', {
-          patrolReport: filteredReports1,
-          location: location,
-          checkpointName: checkpointName
-        });
-      } else {
-        const filteredReports2 = await PatrolReport.findOne({
-          location: location,
-          date: today, // Adjust this value as needed
-          startShift: { $lte: currentTimeNumeric.toString() },
-          endShift: { $gte: currentTimeNumeric.toString() }
-        });
-
-        console.log(filteredReports2);
-
-        res.render('shift-member-submit', {
-          patrolReport: filteredReports2,
-          location: location,
-          checkpointName: checkpointName
-        });
+    // Iterate through each document in the array
+    for (const report of checkShiftTime) {
+      if (report.startShift === '2300') {
+        isStartShift2300 = true;
+        break; // If one document is found, no need to check further
       }
-    } else {
+    }
+
+    if (isStartShift2300) {
+      const filteredReports1 = await PatrolReport.findOne({
+        location: location,
+        startShift: '2300',
+        $or: [{ date: today }, { date: yesterday }]
+      });
+
+      console.log(filteredReports1);
+
       res.render('shift-member-submit', {
-        patrolReport: '',
-        location: '',
-        checkpointName: ''
+        patrolReport: filteredReports1,
+        location: location,
+        checkpointName: checkpointName
+      });
+    } else {
+      const filteredReports2 = await PatrolReport.findOne({
+        location: location,
+        date: today,
+        startShift: { $lte: currentTimeNumeric.toString() },
+        endShift: { $gte: currentTimeNumeric.toString() }
+      });
+
+      res.render('shift-member-submit', {
+        patrolReport: filteredReports2,
+        location: location,
+        checkpointName: checkpointName
       });
     }
   }

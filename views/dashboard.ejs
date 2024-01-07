@@ -2,7 +2,16 @@
 
 <div class="content">
   <!-- Page title -->
-  <h2 class="mb-2 lh-sm">Admin Dashboard</h2>
+  <div class="row mb-2 gx-6 gy-3 align-items-center">
+    <div class="col-auto">
+      <h2 class="mb-0">
+        Dashboard
+      </h2>
+    </div>
+    <div class="col-auto">
+      <a class="btn btn-primary px-3" href="/sign-up"><i class="fa-solid fa-plus me-2"></i>Add new user</a>
+    </div>
+  </div>
   <p class="text-700 lead mb-5">
     Check all the report progression here
   </p>
@@ -21,11 +30,11 @@
         <h1 class="fs-5 pt-3"><%= user.length %></h1>
         <p class="fs-9 mb-0">Total Staffs</p>
       </div>
-      <div class="col-6 col-md-4 col-xxl-2 text-center border-translucent border-start-xxl border-end-md border-end-xxl-0 border-bottom border-bottom-xxl border-top-xxl pb-4 pt-4 py-xxl-3"><span class="uil fs-5 lh-1 uil-book text-info"></span>
+      <div class="col-6 col-md-4 col-xxl-2 text-center border-translucent border-bottom-xxl border-bottom border-bottom-md-0 border-top-0 border-top-md-0 border-top-xxl border-start-0 border-start-xxl border-start-md-0 border-top-xxl pb-md-4 pt-4 py-xxl-3"><span class="uil fs-5 lh-1 uil-book text-info"></span>
         <h1 class="fs-5 pt-3"><%= shiftMember.length %></h1>
         <p class="fs-9 mb-0">Shift Member Patrol</p>
       </div>
-      <div class="col-6 col-md-4 col-xxl-2 text-center border-translucent border-start-xxl border-end border-end-xxl-0 border-bottom-xxl border-top-xxl pb-md-4 pt-4 py-xxl-3"><span class="uil fs-5 lh-1 uil-map-marker text-success"></span>
+      <div class="col-6 col-md-4 col-xxl-2 text-center border-translucent border-start-xxl border-start-md border-end border-end-xxl-0 border-bottom-xxl border-top-xxl pb-md-4 pt-4 py-xxl-3"><span class="uil fs-5 lh-1 uil-map-marker text-success"></span>
         <h1 class="fs-5 pt-3"><%= patrolUnit.length %></h1>
         <p class="fs-9 mb-0">Patrol Unit</p>
       </div>
@@ -45,13 +54,13 @@
             <div class="carousel-item active">
               <div class="row g-3 mb-5 justify-content-center">
                 <div class="col-12">
-                  <div class="card p-4 vh-50">
+                  <div class="card p-4 vh-50 w-100">
                     <div class="card-title">
-                      <h3>Baitul Makmur I Patrol Activity <span class="text-700 fs-1">(<%= previousMonth %>)</span></h3>
+                      <h3>Baitul Makmur I Patrol Activity <br><span class="text-700 fs-1">(<%= previousMonth %>)</span></h3>
                     </div>
                     <div class="card-body">
                       <!-- Container for ECharts chart -->
-                      <div id="chartLocation1" style="width: 40vw; height: 40vh;"></div>
+                      <div class="mt-n4 mt-xxl-n1" id="chartLocation1" style="width: 100%; height: 40vh;"></div>
 
                       <!-- Script to render the ECharts chart -->
                       <script>
@@ -130,13 +139,13 @@
             <div class="carousel-item ">
               <div class="row g-3 mb-5 justify-content-center">
                 <div class="col-12">
-                  <div class="card p-4 vh-50">
+                  <div class="card p-4 vh-50 w-100">
                     <div class="card-title">
-                      <h3>Baitul Makmur II Patrol Activity <span class="text-700 fs-1">(<%= previousMonth %>)</span></h3>
+                      <h3>Baitul Makmur II Patrol Activity<br><span class="text-700 fs-1">(<%= previousMonth %>)</span></h3>
                     </div>
                     <div class="card-body">
                       <!-- Container for ECharts chart -->
-                      <div id="chartLocation2" style="width: 40vw; height: 40vh;"></div>
+                      <div class="mt-n4 mt-xxl-n1" id="chartLocation2" style="width: 100%; height: 40vh;"></div>
 
                       <!-- Script to render the ECharts chart -->
                       <script>
@@ -216,13 +225,13 @@
             <div class="carousel-item ">
               <div class="row g-3 mb-5 justify-content-center">
                 <div class="col-12">
-                  <div class="card p-4 vh-50">
+                  <div class="card p-4 vh-50 w-100">
                     <div class="card-title">
-                      <h3>Jamek Mosque Patrol Activity <span class="text-700 fs-1">(<%= previousMonth %>)</span></h3>
+                      <h3>Jamek Mosque Patrol Activity <br><span class="text-700 fs-1">(<%= previousMonth %>)</span></h3>
                     </div>
                     <div class="card-body">
                       <!-- Container for ECharts chart -->
-                      <div id="chartLocation3" style="width: 40vw; height: 40vh;"></div>
+                      <div class="mt-n4 mt-xxl-n1" id="chartLocation3" style="width: 100%; height: 40vh;"></div>
 
                       <!-- Script to render the ECharts chart -->
                       <script>
@@ -304,11 +313,11 @@
                 <div class="col-12">
                   <div class="card p-4 vh-50">
                     <div class="card-title">
-                      <h3>City Mosque Patrol Activity <span class="text-700 fs-1">(<%= previousMonth %>)</span></h3>
+                      <h3>City Mosque Patrol Activity<br><span class="text-700 fs-1">(<%= previousMonth %>)</span></h3>
                     </div>
                     <div class="card-body">
                       <!-- Container for ECharts chart -->
-                      <div id="chartLocation4" style="width: 40vw; height: 40vh;"></div>
+                      <div class="mt-n4 mt-xxl-n1" id="chartLocation4" style="width: 100%; height: 40vh;"></div>
 
                       <!-- Script to render the ECharts chart -->
                       <script>
@@ -388,13 +397,13 @@
             <div class="carousel-item ">
               <div class="row g-3 mb-5 justify-content-center">
                 <div class="col-12">
-                  <div class="card p-4 vh-50">
+                  <div class="card p-4 vh-50 w-100">
                     <div class="card-title">
-                      <h3>Raudhatul Sakinah Patrol Activity <span class="text-700 fs-1">(<%= previousMonth %>)</span></h3>
+                      <h3>Raudhatul Sakinah Patrol Activity <br><span class="text-700 fs-1">(<%= previousMonth %>)</span></h3>
                     </div>
                     <div class="card-body">
                       <!-- Container for ECharts chart -->
-                      <div id="chartLocation5" style="width: 40vw; height: 40vh;"></div>
+                      <div class="mt-n4 mt-xxl-n1" id="chartLocation5" style="width: 100%; height: 40vh;"></div>
 
                       <!-- Script to render the ECharts chart -->
                       <script>
@@ -486,7 +495,7 @@
 
     <div class="col-12 col-xxl-6">
       <h3>Duty Handover Status</h3>
-      <p class="text-700 fs-1">Status from <%= oneWeekAgo %> until <%= currentDate %></p>
+      <p class="text-700 fs-1">Status for <%= currentDate %></p>
 
       <div id="pieChart" style="height: 500px;"></div>
 
@@ -557,12 +566,12 @@
   </div>
 
   <div class="row g-1 border border-300 rounded-3 p-4 mb-5">
-    <div class="col-12 col-xxl-6 vh-50">
+    <div class="col-12 col-xxl-6 vh-50 mb-3 mb-xxl-0">
       <h3>Shift Member Patrol</h3>
-      <p class="text-700 fs-1">Display patrol activity for this month</p>
+      <p class="text-700 fs-1">Display patrol activity for <strong style="font-style: italic;"><%= currentMonth %></strong></p>
 
       <!-- Container for ECharts chart -->
-      <div id="chartShiftMember" style="width: 100%; height: 90%;"></div>
+      <div class="mt-n3" id="chartShiftMember" style="width: 100%; height: 90%;"></div>
 
       <!-- Script to render the ECharts chart -->
       <script>
@@ -621,11 +630,11 @@
     </div>
 
     <div class="col-12 col-xxl-6 vh-50">
-      <h3>Patrol Unit</h3>
-      <p class="text-700 fs-1">Display patrol activity for this month</p>
+      <h3 class="">Patrol Unit</h3>
+      <p class="text-700 fs-1">Display patrol activity for <strong style="font-style: italic;"><%= currentMonth %></p>
 
       <!-- Container for ECharts chart -->
-      <div id="chartPatrolUnit" style="width: 100%; height: 90%;"></div>
+      <div class="mt-n3" id="chartPatrolUnit" style="width: 100%; height: 90%;"></div>
 
       <!-- Script to render the ECharts chart -->
       <script>

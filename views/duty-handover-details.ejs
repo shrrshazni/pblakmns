@@ -4,7 +4,7 @@
 
 var submitDutyHandover = "";
 
-if(role === 'Admin'){
+if(role === 'Admin' ){
     submitDutyHandover = "d-none";
 }else {
     submitDutyHandover = "";
@@ -120,9 +120,9 @@ if(role === 'Admin'){
                           <div id="giveShiftMemberDisplay" class="d-flex row g-1">
                             <% if (dutyHandover.give && dutyHandover.give.shiftMember && dutyHandover.give.shiftMember.length > 0) { %>
                             <% dutyHandover.give.shiftMember.forEach(member => { %>
-                            <div class="btn btn-outline-primary col-auto">
+                            <a href="/social/profile/<%= member %>" class="btn btn-outline-primary col-auto">
                               <%= member %>
-                            </div>
+                            </a>
                             <% }); %>
                             <% } else { %>
                             <div>No shift members for this handover</div>
@@ -237,7 +237,7 @@ if(role === 'Admin'){
                         </div>
                       </div>
 
-                      <div class="col-12 gy-4">
+                      <div class="col-12 gy-4 mb-3">
                         <label class="form-label" for="floatingProjectDescription2">Notes</label>
                         <textarea class="form-control <%= validationNotes %> scrollbar-overlay" id="floatingProjectDescription2" placeholder="Leave a note here" style="height: 64px" name="notes">
 <%= notes %></textarea>
@@ -245,6 +245,11 @@ if(role === 'Admin'){
                         <div class="invalid-feedback">
                           Please enter a note here.
                         </div>
+                      </div>
+
+                      <div class="col-md-12 mt-0 mb-0">
+                        <h4 class="form-label">Shift Member For Patrol Location</h4>
+                        <div id="selectedNames" class="d-flex flex-wrap border border-300 rounded-3 px-2" style="min-height: 2.5rem"></div>
                       </div>
 
                       <div class="col-md-12">
@@ -260,11 +265,6 @@ if(role === 'Admin'){
 
                           <div id="results" class="mt-3 mb-3 col-12"></div>
                         </div>
-                      </div>
-
-                      <div class="col-md-12 mt-0 mb-3">
-                        <h4 class="form-label">Shift Member For Patrol Location</h4>
-                        <div id="selectedNames" class="d-flex flex-wrap border border-300 rounded-3 px-2" style="min-height: 2.5rem"></div>
                       </div>
 
                       <input type="text" style="display: none" value="<%= reportId %>" name="confirmRid" />
@@ -293,9 +293,9 @@ if(role === 'Admin'){
                         <div id="giveShiftMemberDisplay" class="d-flex row g-1">
                           <% if (dutyHandover.give && dutyHandover.give.shiftMember && dutyHandover.give.shiftMember.length > 0) { %>
                           <% dutyHandover.give.shiftMember.forEach(member => { %>
-                          <div class="btn btn-outline-primary col-auto">
+                          <a href="/social/profile/<%= member %>" class="btn btn-outline-primary col-auto">
                             <%= member %>
-                          </div>
+                          </a>
                           <% }); %>
                           <% } else { %>
                           <div>No shift members for this handover</div>
@@ -344,9 +344,9 @@ if(role === 'Admin'){
                         <div id="giveShiftMemberDisplay" class="d-flex row g-1">
                           <% if (dutyHandover.receive && dutyHandover.receive.shiftMember && dutyHandover.receive.shiftMember.length > 0) { %>
                           <% dutyHandover.receive.shiftMember.forEach(member => { %>
-                          <div class="btn btn-outline-primary col-auto">
+                          <a href="/social/profile/<%= member %>" class="btn btn-outline-primary col-auto">
                             <%= member %>
-                          </div>
+                          </a>
                           <% }); %>
                           <% } else { %>
                           <div>No shift members for this handover</div>
