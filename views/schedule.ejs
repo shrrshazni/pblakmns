@@ -22,98 +22,47 @@ if(role === 'Admin'){
   </nav>
 
   <div class="mb-9">
-    <div
-      id="projectSummary"
-      data-list='{"valueNames":["schedule","month","startDate","endDate","status"],"page":6,"pagination":true}'
-    >
+    <div id="projectSummary" data-list='{"valueNames":["schedule","month","startDate","endDate","status"],"page":6,"pagination":true}'>
       <div class="row mb-4 gx-6 gy-3 align-items-center">
         <div class="col-auto">
           <h2 class="mb-0">
-            Schedule<span class="fw-normal text-700 ms-3"
-              >(<%= totalSchedules %>)</span
-            >
+            Schedule<span class="fw-normal text-700 ms-3">(<%= totalSchedules %>)</span>
           </h2>
         </div>
         <div class="col-auto <%= submitSchedule %>">
-          <a class="btn btn-primary px-5" href="/schedule/submit?rid=<%= rid %>"
-            ><i class="fa-solid fa-plus me-2"></i>Add new schedule</a
-          >
+          <a class="btn btn-primary px-5 myButton" href="/schedule/submit?rid=<%= rid %>"><i class="fa-solid fa-plus me-2"></i>
+            <div class="btn-content">Sign In</div>
+          </a>
         </div>
       </div>
       <div class="row g-3 justify-content-between align-items-end mb-4">
         <div class="col-12 col-sm-auto">
           <ul class="nav nav-links mx-n2">
             <li class="nav-item">
-              <a
-                class="nav-link px-2 py-1 <%= classActive1 %>"
-                aria-current="page"
-                href="/schedule"
-                ><span>All</span
-                ><span class="text-700 fw-semi-bold"
-                  >(<%= totalSchedules %>)</span
-                ></a
-              >
+              <a class="nav-link px-2 py-1 <%= classActive1 %>" aria-current="page" href="/schedule"><span>All</span><span class="text-700 fw-semi-bold">(<%= totalSchedules %>)</span></a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link px-2 py-1 <%= classActive2 %>"
-                href="/schedule/bmi"
-                ><span>Baitul Makmur I</span
-                ><span class="text-700 fw-semi-bold"
-                  >(<%= amountBMI %>)</span
-                ></a
-              >
+              <a class="nav-link px-2 py-1 <%= classActive2 %>" href="/schedule/bmi"><span>Baitul Makmur I</span><span class="text-700 fw-semi-bold">(<%= amountBMI %>)</span></a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link px-2 py-1 <%= classActive3 %>"
-                href="/schedule/bmii"
-                ><span>Baitul Makmur II</span
-                ><span class="text-700 fw-semi-bold"
-                  >(<%= amountBMII %>)</span
-                ></a
-              >
+              <a class="nav-link px-2 py-1 <%= classActive3 %>" href="/schedule/bmii"><span>Baitul Makmur II</span><span class="text-700 fw-semi-bold">(<%= amountBMII %>)</span></a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link px-2 py-1 <%= classActive4 %>"
-                href="/schedule/jm"
-                ><span>Jamek Mosque</span
-                ><span class="text-700 fw-semi-bold">(<%= amountJM %>)</span></a
-              >
+              <a class="nav-link px-2 py-1 <%= classActive4 %>" href="/schedule/jm"><span>Jamek Mosque</span><span class="text-700 fw-semi-bold">(<%= amountJM %>)</span></a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link px-2 py-1 <%= classActive5 %>"
-                href="/schedule/cm"
-                ><span>City Mosque</span
-                ><span class="text-700 fw-semi-bold">(<%= amountCM %>)</span></a
-              >
+              <a class="nav-link px-2 py-1 <%= classActive5 %>" href="/schedule/cm"><span>City Mosque</span><span class="text-700 fw-semi-bold">(<%= amountCM %>)</span></a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link px-2 py-1 <%= classActive6 %>"
-                href="/schedule/rs"
-                ><span>Raudhatul Sakinah</span
-                ><span class="text-700 fw-semi-bold">(<%= amountRS %>)</span></a
-              >
+              <a class="nav-link px-2 py-1 <%= classActive6 %>" href="/schedule/rs"><span>Raudhatul Sakinah</span><span class="text-700 fw-semi-bold">(<%= amountRS %>)</span></a>
             </li>
           </ul>
         </div>
         <div class="col-12 col-sm-auto">
           <div class="d-flex align-items-center">
             <div class="search-box me-0">
-              <form
-                class="position-relative"
-                data-bs-toggle="search"
-                data-bs-display="static"
-              >
-                <input
-                  class="form-control search-input search"
-                  type="search"
-                  placeholder="Search schedule"
-                  aria-label="Search"
-                />
+              <form class="position-relative" data-bs-toggle="search" data-bs-display="static">
+                <input class="form-control search-input search" type="search" placeholder="Search schedule" aria-label="Search" />
                 <span class="fas fa-search search-box-icon"></span>
               </form>
             </div>
@@ -125,51 +74,22 @@ if(role === 'Admin'){
         <table class="table fs--1 mb-0 border-top border-200">
           <thead>
             <tr>
-              <th
-                class="sort white-space-nowrap align-middle ps-0"
-                scope="col"
-                data-sort="schedule"
-                style="width: 30%"
-              >
+              <th class="sort white-space-nowrap align-middle ps-0" scope="col" data-sort="schedule" style="width: 30%">
                 SCHEDULE TITLE
               </th>
-              <th
-                class="sort align-middle ps-3"
-                scope="col"
-                data-sort="month"
-                style="width: 10%"
-              >
+              <th class="sort align-middle ps-3" scope="col" data-sort="month" style="width: 10%">
                 MONTH
               </th>
-              <th
-                class="sort align-middle ps-3"
-                scope="col"
-                data-sort="startDate"
-                style="width: 10%"
-              >
+              <th class="sort align-middle ps-3" scope="col" data-sort="startDate" style="width: 10%">
                 START DATE
               </th>
-              <th
-                class="sort align-middle ps-3"
-                scope="col"
-                data-sort="endDate"
-                style="width: 10%"
-              >
+              <th class="sort align-middle ps-3" scope="col" data-sort="endDate" style="width: 10%">
                 END DATE
               </th>
-              <th
-                class="sort align-middle text-end"
-                scope="col"
-                data-sort="status"
-                style="width: 10%"
-              >
+              <th class="sort align-middle text-end" scope="col" data-sort="status" style="width: 10%">
                 STATUS
               </th>
-              <th
-                class="sort align-middle text-end"
-                scope="col"
-                style="width: 10%"
-              ></th>
+              <th class="sort align-middle text-end" scope="col" style="width: 10%"></th>
             </tr>
           </thead>
 
@@ -180,15 +100,8 @@ if(role === 'Admin'){
             <!-- table item -->
             <% itemSchedules.forEach(function (item) { %>
             <tr class="position-static">
-              <td
-                class="align-middle time white-space-nowrap ps-0 schedule py-4"
-              >
-                <a
-                  class="fw-bold fs-0"
-                  data-bs-toggle="modal"
-                  data-bs-target="#schedule-modal-<%= item.reportId %>"
-                  ><%= item.scheduleTitle %></a
-                >
+              <td class="align-middle time white-space-nowrap ps-0 schedule py-4">
+                <a class="fw-bold fs-0" data-bs-toggle="modal" data-bs-target="#schedule-modal-<%= item.reportId %>"><%= item.scheduleTitle %></a>
               </td>
               <td class="align-middle white-space-nowrap month ps-3 py-4">
                 <p class="mb-0 fs--1 text-900"><%= item.month %></p>
@@ -200,17 +113,11 @@ if(role === 'Admin'){
                 <p class="fw-bo text-900 fs--1 mb-0"><%= item.endDate %></p>
               </td>
               <td class="align-middle white-space-nowrap text-end status">
-                <span class="badge badge-phoenix fs--2 badge-phoenix-success"
-                  ><%= item.status %></span
-                >
+                <span class="badge badge-phoenix fs--2 badge-phoenix-success"><%= item.status %></span>
               </td>
               <td class="align-middle text-end white-space-nowrap pe-0 action">
                 <div class="ms-10">
-                  <button
-                    class="btn btn-primary btn-icon flex-shrink-0"
-                    data-bs-toggle="modal"
-                    data-bs-target="#schedule-modal-<%= item.reportId %>"
-                  >
+                  <button class="btn btn-primary btn-icon flex-shrink-0" data-bs-toggle="modal" data-bs-target="#schedule-modal-<%= item.reportId %>">
                     <span class="fa-solid fa-chevron-right"></span>
                   </button>
                 </div>
@@ -224,25 +131,10 @@ if(role === 'Admin'){
           </tbody>
         </table>
       </div>
-      <div
-        class="d-flex flex-wrap align-items-center justify-content-between py-3 pe-0 fs--1 border-bottom border-200"
-      >
+      <div class="d-flex flex-wrap align-items-center justify-content-between py-3 pe-0 fs--1 border-bottom border-200">
         <div class="d-flex">
-          <p
-            class="mb-0 d-none d-sm-block me-3 fw-semi-bold text-900"
-            data-list-info="data-list-info"
-          ></p>
-          <a class="fw-semi-bold" href="#!" data-list-view="*"
-            >View all<span
-              class="fas fa-angle-right ms-1"
-              data-fa-transform="down-1"
-            ></span></a
-          ><a class="fw-semi-bold d-none" href="#!" data-list-view="less"
-            >View Less<span
-              class="fas fa-angle-right ms-1"
-              data-fa-transform="down-1"
-            ></span
-          ></a>
+          <p class="mb-0 d-none d-sm-block me-3 fw-semi-bold text-900" data-list-info="data-list-info"></p>
+          <a class="fw-semi-bold" href="#!" data-list-view="*">View all<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a><a class="fw-semi-bold d-none" href="#!" data-list-view="less">View Less<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a>
         </div>
         <div class="d-flex">
           <button class="page-link" data-list-pagination="prev">
@@ -260,13 +152,7 @@ if(role === 'Admin'){
 
 <% if (Array.isArray(itemSchedules) && itemSchedules.length > 0) { %> <%
 itemSchedules.forEach(function (item) { %>
-<div
-  class="modal fade"
-  id="schedule-modal-<%= item.reportId %>"
-  tabindex="-1"
-  aria-labelledby="schedule-modal"
-  aria-hidden="true"
->
+<div class="modal fade" id="schedule-modal-<%= item.reportId %>" tabindex="-1" aria-labelledby="schedule-modal" aria-hidden="true">
   <div class="modal-dialog modal-md modal-dialog-centered">
     <div class="modal-content overflow-hidden">
       <div class="modal-body p-5">
@@ -276,19 +162,12 @@ itemSchedules.forEach(function (item) { %>
               <div class="mb-3">
                 <h3 class="fw-bolder lh-sm"><%= item.scheduleTitle %></h3>
                 <p class="text-1000 fw-semi-bold mb-0">
-                  For month,<a class="ms-1 fw-bold" href="#!"
-                    ><%= item.month %></a
-                  >
+                  For month,<a class="ms-1 fw-bold" href="#!"><%= item.month %></a>
                 </p>
               </div>
 
               <!-- button close -->
-              <button
-                class="btn p-1 mt-n7"
-                type="button"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              >
+              <button class="btn p-1 mt-n7" type="button" data-bs-dismiss="modal" aria-label="Close">
                 <span class="fas fa-times fs--1"></span>
               </button>
             </div>
@@ -298,16 +177,13 @@ itemSchedules.forEach(function (item) { %>
               <div class="d-flex mb-2">
                 <p class="mb-0 fw-bold fs--1">
                   Start date :<span class="fw-semi-bold text-600 ms-1">
-                    <%= item.startDate%></span
-                  >
+                    <%= item.startDate%></span>
                 </p>
               </div>
               <div class="d-flex align-items-center">
                 <p class="mb-0 fw-bold fs--1">
                   End date :
-                  <span class="fw-semi-bold text-600 ms-1"
-                    ><%= item.endDate%></span
-                  >
+                  <span class="fw-semi-bold text-600 ms-1"><%= item.endDate%></span>
                 </p>
               </div>
             </div>
@@ -330,8 +206,7 @@ itemSchedules.forEach(function (item) { %>
               <div class="row justify-content-between g-0 gy-2 pb-3">
                 <div class="col-12 col-sm">
                   <p class="fs--1 text-800 mb-2">
-                    <a class="fw-semi-bold" href="#!"><%= item2.by %> </a
-                    >uploaded a file on <strong> <%= item2.date %></strong>
+                    <a class="fw-semi-bold" href="#!"><%= item2.by %> </a>uploaded a file on <strong> <%= item2.date %></strong>
                   </p>
 
                   <p class="text-1000 fw-semi-bold fs--1 mb-0">
@@ -340,23 +215,11 @@ itemSchedules.forEach(function (item) { %>
                 </div>
                 <div class="col-12 col-sm-auto">
                   <div class="font-sans-serif btn-reveal-trigger">
-                    <button
-                      class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal"
-                      type="button"
-                      data-bs-toggle="dropdown"
-                      data-boundary="window"
-                      aria-haspopup="true"
-                      aria-expanded="false"
-                      data-bs-reference="parent"
-                    >
+                    <button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
                       <span class="fas fa-ellipsis-h"></span>
                     </button>
                     <div class="dropdown-menu dropdown-menu-end py-2">
-                      <a
-                        class="dropdown-item"
-                        href="/download/<%= item2.filename %>"
-                        >Download</a
-                      >
+                      <a class="dropdown-item" href="/download/<%= item2.filename %>">Download</a>
                     </div>
                   </div>
                 </div>
@@ -367,8 +230,7 @@ itemSchedules.forEach(function (item) { %>
               <div class="row justify-content-between g-0 gy-2 pb-3">
                 <div class="col-12 col-sm">
                   <p class="fs--1 text-800 mb-2">
-                    <a class="fw-semi-bold" href="#!"
-                      >There is no file uploaded
+                    <a class="fw-semi-bold" href="#!">There is no file uploaded
                     </a>
                   </p>
 
@@ -387,13 +249,7 @@ itemSchedules.forEach(function (item) { %>
   </div>
 </div>
 <% }) %> <% } else { %>
-<div
-  class="modal fade"
-  id="schedule-modal-"
-  tabindex="-1"
-  aria-labelledby="schedule-modal"
-  aria-hidden="true"
->
+<div class="modal fade" id="schedule-modal-" tabindex="-1" aria-labelledby="schedule-modal" aria-hidden="true">
   <div class="modal-dialog modal-md modal-dialog-centered">
     <div class="modal-content overflow-hidden">
       <div class="modal-body p-5">
@@ -408,12 +264,7 @@ itemSchedules.forEach(function (item) { %>
               </div>
 
               <!-- button close -->
-              <button
-                class="btn p-1 mt-n7"
-                type="button"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              >
+              <button class="btn p-1 mt-n7" type="button" data-bs-dismiss="modal" aria-label="Close">
                 <span class="fas fa-times fs--1"></span>
               </button>
             </div>
@@ -423,8 +274,7 @@ itemSchedules.forEach(function (item) { %>
               <div class="d-flex mb-2">
                 <p class="mb-0 fw-bold fs--1">
                   Start date :<span class="fw-semi-bold text-600 ms-1">
-                    None</span
-                  >
+                    None</span>
                 </p>
               </div>
               <div class="d-flex align-items-center">
@@ -450,8 +300,7 @@ itemSchedules.forEach(function (item) { %>
               <div class="row justify-contnet-between g-0 gy-2 pb-3">
                 <div class="col-12 col-sm">
                   <p class="fs--1 text-800 mb-2">
-                    <a class="fw-semi-bold" href="#!">Full name (username) </a
-                    >uploaded a file
+                    <a class="fw-semi-bold" href="#!">Full name (username) </a>uploaded a file
                   </p>
                   <!-- 16:9 aspect ratio -->
 
@@ -477,25 +326,13 @@ itemSchedules.forEach(function (item) { %>
 <!-- toast alert -->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
   <div class="d-flex">
-    <div
-      class="toast <%= toastShow %> align-items-center text-white bg-primary border-0 light"
-      role="alert"
-      data-bs-autohide="false"
-      aria-live="assertive"
-      aria-atomic="true"
-      id="alertToast"
-    >
+    <div class="toast <%= toastShow %> align-items-center text-white bg-primary border-0 light" role="alert" data-bs-autohide="false" aria-live="assertive" aria-atomic="true" id="alertToast">
       <div class="d-flex justify-content-between">
         <div class="toast-body p-3">
           <code class="text-white"><%= toastMsg %></code>
         </div>
 
-        <button
-          class="btn ms-2 p-0 btn-close-white"
-          type="button"
-          data-bs-dismiss="toast"
-          aria-label="Close"
-        >
+        <button class="btn ms-2 p-0 btn-close-white" type="button" data-bs-dismiss="toast" aria-label="Close">
           <span class="uil uil-times fs-1"></span>
         </button>
       </div>
