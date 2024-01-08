@@ -18,6 +18,8 @@ const cron = require('node-cron');
 // getdate
 const dateLocal = require('./public/assets/js/date');
 const cool = require('cool-ascii-faces');
+// judoscale
+const judoscale = require('judoscale-express').default;
 
 const mongoURI =
   'mongodb+srv://shrrshazni:protechlakmns123@cluster0.rembern.mongodb.net/sessions';
