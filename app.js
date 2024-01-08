@@ -31,6 +31,7 @@ app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
+app.use(judoscale());
 
 // mongoose session option
 const store = new MongoDBSession({
