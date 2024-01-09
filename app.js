@@ -1671,7 +1671,8 @@ app.get(
             const filteredReports2 = await PatrolReport.findOne({
                 location: location,
                 date: today,
-                startShift: { $lte: currentTimeNumeric }
+                startShift : {$lte : currentTimeNumeric},
+                endShift :  {$gte : currentTimeNumeric}
             });
 
             console.log(filteredReports2);
