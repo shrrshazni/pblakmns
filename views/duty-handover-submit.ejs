@@ -10,7 +10,19 @@
       <li class="breadcrumb-item active">Duty Handover</li>
     </ol>
   </nav>
-  <h2 class="mb-2 lh-sm">Submit Report</h2>
+  <% 
+  // Function to get today's date in the format "DD/MM/YY"
+  function getTodayDate() {
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Month is zero-based
+    const year = today.getFullYear().toString().substr(-2);
+    return `${day}/${month}/${year}`;
+  }
+
+  const currentDate = getTodayDate();
+  %>
+  <h2 class="mb-2 lh-sm">Submit Duty Handover<span class="fw-normal text-700 ms-3">(<%= currentDate %>)</span></h2>
   <p class="text-700 lead mb-2">
     A handover duty report summarizes tasks, achievements, challenges during a
     period, informing superiors of work progress and outcomes.
@@ -18,14 +30,14 @@
 
   <div class="mt-4">
     <div class="row g-4">
-      <div class="col-12 col-xl-10 order-1 order-xl-0">
+      <div class="col-12 col-xl-9 order-1 order-xl-0">
         <div class="mb-9">
           <div class="card shadow-none border border-300 my-4" data-component-card="data-component-card" id="unit-patrol-report-form">
             <div class="card-header p-4 border-bottom border-300 bg-soft">
               <div class="row g-3 justify-content-between align-items-center">
                 <div class="col-12 col-md">
-                  <h4 class="text-900 mb-0" data-anchor="data-anchor">
-                    Duty Handover
+                  <h4 class="text-900 mb-0">
+                    Form Submission
                   </h4>
                 </div>
               </div>
@@ -35,7 +47,7 @@
                 <!-- form >form tag will be merge with file uploader form tag -->
                 <form action="/duty-handover/submit" method="post" class="row g-3 has-validation" id="reportForm">
                   <!-- form title report -->
-                  <div class="col-md-4">
+                  <div class="col-md-6">
                     <label class="form-label" for="giveShift">Shift</label>
                     <% if(shift === ''){
                             shift = 'Choose a shift'
@@ -52,17 +64,7 @@
                     <div class="invalid-feedback">Please select a shift.</div>
                   </div>
 
-                  <div class="col-md-4">
-                    <label class="form-label" for="giveDate">Date</label>
-
-                    <input class="form-control <%= validationDate %> datetimepicker flatpickr-input" id="giveDate" type="text" placeholder="day/month/year" data-options='{"dateFormat":"d/m/y","disableMobile":true,"allowInput":true}' name="date" value="<%= date %>" />
-                    <div class="valid-feedback">Looks good!</div>
-                    <div class="invalid-feedback">
-                      Please select a date here.
-                    </div>
-                  </div>
-
-                  <div class="col-md-4">
+                  <div class="col-md-6">
                     <label class="form-label" for="handoverLocation">Location</label>
                     <% if(location === ''){
                             location = 'Choose a location'
@@ -86,48 +88,12 @@
                   </div>
 
                   <div class="col-md-6">
-                    <label class="form-label" for="startTime">Start Shift</label>
-                    <% if(startTime === ''){
-                        startTime = 'Choose a start shift time'
-                    } %>
-                    <select class="form-select <%= validationStartTime %>" id="startTime" name="startTime">
-                      <option selected="" value="<%= startTime %>">
-                        <%= startTime %>
-                      </option>
-                      <option value="0700">0700</option>
-                      <option value="1500">1500</option>
-                      <option value="2300">2300</option>
-                    </select>
-                    <div class="valid-feedback">Looks good!</div>
-                    <div class="invalid-feedback">
-                      Please select a start shift time acoordingly.
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
                     <label class="form-label" for="giveHeadShift">Head of Shift</label>
 
                     <input class="form-control <%= validationHeadShift %>" id="giveHeadShift" type="text" name="headShift" value="<%= headShift %>" />
                     <div class="invalid-feedback">
                       Please provide head shift assigned.
                     </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <label class="form-label" for="giveHandoverShift">Handover shift to be received</label>
-                    <% if(handoverShift === ''){
-                            handoverShift = 'Choose a handover shift'
-                        } %>
-                    <select class="form-select <%= validationHandoverShift %>" id="giveHandoverShift" name="handoverShift">
-                      <option selected="" value="<%= handoverShift %>">
-                        <%= handoverShift %>
-                      </option>
-                      <option value="Shift A">Shift A</option>
-                      <option value="Shift B">Shift B</option>
-                      <option value="Shift C">Shift C</option>
-                    </select>
-                    <div class="valid-feedback">Looks good!</div>
-                    <div class="invalid-feedback">Please select a shift.</div>
                   </div>
 
                   <div class="col-md-6">
@@ -140,12 +106,12 @@
                   </div>
 
                   <div class="col-12 gy-4 mb-3">
-                    <label class="form-label" for="giveNotes">Notes</label>
-                    <textarea class="form-control <%= validationNotes %> scrollbar-overlay" id="giveNotes" placeholder="Leave a note here" style="height: 100px" name="notes">
+                    <label class="form-label" for="giveNotes">Summary</label>
+                    <textarea class="form-control <%= validationNotes %> scrollbar-overlay" id="giveNotes" placeholder="Leave a summary here" style="height: 100px" name="notes">
 <%= notes %></textarea>
                     <div class="valid-feedback">Looks good!</div>
                     <div class="invalid-feedback">
-                      Please enter a note here.
+                      Please enter summary here.
                     </div>
                   </div>
 
@@ -188,16 +154,13 @@
       </div>
 
       <!-- page nav -->
-      <div class="col-12 col-xl-2">
+      <div class="col-12 col-xl-3">
         <div class="position-sticky mt-xl-4" style="top: 80px">
           <h5 class="lh-1">On this page</h5>
           <hr class="text-300" />
           <ul class="nav nav-vertical flex-column doc-nav" data-doc-nav="data-doc-nav">
             <li class="nav-item">
-              <a class="nav-link" href="#reportForm">Report Form</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#addFiles">Add Files</a>
+              <a class="nav-link" href="#reportForm">Form Submission</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#submitReport">Submit Form</a>

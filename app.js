@@ -109,6 +109,14 @@ let transporter = nodemailer.createTransport({
     }
 });
 
+// INIT CURRENT TIME UTC+8
+
+const getKualaLumpurTime = () => {
+    const kualaLumpurTimeZoneOffset = 8; // Kuala Lumpur is UTC+8
+    const now = moment().utcOffset(kualaLumpurTimeZoneOffset);
+    return now.format('hh:mm A');
+};
+
 // HOME
 app.get('/', async function (req, res) {
     if (req.isAuthenticated()) {
@@ -849,8 +857,6 @@ app.get('/api/dashboard/patrolUnit', async (req, res) => {
     }
 });
 
-// DUTY HANDOVER
-
 app.get('/api/dutyHandovers', async (req, res) => {
     try {
         // Inside the route handler
@@ -951,7 +957,7 @@ app.post('/upload-patrol', async (req, res) => {
 
         // date for upload
         var uploadDate = dateLocal.getDateYear();
-        var uploadTime = dateLocal.getCurrentTime();
+        var uploadTime = getKualaLumpurTime();
 
         // Activity
         const newItemActivity = {
@@ -1671,8 +1677,8 @@ app.get(
             const filteredReports2 = await PatrolReport.findOne({
                 location: location,
                 date: today,
-                startShift : {$lte : currentTimeNumeric},
-                endShift :  {$gte : currentTimeNumeric}
+                startShift: { $lte: currentTimeNumeric },
+                endShift: { $gte: currentTimeNumeric }
             });
 
             console.log(filteredReports2);
@@ -1775,7 +1781,7 @@ app.get(
 
                         // date for upload
                         var uploadDate = dateLocal.getDateYear();
-                        var uploadTime = dateLocal.getCurrentTime();
+                        var uploadTime = getKualaLumpurTime();
 
                         // Activity
                         const newItemActivity = {
@@ -2211,7 +2217,7 @@ app.get(
         if (checkPatrolUnit === 'Closed' && checkPatrolUnit) {
             // date for upload
             var uploadDate = dateLocal.getDateYear();
-            var uploadTime = dateLocal.getCurrentTime();
+            var uploadTime = getKualaLumpurTime();
 
             // Activity
             const newItemActivity = {
@@ -2318,7 +2324,7 @@ app.post('/upload-case', async (req, res) => {
 
         // date for upload
         var uploadDate = dateLocal.getDateYear();
-        var uploadTime = dateLocal.getCurrentTime();
+        var uploadTime = getKualaLumpurTime();
 
         // Activity
         const newItemActivity = {
@@ -2331,7 +2337,7 @@ app.post('/upload-case', async (req, res) => {
         };
 
         const newActivity = new Activity({
-            date: uploadTime,
+            date: uploadDate,
             items: newItemActivity
         });
 
@@ -3465,7 +3471,7 @@ app.post('/upload-schedule', async (req, res) => {
 
         // date for upload
         var uploadDate = dateLocal.getDateYear();
-        var uploadTime = dateLocal.getCurrentTime();
+        var uploadTime = getKualaLumpurTime();
 
         // Activity
         const newItemActivity = {
@@ -4908,7 +4914,7 @@ app.post('/social/settings/:customListName', async function (req, res) {
 
                     // date for upload
                     var uploadDate = dateLocal.getDateYear();
-                    var uploadTime = dateLocal.getCurrentTime();
+                    var uploadTime = getKualaLumpurTime();
 
                     // Activity
                     const newItemActivity = {
@@ -4992,11 +4998,13 @@ const receive = {
     staffAbsent: String,
     logReport: String,
     shift: String,
+    time: String,
     shiftMember: [String]
 };
 
 const dutyHandoverSchema = new mongoose.Schema({
     reportId: String,
+    handled: String,
     date: String,
     startShift: String,
     endShift: String,
@@ -5439,17 +5447,13 @@ app
                     reportId: confirmRid,
                     //validation
                     validationShift: '',
-                    validationDate: '',
                     validationLocation: '',
                     validationHeadShift: '',
                     validationStaffOnDuty: '',
                     validationStaffSickLeave: '',
                     validationStaffAbsent: '',
                     validationNotes: '',
-                    validationHandoverShift: '',
                     validationSelectedNames: '',
-                    validationStartTime: '',
-                    validationEndTime: '',
                     //form name
                     shift: '',
                     date: '',
@@ -5461,8 +5465,6 @@ app
                     notes: '',
                     handoverShift: '',
                     selectedNames: '',
-                    startTime: '',
-                    endTime: '',
                     //toast alert
                     toastShow: '',
                     toastMsg: '',
@@ -5476,15 +5478,11 @@ app
     })
     .post('/duty-handover/submit', async function (req, res) {
         var validationShift = '';
-        var validationDate = '';
         var validationLocation = '';
         var validationHeadShift = '';
         var validationNotes = '';
-        var validationHandoverShift = '';
         var validationStaffAbsent = '';
         var validationSelectedNames = '';
-        var validationStartTime = '';
-        var validationEndTime = '';
 
         // current date time
         var currentTime = dateLocal.getCurrentTime();
@@ -5494,13 +5492,10 @@ app
 
         const shift = req.body.shift;
         const location = req.body.location;
-        const date = req.body.date;
         const headShift = req.body.headShift;
         const notes = req.body.notes;
-        const handoverShift = req.body.handoverShift;
         const staffAbsent = req.body.staffAbsent;
         const confirmRid = req.body.confirmRid;
-        const startTime = req.body.startTime;
         const selectedNames = req.body.selectedNames
             ? req.body.selectedNames.split(',')
             : [];
@@ -5514,13 +5509,6 @@ app
             validationShift = 'is-invalid';
         } else {
             validationShift = 'is-valid';
-        }
-
-        // Validate the date
-        if (!date || date === '') {
-            validationDate = 'is-invalid';
-        } else {
-            validationDate = 'is-valid';
         }
 
         // Validate the location
@@ -5544,17 +5532,6 @@ app
             validationNotes = 'is-valid';
         }
 
-        // Validate the handoverShift
-        if (
-            !handoverShift ||
-            handoverShift === '' ||
-            handoverShift === 'Choose a handover shift'
-        ) {
-            validationHandoverShift = 'is-invalid';
-        } else {
-            validationHandoverShift = 'is-valid';
-        }
-
         // Validate the staffAbsent
         if (!staffAbsent || staffAbsent === '') {
             validationStaffAbsent = 'is-invalid';
@@ -5569,51 +5546,68 @@ app
             validationSelectedNames = 'is-valid';
         }
 
-        // Validate the startTime
-        if (!startTime || startTime === '') {
-            validationStartTime = 'is-invalid';
-        } else {
-            validationStartTime = 'is-valid';
-        }
-
         if (
             validationShift === 'is-valid' &&
-            validationDate === 'is-valid' &&
             validationLocation === 'is-valid' &&
             validationHeadShift === 'is-valid' &&
             validationNotes === 'is-valid' &&
-            validationHandoverShift === 'is-valid' &&
             validationStaffAbsent === 'is-valid' &&
-            validationSelectedNames === 'is-valid' &&
-            validationStartTime === 'is-valid'
+            validationSelectedNames === 'is-valid'
         ) {
             const currentFullName = checkUser.fullname;
             const currentUser = checkUser.username;
 
             const status = 'Incompleted';
+            var handoverShift = "";
+
+            // determine which shift to be handover 
+            if (shift === "Shift A") {
+                handoverShift = "Shift B";
+            } else if (shift === "Shift B") {
+                handoverShift = "Shift C";
+            } else if (shift === "Shift C") {
+                handoverShift = "Shift A";
+            }
 
             const giveLog =
                 'Saya ' +
                 headShift +
                 ' selaku ketua syif ' +
-                _.lowerCase(shift) +
+                shift +
                 ' telah menyerahkan tugas kepada selaku ketua syif, ' +
-                _.lowerCase(handoverShift) +
+                handoverShift +
                 ' dalam keadaan baik dan senarai peralatan tugas mencukupi di ' +
                 location +
                 ' pada tarikh ' +
-                date;
+                dateLocal.getDate();
 
-            // determine the endshift and cycle amount
-            var endTime = '';
-            var cycleAmount = '';
+            // Assuming you have the current time in the format "HHMM"
+            const currentTimeNumeric = moment().format('HHmm');
 
-            if (startTime === '0700') {
-                endTime = '1500';
-            } else if (startTime === '1500') {
-                endTime = '2300';
-            } else if (startTime === '2300') {
-                endTime = '0700';
+            // Function to choose start shift based on the current time
+            function chooseStartShift(currentTime) {
+                if (currentTime >= "0700" && currentTime < "1500") {
+                    return "0700";
+                } else if (currentTime >= "1500" && currentTime < "2300") {
+                    return "1500";
+                } else {
+                    return "2300";
+                }
+            }
+
+            // Determine the start shift and corresponding end time
+            const startTime = chooseStartShift(currentTimeNumeric);
+
+            // Set the end time based on the chosen start shift
+            let endTime = "";
+            let cycleAmount = "";
+
+            if (startTime === "0700") {
+                endTime = "1500";
+            } else if (startTime === "1500") {
+                endTime = "2300";
+            } else if (startTime === "2300") {
+                endTime = "0700";
                 cycleAmount = 8;
             }
 
@@ -5623,7 +5617,6 @@ app
             }
 
             // check location
-
             var confirmLocation = [];
 
             const locationMappings = {
@@ -5754,11 +5747,12 @@ app
             // patrol report register
             const newPatrolReport = new PatrolReport({
                 reportId: confirmRid,
+                handled: checkUser.fullname,
                 type: 'Shift Member Location',
                 shift: shift,
                 startShift: startTime,
                 endShift: endTime,
-                date: date,
+                date: dateLocal.getDate(),
                 location: location,
                 status: 'Open',
                 staff: selectedNames,
@@ -5776,15 +5770,20 @@ app
                 shiftMember: selectedNames
             };
 
+            const receiveHandover = {
+                shift: handoverShift
+            }
+
             const newHandover = new DutyHandover({
                 reportId: confirmRid,
-                date: date,
+                date: dateLocal.getDate(),
                 startShift: startTime,
                 endShift: endTime,
                 status: status,
                 notes: notes,
                 location: location,
-                give: giveHandover
+                give: giveHandover,
+                receive: receiveHandover
             });
 
             const existing = await DutyHandover.findOne({
@@ -5989,26 +5988,18 @@ app
                 reportId: confirmRid,
                 //validation
                 validationShift: validationShift,
-                validationDate: validationDate,
                 validationLocation: validationLocation,
                 validationHeadShift: validationHeadShift,
                 validationNotes: validationNotes,
-                validationHandoverShift: validationHandoverShift,
                 validationStaffAbsent: validationStaffAbsent,
                 validationSelectedNames: validationSelectedNames,
-                validationStartTime: validationStartTime,
-                validationEndTime: validationEndTime,
                 //form name
                 shift: formData.shift,
-                date: formData.date,
                 location: formData.location,
                 headShift: formData.headShift,
                 notes: formData.notes,
-                handoverShift: formData.handoverShift,
                 staffAbsent: formData.staffAbsent,
                 selectedNames: selectedNames,
-                startTime: startTime,
-                endTime: endTime,
                 //toast alert
                 toastShow: 'show',
                 toastMsg:
@@ -6063,7 +6054,6 @@ app
                         validationHeadShift: '',
                         validationStaffOnDuty: '',
                         validationStaffAbsent: '',
-                        validationNotes: '',
                         validationSelectedNames: '',
                         //form name
                         headShift: '',
@@ -6110,7 +6100,6 @@ app
                         validationHeadShift: '',
                         validationStaffOnDuty: '',
                         validationStaffAbsent: '',
-                        validationNotes: '',
                         validationSelectedNames: '',
                         //form name
                         headShift: '',
@@ -6149,23 +6138,16 @@ app
         var currentTime = dateLocal.getCurrentTime();
         var currentDate = dateLocal.getDateYear();
 
-        const shift = req.body.shift;
-        const date = req.body.date;
-        const location = req.body.location;
         const headShift = req.body.headShift;
-        const handoverShift = req.body.handoverShift;
         const staffOnDuty = req.body.staffOnDuty;
         const staffAbsent = req.body.staffAbsent;
-        const notes = req.body.notes;
         const selectedNames = req.body.selectedNames
             ? req.body.selectedNames.split(',')
             : [];
 
         var validationHeadShift = '';
         var validationStaffOnDuty = '';
-        var validationStaffSickLeave = '';
         var validationStaffAbsent = '';
-        var validationNotes = '';
         var validationSelectedNames = '';
 
         // validation head shift
@@ -6189,13 +6171,6 @@ app
             validationStaffAbsent = 'is-valid';
         }
 
-        // validation notes
-        if (notes === '') {
-            validationNotes = 'is-invalid';
-        } else {
-            validationNotes = 'is-valid';
-        }
-
         // Validate the selectedNames
         if (selectedNames.length === 0) {
             validationSelectedNames = 'is-invalid';
@@ -6207,7 +6182,6 @@ app
             validationHeadShift === 'is-valid' &&
             validationStaffOnDuty === 'is-valid' &&
             validationStaffAbsent === 'is-valid' &&
-            validationNotes === 'is-valid' &&
             validationSelectedNames === 'is-valid'
         ) {
             console.log('Succesful!');
@@ -6217,17 +6191,24 @@ app
 
             const status = 'Completed';
 
+            const location = checkReport.location;
+            const date = checkReport.date;
+            const shift = checkReport.receive.shift;
+            const handoverShift = checkReport.give.shift;
+
+            const currentTimeNumeric = moment().format('HHmm');
+
             const receiveLog =
                 'Saya ' +
                 headShift +
                 ' selaku ketua syif ' +
-                _.lowerCase(shift) +
+                shift +
                 ' telah menerima tugas daripada ketua syif ' +
-                _.lowerCase(handoverShift) +
+                handoverShift +
                 ' dalam keadaan baik dan senarai peralatan tugas mencukupi di ' +
                 location +
-                ' pada tarikh ' +
-                date;
+                ' pada ' +
+                date + ' , ' + currentTimeNumeric;
 
             const updateReport = {
                 status: 'Closed'
@@ -6239,12 +6220,12 @@ app
                 staffAbsent: staffAbsent,
                 handoverShift: handoverShift,
                 logReport: receiveLog,
-                shiftMember: selectedNames
+                shiftMember: selectedNames,
+                time : currentTimeNumeric
             };
 
             const updatedData = {
                 status: status,
-                notes: notes,
                 location: location,
                 receive: receive
             };
@@ -6276,7 +6257,7 @@ app
                         ' & status is ' +
                         status +
                         ' and this shift member patrol report is now closed',
-                    about: notes
+                    about: receiveLog
                 };
 
                 const newActivity = new Activity({
@@ -6334,9 +6315,7 @@ app
                 // validation
                 validationHeadShift: validationHeadShift,
                 validationStaffOnDuty: validationStaffOnDuty,
-                validationStaffSickLeave: validationStaffSickLeave,
                 validationStaffAbsent: validationStaffAbsent,
-                validationNotes: validationNotes,
                 validationSelectedNames: validationSelectedNames,
                 //form name
                 headShift: headShift,
