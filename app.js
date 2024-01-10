@@ -5747,7 +5747,6 @@ app
             // patrol report register
             const newPatrolReport = new PatrolReport({
                 reportId: confirmRid,
-                handled: checkUser.fullname,
                 type: 'Shift Member Location',
                 shift: shift,
                 startShift: startTime,
@@ -5776,6 +5775,7 @@ app
 
             const newHandover = new DutyHandover({
                 reportId: confirmRid,
+                handled: checkUser.fullname,
                 date: dateLocal.getDate(),
                 startShift: startTime,
                 endShift: endTime,
@@ -6010,6 +6010,432 @@ app
         }
     });
 
+// EDIT
+app
+    .get('/duty-handover/edit', async function (req, res) {
+        if (req.isAuthenticated()) {
+            const currentUsername = req.session.user.username;
+
+            const checkUser = await User.findOne({ username: currentUsername });
+
+            const confirmRid = req.query.id;
+
+            if (checkUser) {
+                res.render('duty-handover-edit', {
+                    currentFullName: checkUser.fullname,
+                    currentUser: checkUser.username,
+                    currentProfile: checkUser.profile,
+                    reportId: confirmRid,
+                    //validation
+                    validationShift: '',
+                    validationLocation: '',
+                    validationHeadShift: '',
+                    validationStaffOnDuty: '',
+                    validationStaffSickLeave: '',
+                    validationStaffAbsent: '',
+                    validationSelectedNames: '',
+                    //form name
+                    shift: '',
+                    date: '',
+                    location: '',
+                    headShift: '',
+                    staffOnDuty: '',
+                    staffSickLeave: '',
+                    staffAbsent: '',
+                    handoverShift: '',
+                    selectedNames: '',
+                    //toast alert
+                    toastShow: '',
+                    toastMsg: '',
+                    //role
+                    role: checkUser.role
+                });
+            }
+        } else {
+            res.redirect('/sign-in');
+        }
+    })
+    .post('/duty-handover/edit', async function (req, res) {
+        var validationShift = '';
+        var validationLocation = '';
+        var validationHeadShift = '';
+        var validationStaffAbsent = '';
+        var validationSelectedNames = '';
+
+        // current date time
+        var currentTime = dateLocal.getCurrentTime();
+        var currentDate = dateLocal.getDateYear();
+
+        const formData = req.body;
+
+        const shift = req.body.shift;
+        const location = req.body.location;
+        const headShift = req.body.headShift;
+        const staffAbsent = req.body.staffAbsent;
+        const confirmRid = req.body.confirmRid;
+        const selectedNames = req.body.selectedNames
+            ? req.body.selectedNames.split(',')
+            : [];
+
+        const currentUsername = req.session.user.username;
+
+        const checkUser = await User.findOne({ username: currentUsername });
+
+        // Validate the reportType
+        if (!shift || shift === '' || shift === 'Choose a shift') {
+            validationShift = 'is-invalid';
+        } else {
+            validationShift = 'is-valid';
+        }
+
+        // Validate the location
+        if (!location || location === '' || location === 'Choose a location') {
+            validationLocation = 'is-invalid';
+        } else {
+            validationLocation = 'is-valid';
+        }
+
+        // Validate the headShift
+        if (!headShift || headShift === '') {
+            validationHeadShift = 'is-invalid';
+        } else {
+            validationHeadShift = 'is-valid';
+        }
+
+        // Validate the staffAbsent
+        if (!staffAbsent || staffAbsent === '') {
+            validationStaffAbsent = 'is-invalid';
+        } else {
+            validationStaffAbsent = 'is-valid';
+        }
+
+        // Validate the selectedNames
+        if (selectedNames.length === 0) {
+            validationSelectedNames = 'is-invalid';
+        } else {
+            validationSelectedNames = 'is-valid';
+        }
+
+        if (
+            validationShift === 'is-valid' &&
+            validationLocation === 'is-valid' &&
+            validationHeadShift === 'is-valid' &&
+            validationStaffAbsent === 'is-valid' &&
+            validationSelectedNames === 'is-valid'
+        ) {
+
+            const currentFullName = checkUser.fullname;
+            const currentUser = checkUser.username;
+
+            const status = 'Incompleted';
+            var handoverShift = "";
+
+            // determine which shift to be handover 
+            if (shift === "Shift A") {
+                handoverShift = "Shift B";
+            } else if (shift === "Shift B") {
+                handoverShift = "Shift C";
+            } else if (shift === "Shift C") {
+                handoverShift = "Shift A";
+            }
+
+            const giveLog =
+                'Saya ' +
+                headShift +
+                ' selaku ketua syif ' +
+                shift +
+                ' telah menyerahkan tugas kepada selaku ketua syif, ' +
+                handoverShift +
+                ' dalam keadaan baik dan senarai peralatan tugas mencukupi di ' +
+                location +
+                ' pada tarikh ' +
+                dateLocal.getDate();
+
+            // Assuming you have the current time in the format "HHMM"
+            const currentTimeNumeric = moment().format('HHmm');
+
+            // Function to choose start shift based on the current time
+            function chooseStartShift(currentTime) {
+                if (currentTime >= "0700" && currentTime < "1500") {
+                    return "0700";
+                } else if (currentTime >= "1500" && currentTime < "2300") {
+                    return "1500";
+                } else {
+                    return "2300";
+                }
+            }
+
+            // Determine the start shift and corresponding end time
+            const startTime = chooseStartShift(currentTimeNumeric);
+
+            // Set the end time based on the chosen start shift
+            let endTime = "";
+            let cycleAmount = "";
+
+            if (startTime === "0700") {
+                endTime = "1500";
+            } else if (startTime === "1500") {
+                endTime = "2300";
+            } else if (startTime === "2300") {
+                endTime = "0700";
+                cycleAmount = 8;
+            }
+
+            // Calculate cycleAmount based on the index
+            function calculateCycleAmount(index) {
+                return cycleAmount || 4; // Use cycleAmount if defined, otherwise default to 4
+            }
+
+            // check location
+            var confirmLocation = [];
+
+            const locationMappings = {
+                'Baitul Makmur I': [
+                    { checkpointName: 'Parameter 1', time: '', logReport: '' },
+                    { checkpointName: 'Parameter 2', time: '', logReport: '' },
+                    { checkpointName: 'Parameter 3', time: '', logReport: '' },
+                    { checkpointName: 'Parameter 4', time: '', logReport: '' },
+                    { checkpointName: 'Basement 1', time: '', logReport: '' },
+                    { checkpointName: 'Basement 2', time: '', logReport: '' },
+                    { checkpointName: 'Basement 3', time: '', logReport: '' },
+                    { checkpointName: 'Basement 4', time: '', logReport: '' },
+                    { checkpointName: 'Club House', time: '', logReport: '' },
+                    { checkpointName: 'Old Cafe', time: '', logReport: '' },
+                    { checkpointName: 'Level 4', time: '', logReport: '' },
+                    { checkpointName: 'Level 8', time: '', logReport: '' }
+                ],
+                'Baitul Makmur II': [
+                    { checkpointName: 'Basement 1 (a)', time: '', logReport: '' },
+                    { checkpointName: 'Basement 1 (b)', time: '', logReport: '' },
+                    { checkpointName: 'Basement 1 (c)', time: '', logReport: '' },
+                    { checkpointName: 'Basement 2 (a)', time: '', logReport: '' },
+                    { checkpointName: 'Basement 2 (b)', time: '', logReport: '' },
+                    { checkpointName: 'Basement 2 (c)', time: '', logReport: '' },
+                    { checkpointName: 'Ground Floor 1', time: '', logReport: '' },
+                    { checkpointName: 'Ground Floor 2', time: '', logReport: '' },
+                    { checkpointName: 'Level 8', time: '', logReport: '' },
+                    { checkpointName: 'Level 17', time: '', logReport: '' },
+                    { checkpointName: 'Level 5 (a)', time: '', logReport: '' },
+                    { checkpointName: 'Level 5 (b)', time: '', logReport: '' },
+                    {
+                        checkpointName: 'Genset Outside Building',
+                        time: '',
+                        logReport: ''
+                    },
+                    { checkpointName: 'Emergency Entrance', time: '', logReport: '' },
+                    { checkpointName: 'Outside Cafe 1', time: '', logReport: '' },
+                    { checkpointName: 'Outside Cafe 2', time: '', logReport: '' },
+                    { checkpointName: 'Service Lift Level 6', time: '', logReport: '' },
+                    { checkpointName: 'Service Lift Level 10', time: '', logReport: '' },
+                    { checkpointName: 'Service Lift Level 11', time: '', logReport: '' }
+                ],
+                'Jamek Mosque': [
+                    { checkpointName: 'Bilal Area', time: '', logReport: '' },
+                    { checkpointName: 'Mosque Tower', time: '', logReport: '' },
+                    { checkpointName: 'Cooling Tower', time: '', logReport: '' },
+                    { checkpointName: 'Mimbar Area', time: '', logReport: '' },
+                    { checkpointName: 'First Gate', time: '', logReport: '' }
+                ],
+                'City Mosque': [
+                    { checkpointName: 'Main Entrance', time: '', logReport: '' },
+                    { checkpointName: 'Gate 2', time: '', logReport: '' },
+                    {
+                        checkpointName: 'Backside Mosque (cemetery)',
+                        time: '',
+                        logReport: ''
+                    },
+                    { checkpointName: 'Muslimah Pray Area', time: '', logReport: '' }
+                ],
+                'Raudhatul Sakinah': [
+                    { checkpointName: 'Cemetery Area 1', time: '', logReport: '' },
+                    { checkpointName: 'Cemetery Area 2', time: '', logReport: '' },
+                    { checkpointName: 'Cemetery Area 3', time: '', logReport: '' },
+                    { checkpointName: 'Cemetery Area 4', time: '', logReport: '' },
+                    { checkpointName: 'Office Area 1', time: '', logReport: '' },
+                    { checkpointName: 'Office Area 2', time: '', logReport: '' },
+                    { checkpointName: 'Office Area 3', time: '', logReport: '' }
+                ]
+            };
+
+            if (locationMappings.hasOwnProperty(location)) {
+                confirmLocation = locationMappings[location];
+            }
+
+            // Insert fullName into each checkpoint with a blank value
+            confirmLocation.map(checkpoint => ({
+                ...checkpoint,
+                fullName: '' // Insert the fullName (may be blank)
+            }));
+
+            // Create an array of cycles with varying amounts based on the start time
+            const cycles = [];
+
+            const cycleAmounts = {
+                '0700': 4,
+                1500: 4,
+                2300: 8
+            };
+
+            const timeSlotOffsets = {
+                '0700': 0,
+                1500: 0, // No offset for '1500'
+                2300: 0 // No offset for '2200'
+            };
+
+            const timeSlotIncrements = {
+                '0700': 200, // 2 hours for '0700'
+                1500: 200, // 2 hours for '1500'
+                2300: 100 // 1 hour for '2200'
+            };
+
+            const timeSlotStartOffset = timeSlotOffsets[startTime];
+            const timeSlotIncrement = timeSlotIncrements[startTime];
+
+            for (let i = 0; i < cycleAmounts[startTime]; i++) {
+                const timeSlotStart =
+                    (parseInt(startTime, 10) +
+                        i * timeSlotIncrement +
+                        timeSlotStartOffset) %
+                    2400; // Ensure time is within 24-hour format
+                const timeSlotEnd = (timeSlotStart + timeSlotIncrement) % 2400;
+
+                const currentCycleAmount = calculateCycleAmount(i + 1);
+
+                cycles.push({
+                    cycleSeq: i + 1, // Insert the cycleSeq
+                    cycleAmount: currentCycleAmount,
+                    timeSlot: `${timeSlotStart.toString().padStart(4, '0')}-${timeSlotEnd
+                        .toString()
+                        .padStart(4, '0')}`,
+                    checkpoint: confirmLocation.map(checkpoint => ({
+                        ...checkpoint,
+                        fullName: '' // Insert the fullName (may be blank)
+                    }))
+                });
+            }
+
+            // patrol report updated
+            const editedReport = {
+                reportId: confirmRid,
+                type: 'Shift Member Location',
+                shift: shift,
+                location: location,
+                status: 'Open',
+                staff: selectedNames,
+                shiftMember: {
+                    cycle: cycles
+                }
+            };
+
+            const giveHandover = {
+                headShift: headShift,
+                handoverShift: handoverShift,
+                staffAbsent: staffAbsent,
+                logReport: giveLog,
+                shift: shift,
+                shiftMember: selectedNames
+            };
+
+            const receiveHandover = {
+                shift: handoverShift
+            }
+
+            // updated duty handover
+            const editedData ={
+                reportId: confirmRid,
+                handled: checkUser.fullname,
+                status: status,
+                location: location,
+                give: giveHandover,
+                receive: receiveHandover
+            };
+
+            const editedHandover = await DutyHandover.findOneAndUpdate(
+                { reportId: confirmRid },
+                { $set: editedData },
+                { new: true }
+            );
+
+            const editedPatrol = await PatrolReport.findOneAndUpdate(
+                { reportId: confirmRid },
+                { $set: editedReport },
+                { new: true }
+            );
+
+            if (editedHandover && editedPatrol) {
+                // Activity
+                const newItemActivity = {
+                    time: currentTime,
+                    by: currentFullName,
+                    username: currentUser,
+                    type: 'Duty Handover',
+                    title:
+                        'Edited a duty handover report of ' +
+                        _.lowerCase(shift) +
+                        ' & status is ' +
+                        status,
+                    about: giveLog
+                };
+
+                const newActivity = new Activity({
+                    date: currentDate,
+                    items: newItemActivity
+                });
+
+                const findDate = await Activity.findOne({ date: currentDate });
+
+                if (findDate) {
+                    findDate.items.push(newItemActivity);
+                    await findDate.save();
+                    console.log('Activity added to existing date');
+                } else {
+                    const resultActivity = Activity.create(newActivity);
+
+                    if (resultActivity) {
+                        console.log('Added new activity');
+                    } else {
+                        console.log('Something is wrong');
+                    }
+                }
+
+                console.log("Edited for duty handover and patrol report : " + confirmRid);
+
+                res.redirect('/duty-handover/details?id='+confirmRid);
+
+            } else {
+                console.log("Unsuccessful to edit duty handover and patrol report : " + confirmRid);
+
+                res.redirect('/duty-handover/edit?id='+confirmRid);
+            }
+        } else {
+            res.render('duty-handover-edit', {
+                currentFullName: checkUser.fullname,
+                currentUser: checkUser.username,
+                currentProfile: checkUser.profile,
+                reportId: confirmRid,
+                //validation
+                validationShift: validationShift,
+                validationLocation: validationLocation,
+                validationHeadShift: validationHeadShift,
+                validationStaffAbsent: validationStaffAbsent,
+                validationSelectedNames: validationSelectedNames,
+                //form name
+                shift: formData.shift,
+                location: formData.location,
+                headShift: formData.headShift,
+                staffAbsent: formData.staffAbsent,
+                selectedNames: selectedNames,
+                //toast alert
+                toastShow: 'show',
+                toastMsg:
+                    'There is an error at your input or staff on duty is empty, please do check it again',
+                //role
+                role: checkUser.role
+            });
+        }
+    });
+
+
 // DETAILS
 app
     .get('/duty-handover/details', async function (req, res) {
@@ -6068,7 +6494,8 @@ app
                         toastShow: '',
                         toastMsg: '',
                         //role
-                        role: checkUser.role
+                        role: checkUser.role,
+                        user: checkUser
                     });
                 } else if (checkReport.status === 'Incompleted') {
                     res.render('duty-handover-details', {
@@ -6114,7 +6541,8 @@ app
                         toastShow: '',
                         toastMsg: '',
                         //role
-                        role: checkUser.role
+                        role: checkUser.role,
+                        user: checkUser
                     });
                 }
             }
@@ -6221,7 +6649,7 @@ app
                 handoverShift: handoverShift,
                 logReport: receiveLog,
                 shiftMember: selectedNames,
-                time : currentTimeNumeric
+                time: currentTimeNumeric
             };
 
             const updatedData = {
@@ -6331,7 +6759,8 @@ app
                 toastMsg:
                     'There is an error, please do check your input form at received section',
                 //role
-                role: checkUser.role
+                role: checkUser.role,
+                user: checkUser
             });
         }
     });
@@ -6463,6 +6892,27 @@ app.get('/download/:fileName', async function (req, res) {
         // Send the file as a response
         res.download(filePath, file.filename);
         console.log('Downloading file...');
+    }
+});
+
+// DELETE
+app.get('/delete/:reportType/:reportId', async function (req, res) {
+    const reportType = req.params.reportType;
+    const reportId = req.params.reportId;
+
+    if (reportType === 'duty-handover') {
+        const deleteDutyHandover = await DutyHandover.deleteOne({ reportId: reportId });
+        const deletePatrolReport = await PatrolReport.deleteOne({ reportId: reportId });
+
+        if (deleteDutyHandover && deletePatrolReport) {
+            console.log("Delete successful on report ID: " + reportId);
+
+            res.redirect('/duty-handover/view');
+        } else {
+            console.log("Delete unsuccessful on report ID: " + reportId);
+
+            res.redirect('/duty-handover/view');
+        }
     }
 });
 

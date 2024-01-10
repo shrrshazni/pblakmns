@@ -3,11 +3,18 @@
 <%
 
 var submitDutyHandover = "";
+var editDutyHandover = "";
 
 if(role === 'Admin' ){
     submitDutyHandover = "d-none";
 }else {
     submitDutyHandover = "";
+}
+
+if(role === 'Head Shift' && dutyHandover.handled === user.fullname ){
+    editDutyHandover = "d-block";
+}else{
+    editDutyHandover = "d-none";
 }
 
 %>
@@ -35,6 +42,8 @@ if(role === 'Admin' ){
         </button>
         <div class="dropdown-menu dropdown-menu-end py-2">
           <a class="dropdown-item" href="#!" id="printLink">Print</a>
+          <div class="dropdown-divider <%= editDutyHandover %>"></div>
+          <a class="dropdown-item <%= editDutyHandover %>" href="/duty-handover/edit?id=<%= dutyHandover.reportId %>">Edit</a>
         </div>
       </div>
     </div>
