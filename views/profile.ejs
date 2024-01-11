@@ -107,8 +107,7 @@
                       <span class="fa-solid fa-rocket text-success fs--1"></span>
                       <% } %>
                     </div>
-                    <% if ( lastItemIndex >= 0 &&
-                    activity.items[lastItemIndex].username === currentUser ) {
+                    <% if ( lastItemIndex >= 0 ) {
                     %> <% if (itemIndex === activity.items[lastItemIndex].username.length) { %>
                     <span class=""></span>
                     <% } else { %>
@@ -120,7 +119,7 @@
                   <div class="d-flex justify-content-between">
                     <div class="d-flex mb-2">
                       <h6 class="lh-sm mb-0 me-2 text-800 timeline-item-title">
-                        <%= itemArray.title %>
+                        <%= itemArray.title %> 
                       </h6>
                     </div>
                     <p class="text-500 fs--1 mb-0 text-nowrap timeline-time">

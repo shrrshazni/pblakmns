@@ -862,9 +862,6 @@ app.get('/api/dutyHandovers', async (req, res) => {
         // Inside the route handler
         const currentDate = moment().format('DD/MM/YY');
 
-        // Calculate one week ago
-        const oneWeekAgo = moment().subtract(7, 'days').format('DD/MM/YY');
-
         // Use these formatted dates in your MongoDB query
         const dutyHandovers = await DutyHandover.find({
             date: currentDate
@@ -1764,10 +1761,6 @@ app.get(
 
                         const inputString = checkUser.fullname;
 
-                        const lowerCase = _.toLower(inputString);
-
-                        const resultString = _.startCase(lowerCase);
-
                         // Update the time in the found checkpoint with the current time
                         checkpointToUpdate.time = currentTime1 + 'HRS';
                         checkpointToUpdate.logReport =
@@ -1778,6 +1771,7 @@ app.get(
                             currentTime1 +
                             'HRS';
                         checkpointToUpdate.username = checkUser.username;
+                        checkpointToUpdate.fullName = inputString;
 
                         // date for upload
                         var uploadDate = dateLocal.getDateYear();
@@ -1900,6 +1894,85 @@ app.get('/shift-member/echarts-data/:reportId', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
+    }
+});
+
+app.get('/chart/:reportId', async (req, res) => {
+    try {
+        const reportId = req.params.reportId;
+
+        // Fetch data from the database using findOne
+        const patrolReport = await PatrolReport.findOne({ reportId: reportId });
+
+        // Check if a patrol report was found
+        if (patrolReport) {
+            // Extract staff names from the first patrol report
+            const staffNames = patrolReport.staff || [];
+
+            // Initialize an array to store staff presence counts for each cycle
+            const staffPresenceCountsPerCycle = [];
+
+            // Loop through each cycle in shiftMember
+            for (const cycle of patrolReport.shiftMember?.cycle || []) {
+                // Initialize staff presence count map for the current cycle
+                const staffPresenceCount = new Map(staffNames.map(name => [name, 0]));
+
+                // Loop through each checkpoint in the current cycle
+                for (const checkpoint of cycle.checkpoint || []) {
+                    if (staffNames.includes(checkpoint.fullName)) {
+                        staffPresenceCount.set(checkpoint.fullName, staffPresenceCount.get(checkpoint.fullName) + 1);
+                    }
+                }
+
+                // Get the presence count for each staff name for the current cycle
+                const staffPresenceCounts = staffNames.map(name => staffPresenceCount.get(name) || 0);
+
+                // Add the staff presence counts for the current cycle to the array
+                staffPresenceCountsPerCycle.push(staffPresenceCounts);
+            }
+
+            console.log(staffPresenceCountsPerCycle);
+
+            // Send data as JSON
+            res.json({
+                staffNames,
+                staffPresenceCountsPerCycle,
+                totalCycles: staffPresenceCountsPerCycle.length,
+            });
+        } else {
+            // Handle the case where the patrol report with the given reportId is not found
+            res.status(404).json({ error: 'Patrol report not found' });
+        }
+    } catch (error) {
+        console.error('Error fetching data from the database:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.get('/api/patrolData/:reportId', async (req, res) => {
+    try {
+        const patrolReports = await PatrolReport.findOne({ reportId: req.params.reportId });
+
+        const cycles = patrolReports.shiftMember.cycle;
+
+        const responseData = {
+            cycles: cycles.map(cycle => ({
+                checkpointData: cycle.checkpoint.map(checkpoint => ({
+                    name: checkpoint.checkpointName,
+                    value: [checkpoint.time, cycle.cycleSeq],
+                    label: {
+                        show: true,
+                        position: 'top',
+                        formatter: checkpoint.checkpointName,
+                    },
+                })),
+            })),
+        };
+
+        res.json(responseData);
+    } catch (error) {
+        console.error('Error fetching patrol data:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
@@ -2115,7 +2188,9 @@ app.get('/patrol-unit/details', async function (req, res) {
 
             // Check for amount of time for checkpoint being submit or not
             let nonEmptyTimeCount = 0;
-            let totalPatrolUnits = checkReport.patrolUnit.length;
+            const totalPatrolUnits = checkReport.patrolUnit.length;
+
+            console.log(checkReport.patrolUnit.length);
 
             // Check each patrol unit for non-empty time
             checkReport.patrolUnit.forEach(patrolUnit => {
@@ -2124,7 +2199,7 @@ app.get('/patrol-unit/details', async function (req, res) {
                 }
             });
 
-            let percentageNonEmptyTime = (nonEmptyTimeCount / totalPatrolUnits) * 100;
+            const percentageNonEmptyTime = (nonEmptyTimeCount / totalPatrolUnits) * 100;
 
             // check result and render
             if (checkReport) {
@@ -2184,7 +2259,9 @@ app.get(
     '/patrol-unit/checkpoint-submit/:checkpointName/:longitude/:latitude',
     async function (req, res) {
         const dateToday = dateLocal.getDate();
-        const time = dateLocal.getCurrentTime();
+        const time = moment().format('HHmm') + "HRS";
+
+        console.log(dateToday);
 
         const checkpointName = _.startCase(
             req.params.checkpointName.replace(/-/g, ' ')
@@ -2192,15 +2269,19 @@ app.get(
         const currentLongitude = req.params.longitude;
         const currentLatitude = req.params.latitude;
 
+        const logReport = "Have patrol this area at " + time;
+
         const updatedCheckpointData = {
             time: time, // Replace with the new time
             longitude: currentLongitude, // Replace with the new longitude
-            latitude: currentLatitude // Replace with the new latitude
+            latitude: currentLatitude, // Replace with the new latitude
+            logReport: logReport
         };
 
         // Find the patrol report by ID and update the specific checkpoint in the patrolUnit array
         const checkPatrolUnit = await PatrolReport.findOneAndUpdate(
             {
+                type: "Patrol Unit",
                 date: dateToday,
                 'patrolUnit.checkpointName': checkpointName
             },
@@ -2208,13 +2289,14 @@ app.get(
                 $set: {
                     'patrolUnit.$.time': updatedCheckpointData.time,
                     'patrolUnit.$.longitude': updatedCheckpointData.longitude,
-                    'patrolUnit.$.latitude': updatedCheckpointData.latitude
+                    'patrolUnit.$.latitude': updatedCheckpointData.latitude,
+                    'patrolUnit.$.logReport': updatedCheckpointData.logReport
                 }
             },
             { new: true, useFindAndModify: false }
         );
 
-        if (checkPatrolUnit === 'Closed' && checkPatrolUnit) {
+        if (checkPatrolUnit.status === 'Open' && checkPatrolUnit) {
             // date for upload
             var uploadDate = dateLocal.getDateYear();
             var uploadTime = getKualaLumpurTime();
@@ -2256,10 +2338,10 @@ app.get(
                 ' at ' +
                 checkpointName
             );
-            res.redirect('/patrol-unit/details?id' + checkPatrolUnit.reportId);
+            res.redirect('/patrol-unit/details?id=' + checkPatrolUnit.reportId);
         } else {
             console.log('Unsuccessful update the qr data due to closed status!');
-            res.redirect('/patrol-unit/details?id' + checkPatrolUnit.reportId);
+            res.redirect('/patrol-unit/details?id=' + checkPatrolUnit.reportId);
         }
     }
 );
@@ -5491,7 +5573,6 @@ app
         const formData = req.body;
 
         const shift = req.body.shift;
-        const location = req.body.location;
         const headShift = req.body.headShift;
         const notes = req.body.notes;
         const staffAbsent = req.body.staffAbsent;
@@ -5509,13 +5590,6 @@ app
             validationShift = 'is-invalid';
         } else {
             validationShift = 'is-valid';
-        }
-
-        // Validate the location
-        if (!location || location === '' || location === 'Choose a location') {
-            validationLocation = 'is-invalid';
-        } else {
-            validationLocation = 'is-valid';
         }
 
         // Validate the headShift
@@ -5548,7 +5622,6 @@ app
 
         if (
             validationShift === 'is-valid' &&
-            validationLocation === 'is-valid' &&
             validationHeadShift === 'is-valid' &&
             validationNotes === 'is-valid' &&
             validationStaffAbsent === 'is-valid' &&
@@ -5556,6 +5629,20 @@ app
         ) {
             const currentFullName = checkUser.fullname;
             const currentUser = checkUser.username;
+
+            // set location based on the head shift location
+            var location = "";
+            if (currentFullName === "Head Shift BMI") {
+                location = "Baitul Makmur I"
+            } else if (currentFullName === "Head Shift BMII") {
+                location = "Baitul Makmur II"
+            } else if (currentFullName === "Head Shift JM") {
+                location = "Jamek Mosque"
+            } else if (currentFullName === "Head Shift CM") {
+                location = "City Mosque"
+            } else if (currentFullName === "Head Shift RS") {
+                location = "Raudhatul Sakinah"
+            }
 
             const status = 'Incompleted';
             var handoverShift = "";
@@ -6341,7 +6428,7 @@ app
             }
 
             // updated duty handover
-            const editedData ={
+            const editedData = {
                 reportId: confirmRid,
                 handled: checkUser.fullname,
                 status: status,
@@ -6400,12 +6487,12 @@ app
 
                 console.log("Edited for duty handover and patrol report : " + confirmRid);
 
-                res.redirect('/duty-handover/details?id='+confirmRid);
+                res.redirect('/duty-handover/details?id=' + confirmRid);
 
             } else {
                 console.log("Unsuccessful to edit duty handover and patrol report : " + confirmRid);
 
-                res.redirect('/duty-handover/edit?id='+confirmRid);
+                res.redirect('/duty-handover/edit?id=' + confirmRid);
             }
         } else {
             res.render('duty-handover-edit', {

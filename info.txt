@@ -30,7 +30,7 @@ username:00015
 
 BMI
 
-http://localhost:5001/shift-member/fullname-submit/baitul-makmur-i/parameter-1
+http://localhost:5001/shift-member/fullname-submit/baitul-makmur-i/basement-1
 
 https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-i/parameter-1
 https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-i/parameter-2
@@ -100,4 +100,6 @@ https://guarded-shore-55159-b88e13b0676b.herokuapp.com/patrol-unit/checkpoint-su
 https://guarded-shore-55159-b88e13b0676b.herokuapp.com/patrol-unit/checkpoint-submit/sicc/110.3333/1.7333
 
 // now also have to wait on the 3d video
+
+http://localhost:5001/patrol-unit/checkpoint-submit/ceo-residence/110.3333/1.7333
 
