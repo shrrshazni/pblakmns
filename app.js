@@ -1766,7 +1766,7 @@ app.get(
                         checkpointToUpdate.logReport =
                             checkpointName +
                             ' have been patrol by ' +
-                            resultString +
+                            inputString +
                             ' at ' +
                             currentTime1 +
                             'HRS';
