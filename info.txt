@@ -30,7 +30,7 @@ username:00015
 
 BMI
 
-http://localhost:5001/shift-member/fullname-submit/baitul-makmur-i/basement-1
+http://localhost:5001/shift-member/fullname-submit/baitul-makmur-i/basement-2
 
 https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-i/parameter-1
 https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-i/parameter-2

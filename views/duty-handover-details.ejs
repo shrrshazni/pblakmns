@@ -54,7 +54,7 @@ if(role === 'Head Shift' && dutyHandover.handled === user.fullname ){
   </div>
 
   <div class="row">
-    <div class="col-12 col-xxl-9 px-0 bg-soft">
+    <div class="col-12 col-xxl-9 px-0 bg-soft order-1 order-xxl-0">
       <div class="px-2 px-lg-2 pt-6 pb-9">
 
         <!-- body section -->
@@ -66,7 +66,7 @@ if(role === 'Head Shift' && dutyHandover.handled === user.fullname ){
                   <li class="nav-item">
                     <a class="nav-link <%= showTabPane1 %> fw-semi-bold" href="#bootstrap-wizard-tab1" data-bs-toggle="tab" data-wizard-step="1">
                       <div class="text-center d-inline-block">
-                        <span class="nav-item-circle-parent"><span class="nav-item-circle"><span class="fas fa-thumbs-up"></span></span></span>
+                        <span class="nav-item-circle-parent mt-3 me-1"><span class="nav-item-circle"><span class="fas fa-thumbs-up"></span></span></span>
                         <span class="d-none d-md-block mt-1 fs--1">Handover</span>
                         <span class="fs--1">(<%= giveShift %>)</span>
                       </div>
@@ -75,8 +75,8 @@ if(role === 'Head Shift' && dutyHandover.handled === user.fullname ){
                   <li class="nav-item">
                     <a class="nav-link <%= showTabPane2 %> fw-semi-bold" href="#bootstrap-wizard-tab2" data-bs-toggle="tab" data-wizard-step="2">
                       <div class="text-center d-inline-block">
-                        <span class="nav-item-circle-parent"><span class="nav-item-circle"><span class="fas fa-handshake-simple"></span></span></span>
-                        <span class="d-none d-md-block mt-1 fs--1">Received</span>
+                        <span class="nav-item-circle-parent mt-3 me-1"><span class="nav-item-circle"><span class="fas fa-handshake-simple"></span></span></span>
+                        <span class="d-none d-md-block mt-3 fs--1">Received</span>
                         <span class="fs--1">(<%= receiveShift %>)</span>
                       </div>
                     </a>
@@ -84,7 +84,7 @@ if(role === 'Head Shift' && dutyHandover.handled === user.fullname ){
                   <li class="nav-item">
                     <a class="nav-link <%= showTabPane3 %> fw-semi-bold" href="#bootstrap-wizard-tab3" data-bs-toggle="tab" data-wizard-step="3">
                       <div class="text-center d-inline-block">
-                        <span class="nav-item-circle-parent"><span class="nav-item-circle"><span class="fas fa-check"></span></span></span><span class="d-none d-md-block mt-1 fs--1">Done</span>
+                        <span class="nav-item-circle-parent mt-3"><span class="nav-item-circle"><span class="fas fa-check"></span></span></span><span class="d-none d-md-block mt-1 fs--1">Done</span>
                       </div>
                     </a>
                   </li>
@@ -338,7 +338,7 @@ if(role === 'Head Shift' && dutyHandover.handled === user.fullname ){
     </div>
 
     <!-- page nav -->
-    <div class="col-12 col-xl-3 d-print-none">
+    <div class="col-12 col-xl-3 d-print-none order-0 order-xxl-1">
       <div class="position-sticky mt-xxl-8" style="top: 80px">
         <h5 class="lh-1">On this page</h5>
         <hr class="text-300" />
