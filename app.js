@@ -1637,40 +1637,15 @@ app.get(
       10
     );
 
-    const checkShiftTime = await PatrolReport.find({
-      location: location
+    const checkShiftTime = await PatrolReport.findOne({
+      location: location,
+      startShift: '2300',
+      $or: [{ date: today }, { date: yesterday }]
     });
 
-    let isStartShift2300 = '';
+    console.log(checkShiftTime);
 
-    // Iterate through each document in the array
-    for (const report of checkShiftTime) {
-      if (report.startShift === '2300') {
-        isStartShift2300 = 'true';
-        break; // If one document is found, no need to check further
-      } else {
-        isStartShift2300 = 'false';
-        break;
-      }
-    }
-
-    console.log(isStartShift2300);
-
-    if (isStartShift2300 === 'true') {
-      const filteredReports1 = await PatrolReport.findOne({
-        location: location,
-        startShift: '2300',
-        $or: [{ date: today }, { date: yesterday }]
-      });
-
-      console.log(filteredReports1);
-
-      res.render('shift-member-submit', {
-        patrolReport: filteredReports1,
-        location: location,
-        checkpointName: checkpointName
-      });
-    } else {
+    if (!checkShiftTime) {
       const filteredReports2 = await PatrolReport.findOne({
         location: location,
         date: today,
@@ -1682,6 +1657,12 @@ app.get(
 
       res.render('shift-member-submit', {
         patrolReport: filteredReports2,
+        location: location,
+        checkpointName: checkpointName
+      });
+    } else {
+      res.render('shift-member-submit', {
+        patrolReport: checkShiftTime,
         location: location,
         checkpointName: checkpointName
       });
@@ -5734,6 +5715,8 @@ app
           return '0700';
         } else if (currentTime >= '1500' && currentTime < '2300') {
           return '1500';
+        } else if (currentTime >= '2300' && currentTime < '0000') {
+          return '2300';
         } else {
           return '2300';
         }
@@ -6787,7 +6770,8 @@ app
         ' pada ' +
         date +
         ' , ' +
-        currentTimeNumeric + 'HRS';
+        currentTimeNumeric +
+        'HRS';
 
       const updateReport = {
         status: 'Closed'
