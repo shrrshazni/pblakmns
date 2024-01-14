@@ -59,7 +59,7 @@ https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-sub
 https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/service-lift-level-11
 https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/outside-cafe-1
 https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/outside-cafe-2
-https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/emergency entrance
+https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/emergency-entrance
 https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/genset-outside-building
 https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/level-8
 https://guarded-shore-55159-b88e13b0676b.herokuapp.com/shift-member/fullname-submit/baitul-makmur-ii/level-17
