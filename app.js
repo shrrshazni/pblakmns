@@ -1632,17 +1632,20 @@ app.get(
         // Get the current time in the Asia/Kuala_Lumpur timezone
         const currentTimeNumeric = now1.format('HHmm');
 
-        const checkShiftTime = await PatrolReport.findOne({
-            location: location,
-            startShift: '2300',
-            $or: [{ date: today }, { date: yesterday }]
-        });
+        // Check if the current time is between 2300 and 0700
+        const isNightShift = currentTimeNumeric >= 2300 || currentTimeNumeric < 700;
 
-        console.log(checkShiftTime);
+        if (isNightShift) {
+            const filteredReports1 = await PatrolReport.findOne({
+                location: location,
+                startShift: '2300',
+                $or: [{ date: today }, { date: yesterday }]
+            });
 
-        if (checkShiftTime) {
+            console.log(filteredReports1);
+
             res.render('shift-member-submit', {
-                patrolReport: checkShiftTime,
+                patrolReport: filteredReports1,
                 location: location,
                 checkpointName: checkpointName
             });
@@ -2293,7 +2296,7 @@ app.get(
         const now1 = moment().utcOffset(kualaLumpurTimeZoneOffset1 * 60); // Convert hours to minutes
 
         // Get the current time in the Asia/Kuala_Lumpur timezone
-        const time = now1.format('HHmm')+ 'HRS';
+        const time = now1.format('HHmm') + 'HRS';
 
         console.log(dateToday);
 
