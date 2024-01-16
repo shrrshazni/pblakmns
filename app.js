@@ -1713,9 +1713,12 @@ app.get(
           });
           const currentTime = parseInt(currentTimeNumeric.replace(':', ''), 10);
 
+          var startNumeric = '';
+          var endNumeric = '';
+
           // Convert start and end times to numeric format
-          const startNumeric = parseInt(startTime.replace(':', ''), 10);
-          const endNumeric = parseInt(endTime.replace(':', ''), 10);
+          startNumeric = parseInt(startTime.replace(':', ''), 10);
+          endNumeric = parseInt(endTime.replace(':', ''), 10);
 
           if (endNumeric === 0) {
             endNumeric = 2400;
