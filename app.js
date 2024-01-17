@@ -1468,6 +1468,7 @@ app.get('/shift-member/details', async function (req, res) {
         const reportId = req.query.id;
 
         if (checkUser) {
+
             const checkReport = await PatrolReport.findOne({
                 reportId: reportId
             });
@@ -2505,10 +2506,10 @@ app.post('/upload-case', async (req, res) => {
                     newFile.save();
                 });
             }
-            res.redirect('/shift-member/details?id=' + confirmRid);
+            res.redirect('/case-report/details?id=' + confirmRid);
         } else {
             // File with the report ID already exists
-            res.redirect('/shift-member/details?id=' + confirmRid);
+            res.redirect('/case-report/details?id=' + confirmRid);
         }
     }
 });
@@ -3495,7 +3496,9 @@ app.get('/case-report/details', async function (req, res) {
                         notes: checkReport.notes,
                         reportId: checkReport.reportId,
                         // files
-                        files: checkFiles
+                        files: checkFiles,
+                        //role
+                        role: checkUser.role
                     });
                 } else {
                     res.render('case-report-details', {
