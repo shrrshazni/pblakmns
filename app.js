@@ -2516,10 +2516,10 @@ app.post('/upload-case', async (req, res) => {
           newFile.save();
         });
       }
-      res.redirect('/shift-member/details?id=' + confirmRid);
+      res.redirect('/case-report/details?id=' + confirmRid);
     } else {
       // File with the report ID already exists
-      res.redirect('/shift-member/details?id=' + confirmRid);
+      res.redirect('/case-report/details?id=' + confirmRid);
     }
   }
 });
