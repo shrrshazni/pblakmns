@@ -2386,10 +2386,10 @@ app.get(
           ' at ' +
           checkpointName
       );
-      res.redirect('/patrol-unit/details?id=' + checkPatrolUnit.reportId);
+      res.render('submit-success');
     } else {
       console.log('Unsuccessful update the qr data due to closed status!');
-      res.redirect('/patrol-unit/details?id=' + checkPatrolUnit.reportId);
+      res.render('submit-failed');
     }
   }
 );

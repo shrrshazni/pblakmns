@@ -1,0 +1,255 @@
+[
+  {
+    "_id": {
+      "$oid": "65a8cdbe4c5e79b422a7afd7"
+    },
+    "reportId": "E2DDE33E1BBC",
+    "shift": "Shift B",
+    "type": "Shift Member Location",
+    "date": "18/01/24",
+    "location": "Jamek Mosque",
+    "status": "Open",
+    "startShift": "1500",
+    "endShift": "2300",
+    "staff": [
+      "ABDUL RAHIM BIN MOHAMAD TUAH",
+      "ISMAIL BIN LEMAN",
+      "SYED FAIZUL NIZAM BIN WAN ANNUAR"
+    ],
+    "shiftMember": {
+      "cycle": [
+        {
+          "cycleSeq": 1,
+          "timeSlot": "1500-1700",
+          "checkpoint": [
+            {
+              "checkpointName": "Bilal Area",
+              "time": "1507HRS",
+              "logReport": "Bilal Area have been patrol by SYED FAIZUL NIZAM BIN WAN ANNUAR at 1507HRS",
+              "fullName": "SYED FAIZUL NIZAM BIN WAN ANNUAR",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7afd9"
+              },
+              "username": "66700"
+            },
+            {
+              "checkpointName": "Mosque Tower",
+              "time": "1507HRS",
+              "logReport": "Mosque Tower have been patrol by ISMAIL BIN LEMAN at 1507HRS",
+              "fullName": "ISMAIL BIN LEMAN",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7afda"
+              },
+              "username": "66672"
+            },
+            {
+              "checkpointName": "Cooling Tower",
+              "time": "",
+              "logReport": "",
+              "fullName": "",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7afdb"
+              }
+            },
+            {
+              "checkpointName": "Mimbar Area",
+              "time": "1507HRS",
+              "logReport": "Mimbar Area have been patrol by SYED FAIZUL NIZAM BIN WAN ANNUAR at 1507HRS",
+              "fullName": "SYED FAIZUL NIZAM BIN WAN ANNUAR",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7afdc"
+              },
+              "username": "66672"
+            },
+            {
+              "checkpointName": "First Gate",
+              "time": "1508HRS",
+              "logReport": "First Gate have been patrol by SYED FAIZUL NIZAM BIN WAN ANNUAR at 1508HRS",
+              "fullName": "SYED FAIZUL NIZAM BIN WAN ANNUAR",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7afdd"
+              },
+              "username": "66700"
+            }
+          ],
+          "_id": {
+            "$oid": "65a8cdbe4c5e79b422a7afd8"
+          }
+        },
+        {
+          "cycleSeq": 2,
+          "timeSlot": "1700-1900",
+          "checkpoint": [
+            {
+              "checkpointName": "Bilal Area",
+              "time": "1707HRS",
+              "logReport": "Bilal Area have been patrol by SYED FAIZUL NIZAM BIN WAN ANNUAR at 1707HRS",
+              "fullName": "SYED FAIZUL NIZAM BIN WAN ANNUAR",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7af12"
+              },
+              "username": "66700"
+            },
+            {
+              "checkpointName": "Mosque Tower",
+              "time": "1707HRS",
+              "logReport": "Mosque Tower have been patrol by ISMAIL BIN LEMAN at 1707HRS",
+              "fullName": "ISMAIL BIN LEMAN",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7af12"
+              },
+              "username": "66672"
+            },
+            {
+              "checkpointName": "Cooling Tower",
+              "time": "1707HRS",
+              "logReport": "Cooling Tower have been patrol by ISMAIL BIN LEMAN at 1707HRS",
+              "fullName": "ABDUL RAHIM BIN MOHAMAD TUAH",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7af12"
+              }
+            },
+            {
+              "checkpointName": "Mimbar Area",
+              "time": "1707HRS",
+              "logReport": "Mimbar Area have been patrol by SYED FAIZUL NIZAM BIN WAN ANNUAR at 1707HRS",
+              "fullName": "SYED FAIZUL NIZAM BIN WAN ANNUAR",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7af12"
+              },
+              "username": "66672"
+            },
+            {
+              "checkpointName": "First Gate",
+              "time": "1708HRS",
+              "logReport": "First Gate have been patrol by SYED FAIZUL NIZAM BIN WAN ANNUAR at 1708HRS",
+              "fullName": "SYED FAIZUL NIZAM BIN WAN ANNUAR",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7af12"
+              },
+              "username": "66700"
+            }
+          ],
+          "_id": {
+            "$oid": "65a8cdbe4c5e79b422a7af12"
+          }
+        },
+        {
+          "cycleSeq": 3,
+          "timeSlot": "1900-2100",
+          "checkpoint": [
+            {
+              "checkpointName": "Bilal Area",
+              "time": "",
+              "logReport": "",
+              "fullName": "",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7afe5"
+              }
+            },
+            {
+              "checkpointName": "Mosque Tower",
+              "time": "",
+              "logReport": "",
+              "fullName": "",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7afe6"
+              }
+            },
+            {
+              "checkpointName": "Cooling Tower",
+              "time": "",
+              "logReport": "",
+              "fullName": "",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7afe7"
+              }
+            },
+            {
+              "checkpointName": "Mimbar Area",
+              "time": "",
+              "logReport": "",
+              "fullName": "",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7afe8"
+              }
+            },
+            {
+              "checkpointName": "First Gate",
+              "time": "",
+              "logReport": "",
+              "fullName": "",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7afe9"
+              }
+            }
+          ],
+          "_id": {
+            "$oid": "65a8cdbe4c5e79b422a7afe4"
+          }
+        },
+        {
+          "cycleSeq": 4,
+          "timeSlot": "2100-2300",
+          "checkpoint": [
+            {
+              "checkpointName": "Bilal Area",
+              "time": "2207HRS",
+              "logReport": "Bilal Area have been patrol by ABDUL RAHIM BIN MOHAMAD TUAH at 2207HRS",
+              "fullName": "ABDUL RAHIM BIN MOHAMAD TUAH",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7af14"
+              },
+              "username": "66700"
+            },
+            {
+              "checkpointName": "Mosque Tower",
+              "time": "2207HRS",
+              "logReport": "Mosque Tower have been patrol by ISMAIL BIN LEMAN at 2207HRS",
+              "fullName": "ISMAIL BIN LEMAN",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7af14"
+              },
+              "username": "66672"
+            },
+            {
+              "checkpointName": "Cooling Tower",
+              "time": "2207HRS",
+              "logReport": "Cooling Tower have been patrol by ISMAIL BIN LEMAN at 2207HRS",
+              "fullName": "ABDUL RAHIM BIN MOHAMAD TUAH",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7af14"
+              }
+            },
+            {
+              "checkpointName": "Mimbar Area",
+              "time": "2207HRS",
+              "logReport": "Mimbar Area have been patrol by ABDUL RAHIM BIN MOHAMAD TUAH at 2207HRS",
+              "fullName": "ABDUL RAHIM BIN MOHAMAD TUAH",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7af14"
+              },
+              "username": "66672"
+            },
+            {
+              "checkpointName": "First Gate",
+              "time": "2208HRS",
+              "logReport": "First Gate have been patrol by SYED FAIZUL NIZAM BIN WAN ANNUAR at 2208HRS",
+              "fullName": "SYED FAIZUL NIZAM BIN WAN ANNUAR",
+              "_id": {
+                "$oid": "65a8cdbe4c5e79b422a7af14"
+              },
+              "username": "66700"
+            }
+          ],
+          "_id": {
+            "$oid": "65a8cdbe4c5e79b422a7af14"
+          }
+        }
+      ]
+    },
+    "patrolUnit": [],
+    "__v": 0,
+    "notes": "Near cooling water are has closed due to construction site."
+  }
+]
