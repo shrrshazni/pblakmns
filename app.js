@@ -22,7 +22,7 @@ const cool = require('cool-ascii-faces');
 // const judoscale = require('judoscale-express').default;
 
 const mongoURI =
-  'mongodb+srv://shrrshazni:protechlakmns123@cluster0.rembern.mongodb.net/sessions';
+  'mongodb+srv://@cluster0.rembern.mongodb.net/sessions';
 
 const app = express();
 
@@ -61,7 +61,7 @@ main().catch(err => console.log(err));
 
 async function main() {
   await mongoose.connect(
-    'mongodb+srv://shrrshazni:protechlakmns123@cluster0.rembern.mongodb.net/auxiliaryPolice'
+    'mongodb+srv://*'
   );
 }
 
@@ -104,8 +104,8 @@ passport.deserializeUser(function (id, done) {
 let transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'shrrshazni@gmail.com',
-    pass: 'hzjlhfyspfyynndw'
+    user: '*',
+    pass: '*'
   }
 });
 
